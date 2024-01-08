@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'User'
+    #custom app
+    'User','Admin','products','customers','orders'
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'zacom.wsgi.application'
+
+AUTH_USER_MODEL = 'customers.Account'
 
 
 # Database
