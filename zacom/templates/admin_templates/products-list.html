@@ -1,0 +1,147 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Products List</h2>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-light rounded font-md">Export</a>
+                    <a href="#" class="btn btn-light rounded  font-md">Import</a>
+                    <a href="#" class="btn btn-primary btn-sm rounded">Create new</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col col-check flex-grow-0">
+                            <div class="form-check ms-2">
+                                <input class="form-check-input" type="checkbox" value="">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                            <select id='category_select' class="form-select">
+                                <option selected>All category</option>
+                                <option>Tablet</option>
+                                <option>Smartphone</option>
+                                <option>Automobile</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <input type="date" value="02.05.2021" class="form-control">
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <select class="form-select">
+                                <option selected>Status</option>
+                                <option>Active</option>
+                                <option>Disabled</option>
+                                <option>Show all</option>
+                            </select>
+                        </div>
+                    </div>
+                </header> <!-- card-header end// -->
+
+                <div class="card-body">
+                    {% for product in products %}
+                    <article class="itemlist">
+                        <div class="row align-items-center">
+                            <div class="col col-check flex-grow-0">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                <a class="itemside" href="#">
+                                    <div class="left">
+                                        <img src="{{ product.images.url }}" class="img-sm img-thumbnail" alt="Item">
+                                    </div>
+                                    <div class="info">
+                                        <h6 class="mb-0">{{ product.product_name}}</h6>
+                                        <span>{{product.category}}</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>${{ product.price}}</span> </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                {% if product.is_available == True %}
+                                <span class="badge rounded-pill alert-success">Active</span>
+                                {% else %}
+
+                                <span class="badge rounded-pill alert-success">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-1 col-sm-2 col-4 col-date">
+                                <span>02.11.2021</span>
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                                <a href="#" class="btn btn-sm font-sm rounded btn-brand">
+                                    <i class="material-icons md-edit"></i> Edit
+                                </a>
+                                <a href="#" class="btn btn-sm font-sm btn-light rounded">
+                                    <i class="material-icons md-delete_forever"></i> Delete
+                                </a>
+                                {% if product.is_available   == True %}
+                                <a   href="{% url 'deactivateproduct' product_id=product.id %}"  class="btn btn-sm font-sm alert-danger rounded block-user-btn">
+                                    Unlist
+                                </a>
+                                {% else %}
+                                <a   href="{% url 'activateproduct' product_id=product.id %}" class="btn btn-sm font-sm alert-success rounded unblock-user-btn">
+                                    List
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div> <!-- row .// -->
+
+                    </article> <!-- itemlist  .// -->
+                    {% endfor %}
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+
+
+
+        <script>
+            $(document).ready(function () {
+                $('#category_select').change(function () {
+                      selectedOption = $(this).val(); // Get the selected option value
+                    // Send the selected option to the server using AJAX
+                    $.ajax({
+                        type: 'POST',
+                        url: '',  // Replace with the actual URL endpoint in your Django views.py
+                        data: {
+                            'selectedOption': selectedOption,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token for security
+                        },
+                        success: function (data) {
+                            // Handle the success response from the server
+                            console.log('Option sent successfully');
+                            console.log('Server response:', data);
+                        },
+                        error: function (error) {
+                            // Handle the error response from the server
+                            console.error('Error sending option: ', error);
+                        }
+                    });
+                });
+            });
+        </script>
+        
+ {% endblock content %}

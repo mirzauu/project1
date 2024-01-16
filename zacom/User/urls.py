@@ -5,5 +5,8 @@ from django.conf import settings
 from . import views
 
 urlpatterns = [
-    path('', views.index),
+    path('',views.home,name='home'),
+    path('shop/', views.shop,name='shop'),
+    path('<slug:category_slug>/', views.shop,name='product_by_category'),
+
 ]
