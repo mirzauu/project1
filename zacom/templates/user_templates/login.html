@@ -3,7 +3,9 @@
 {% load static %}
 
 {% block content %}
-<div class="login_container " id="container">
+
+<!--  -->
+<div class="login_container" id="container">
 	<div class="form-container sign-up-container">
 		<!-- sign up -->
 		<form action="{% url 'register' %}" method ="POST">
@@ -16,16 +18,13 @@
 			</div>
 			<span>or use your email for registration</span>
 			<div>
-			 {{ form.first_name }}
-			 {{ form.last_name }}
-			 {{ form.phone_number }}
-			 {{ form.email }}
-			 {{ form.password }}
-			 {{ form.confirm_password }}
-			 {{ form.email.errors }}
-			 {{ form.non_field_errors }}
+				<input type="text" placeholder="First name" name="first_name" id="first_name"/>
+				<input type="text" placeholder="Last name" name="last_name" id="last_name"/>
+				<input type="email" placeholder="Email" name="email" id="email"/>
+				<input type="password" placeholder="Password" name="password1" id="password1" />
+				<input type="password" placeholder="Confirm Password" name="password2" id="password2" />
 			</div>
-			<button>Sign Up</button>
+			<button type="submit">Sign Up</button>
 		</form>
 	</div>
 	<div class="form-container sign-in-container">

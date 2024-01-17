@@ -7,9 +7,6 @@ from django.contrib.auth.decorators import login_required
 from products.models import Product
 
 from django.http import JsonResponse
-from products.models import Category
-
-
 
 # Create your views here.
 
