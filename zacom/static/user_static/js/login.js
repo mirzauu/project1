@@ -9,3 +9,8 @@ signUpButton.addEventListener('click', () => {
 signInButton.addEventListener('click', () => {
 	container.classList.remove("right-panel-active");
 });
+
+
+setTimeout(function(){
+	$('#message').fadeOut('slow')
+}, 4000)

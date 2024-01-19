@@ -35,7 +35,7 @@ def register(request):
                 myuser.is_admin     = False
                 myuser.is_superuser = False
                 myuser.is_staff     = False
-
+ 
                 myuser.save()
 
             # user activation
@@ -50,10 +50,8 @@ def register(request):
                 to_email = email
                 send_email = EmailMessage(mail_subject,message,to=[to_email])
                 send_email.send()
-                messages.success(request,'Registration successful')
-                return redirect('accounts/login/?command=verification&email='+email)
-
- 
+                # messages.success(request,'Thank you for registering with us. We have sent you a verification email to your email address.Please verify it.')
+                return redirect('/accounts/register/?command=verification&email='+email)
     return render(request, 'user_templates/login.html',)
 
 
@@ -68,11 +66,10 @@ def login(request):
 
         if user is not None:
             auth.login(request,user)
-            print('if')  
             return render(request, 'user_templates/home.html')
+        
         else:
-            messages.error(request,'invalid')
-            print('else')  
+            messages.error(request,'invalid') 
             return redirect ('login') 
     return render(request, 'user_templates/login.html')
 

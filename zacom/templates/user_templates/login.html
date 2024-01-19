@@ -4,44 +4,76 @@
 
 {% block content %}
 
+{% load socialaccount %}
+
+
+{% load account %}
+
+<link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
 <!--  -->
+{% if request.GET.command == 'verification' %}
+
+<div class="container mx-auto alert alert-info" role="alert" style="max-width: 380px; margin-top: 100px;">
+	'Thank you for registering with us. We have sent you a verification email to your email address [{{request.GET.email}}].Please verify it.
+	<br><br>
+	Already verified? <a href="{% url 'login' %}">Login</a>
+</div>
+
+{% else %}
+
+{% include 'includes/alerts.html'%}
 <div class="login_container" id="container">
 	<div class="form-container sign-up-container">
+		
 		<!-- sign up -->
 		<form action="{% url 'register' %}" method ="POST">
 			{% csrf_token %}
 			<h1>Sign up</h1>
 			<div class="social-container">
-				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+				
+				<a href="{% provider_login_url 'google' %}" class="social"><i class="fa-brands fa-google fa-fade"></i></a>
+				
 			</div>
 			<span>or use your email for registration</span>
 			<div>
-				<input type="text" placeholder="First name" name="first_name" id="first_name"/>
-				<input type="text" placeholder="Last name" name="last_name" id="last_name"/>
-				<input type="email" placeholder="Email" name="email" id="email"/>
-				<input type="password" placeholder="Password" name="password1" id="password1" />
-				<input type="password" placeholder="Confirm Password" name="password2" id="password2" />
+				<input type="text" placeholder="First name" name="first_name" id="first_name"  oninput="validateFname()" />
+				<span class="error"  id="fnameError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+				
+				<input type="text" placeholder="Last name" name="last_name" id="last_name" oninput="validateLname()" />
+				<span class="error" id="lnameError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+				
+				<input type="text" placeholder="Email" name="email" id="email" oninput="validateEmail()"/>
+				<span class="error"  id="emailError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+                              
+				
+				<input type="password" placeholder="Password" name="password1" id="password1" oninput="validatePassword()" />
+				<span class="error" id="passwordError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;"></span>
+                            
+				<input type="password" placeholder="Confirm Password" name="password2" id="password2"  oninput="validatePassword2()"/>
+				<span class="error" id="password2Error" style="font-size: 14px; font-weight: 400; color: red; width: 190px; transition: opacity 0.5s;"></span>
+                          
+
 			</div>
 			<button type="submit">Sign Up</button>
 		</form>
 	</div>
+
+
 	<div class="form-container sign-in-container">
 		<!-- sign in -->
 		<form action="{% url 'login' %}" method ="POST">
 			{% csrf_token %}
 			<h1>Sign in</h1>
 			<div class="social-container">
-				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+				
+				<a href="{% provider_login_url 'google' %}" class="social"><i class="fab fa-google fa-fade"></i></a>
+				
 			</div>
 			<span>or use your account</span>
 			<input type="email" placeholder="Email" name="email"/>
 			<input type="password" placeholder="Password" name="password" />
-			<a href="#">Forgot your password?</a>
-			<button>Sign In</button>
+			<a href="{% url 'account_reset_password' %}">Forgot your password?</a>
+			<button type="submit1">Sign In</button>
 		</form>
 	</div>
 	<div class="overlay-container">
@@ -59,7 +91,157 @@
 		</div>
 	</div>
 </div>
+{% endif %}
 
 
+<script>
+
+    function validateFname() {
+        const fname = document.getElementById('first_name').value;
+        const fnameError = document.getElementById('fnameError');
+
+        if (fname === "") {
+            fnameError.innerHTML = 'Enter your First Name';
+            return false;
+        }
+        if (!fname.match(/^[a-zA-Z\s-, ]+$/)) {
+            fnameError.innerHTML = 'Numbers and symbols are not allowed';
+            return false;
+        }
+        if (fname.length < 3) {
+            fnameError.innerHTML = "Must be three characters";
+            return false;
+        }
+        fnameError.innerHTML = null;
+        return true;
+    }
+
+    function validateLname() {
+        const lname = document.getElementById('last_name').value;
+        const lnameError = document.getElementById('lnameError');
+
+        if (lname === "") {
+            lnameError.innerHTML = 'Enter your Last Name';
+            return false;
+        }
+		
+        if (!lname.match(/^[a-zA-Z\s-, ]+$/)) {
+            lnameError.innerHTML = 'Numbers and symbols are not allowed';
+            return false;
+        }
+        if (lname.length < 3) {
+            lnameError.innerHTML = "Must be three characters";
+            return false;
+        }
+        lnameError.innerHTML = null;
+        return true;
+    }
+
+    function validateEmail() {
+        const email = document.getElementById('email').value;
+        const emailError = document.getElementById('emailError');
+
+        if (email === "") {
+            emailError.innerHTML = "Enter your email address";
+            return false;
+        }
+        if (!email.match(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/)) {
+            emailError.innerHTML = 'Unvalid email address';
+            return false;
+        }
+        emailError.innerHTML = null;
+        return true;
+    }
+
+    function validatePassword() {
+        const password = document.getElementById('password1').value;
+        const passwordError = document.getElementById('passwordError');
+
+        if (password === "") {
+            passwordError.innerHTML = "Enter password";
+            return false;
+        }
+        if (password.length < 6) {
+            passwordError.innerHTML = "Password should be more than six characters";
+            return false;
+        }
+        passwordError.innerHTML = null;
+        return true;
+    }
+
+
+    function validatePassword2() {
+        const password1 = document.getElementById('password2').value;
+        const password2 = document.getElementById('password2').value;
+        const password2Error = document.getElementById('password2Error');
+
+        if (password2 === "") {
+            password2Error.innerHTML = "Confirm your password";
+            return false;
+        }
+        if (password1 !== password2) {
+            password2Error.innerHTML = "Passwords do not match";
+            return false;
+        }
+        password2Error.innerHTML = null;
+        return true;
+    }
+
+
+
+    function validation() {
+      
+        const isValidFname = validateFname();
+        const isValidLname = validateLname();
+        const isValidEmail = validateEmail();
+        const isValidPassword = validatePassword();
+        const isValidPassword2 = validatePassword2();
+        
+
+        return  isValidFname && isValidLname && isValidEmail && isValidPassword && isValidPassword2;
+    }
+
+//     form.addEventListener('submit', e => {
+//     e.preventDefault();
+   
+// });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const signUpForm = document.querySelector('.form-container.sign-up-container form');
+        const signInForm = document.querySelector('.form-container.sign-in-container form');
+
+        signUpForm.addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission behavior
+
+            // Your validation and other logic here
+            if (validation()) {
+                console.log('Sign up form submitted successfully');
+                this.submit(); // Manually submit the form
+            } else {
+                console.log('Sign up form not submitted due to validation error');
+            }
+        });
+
+        signInForm.addEventListener('submit1', function (e) {
+            e.preventDefault(); // Prevent the default form submission behavior
+
+            // Your validation and other logic here
+            if (validation()) {
+                console.log('Sign in form submitted successfully');
+                this.submit(); // Manually submit the form
+            } else {
+                console.log('Sign in form not submitted due to validation error');
+            }
+        });
+    });
+
+    // Your validation functions...
+</script>
+
+
+
+ -->
 
 {% endblock %}
