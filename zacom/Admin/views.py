@@ -45,11 +45,14 @@ def productdetail(request):
 
     if request.method == 'POST':
         selected_option = request.POST.get('selectedOption')
-        
-        products = Product.objects.filter(category__Category_name = selected_option)
-        print(products)
-        product_count = products.count()
-        print(selected_option)
+        if selected_option =="All category":
+             products = Product.objects.all().order_by('-id')
+             product_count = products.count()
+        else:
+            products = Product.objects.filter(category__Category_name = selected_option)
+            print(products)
+            product_count = products.count()
+            print(selected_option)
     else:
         products = Product.objects.all().order_by('-id')
         product_count = products.count()

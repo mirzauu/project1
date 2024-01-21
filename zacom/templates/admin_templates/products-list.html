@@ -7,7 +7,7 @@
 
         <section class="content-main">
             <div class="content-header">
-                
+
                 <div>
                     <h2 class="content-title card-title">Products List</h2>
                     <p>Lorem ipsum dolor sit amet.</p>
@@ -28,10 +28,11 @@
                         </div>
                         <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
                             <select id='category_select' class="form-select">
-                                <option selected>All category</option>
-                                <option>Tablet</option>
-                                <option>Smartphone</option>
-                                <option>Automobile</option>
+                                <option value="All category">All category</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="All category">All category</option>
+                                
                             </select>
                         </div>
                         <div class="col-md-2 col-6">
@@ -121,12 +122,18 @@
 
         <script>
             $(document).ready(function () {
-                $('#category_select').change(function () {
+
+                $(document).on('change','#category_select',function (e) {
+
+                    console.log($(this).val());
+                    
                       selectedOption = $(this).val(); // Get the selected option value
                     // Send the selected option to the server using AJAX
+                    
+
                     $.ajax({
                         type: 'POST',
-                        url: '',  // Replace with the actual URL endpoint in your Django views.py
+                        url: '/admin/product/',  // Replace with the actual URL endpoint in your Django views.py
                         data: {
                             'selectedOption': selectedOption,
                             'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token for security
@@ -134,14 +141,20 @@
                         success: function (data) {
                             // Handle the success response from the server
                             console.log('Option sent successfully');
-                            console.log('Server response:', data);
+                            // console.log(data,'dddddddddddddddddddd')
+                            $('html').html(data);
+                            console.log(data,'dddddddddddddddddddd');
+                            // console.log('Server response:', data);
                         },
                         error: function (error) {
                             // Handle the error response from the server
                             console.error('Error sending option: ', error);
                         }
                     });
-                });
+                
+                })
+
+                
             });
         </script>
         
