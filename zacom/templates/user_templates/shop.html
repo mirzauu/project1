@@ -32,6 +32,7 @@
                             </div>
                             <div class="categories__accordion">
                                 <div class="accordion" id="accordionExample">
+                                    
                                     <div class="card">
                                         <div class="card-heading active">
                                             <a data-toggle="collapse" data-target="#collapseOne">Women</a>
@@ -49,6 +50,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="card">
                                         <div class="card-heading">
                                             <a data-toggle="collapse" data-target="#collapseTwo">Men</a>
@@ -139,31 +141,26 @@
                         </div>
                         <div class="sidebar__sizes">
                             <div class="section-title">
-                                <h4>Shop by size</h4>
+                                <h4>Shop by Brand</h4>
                             </div>
                             <div class="size__list">
-                                <label for="xxs">
-                                    xxs
-                                    <input type="checkbox" id="xxs">
-                                    <span class="checkmark"></span>
-                                </label>
                                 <label for="xs">
-                                    xs
+                                    I phone
                                     <input type="checkbox" id="xs">
                                     <span class="checkmark"></span>
                                 </label>
                                 <label for="xss">
-                                    xs-s
+                                    One Plus
                                     <input type="checkbox" id="xss">
                                     <span class="checkmark"></span>
                                 </label>
                                 <label for="s">
-                                    s
+                                    Google
                                     <input type="checkbox" id="s">
                                     <span class="checkmark"></span>
                                 </label>
                                 <label for="m">
-                                    m
+                                    
                                     <input type="checkbox" id="m">
                                     <span class="checkmark"></span>
                                 </label>
@@ -238,19 +235,19 @@
                 <div class="col-lg-9 col-md-9">
                     <h>Found <b>{{   product_count }}</b> items</h>
                     <div class="row">
-                        {% for product in products %}
+                        {% for p in products %}
                         <div class="col-lg-4 col-md-6">
                             <div class="product__item">
-                                <div class="product__item__pic set-bg" data-setbg="{{ product.images.url }}">
+                                <div class="product__item__pic set-bg" data-setbg="{{ p.thumbnail_image.url }}">
                                     <div class="label new">new</div>
                                     <ul class="product__hover">
-                                        <li><a href="{{ product.images.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                        <li><a href="{{ p.thumbnail_image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
                                         <li><a href="#"><span class="icon_heart_alt"></span></a></li>
                                         <li><a href="#"><span class="icon_bag_alt"></span></a></li>
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><a href="#">{{ product.product_name }}</a></h6>
+                                    <h6><a href="#">{{ p.product.product_name }}<br>{{ p.sku_id }}</a></h6>
                                     <div class="rating">
                                         <i class="fa fa-star"></i>
                                         <i class="fa fa-star"></i>
@@ -258,7 +255,7 @@
                                         <i class="fa fa-star"></i>
                                         <i class="fa fa-star"></i>
                                     </div>
-                                    <div class="product__price">{{ product.price }}</div>
+                                    <div class="product__price">{{ p.sale_price }}</div>
                                 </div>
                             </div>
                         </div>
