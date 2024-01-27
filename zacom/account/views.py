@@ -24,11 +24,11 @@ def register(request):
             username = email.split('@')[0]
             # user = Account.objects.create_user(first_name=first_name,last_name=last_name,username=username,email=email,password=password)
             if Account.objects.filter(username = username).exists():
-                messages.success(request,'User Already Exists')
+                messages.error(request,'User Already Exists')
             elif Account.objects.filter(email = email).exists():
-                messages.success(request,'Email Already Exists')
+                messages.error(request,'Email Already Exists')
             elif password1 != password2:
-                messages.success(request,'Passwords does not match')
+                messages.error(request,'Passwords does not match')
             else:
                 myuser = Account.objects.create_user(first_name=first_name,last_name=last_name,username=username,email=email,password=password1)
                 myuser.is_active    = False
@@ -69,7 +69,7 @@ def login(request):
             return render(request, 'user_templates/home.html')
         
         else:
-            messages.error(request,'invalid') 
+            messages.error(request,'invalid email/password') 
             return redirect ('login') 
     return render(request, 'user_templates/login.html')
 

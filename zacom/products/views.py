@@ -22,23 +22,6 @@ def create_brand(requset):
 
 
 def create_product(request):
-    attributes = Atribute.objects.prefetch_related('atribute_value_set').filter(is_active=True)
-    attribute_dict = {}
-    for attribute in attributes:
-        attribute_values = attribute.atribute_value_set.filter(is_active=True)
-        attribute_dict[attribute.atribute_name] = attribute_values                                                                                  
-    category=Category.objects.all()
-    brand = Brand.objects.all()
-    products =Product.objects.all()
-
-    print(attributes)
-    print(attribute_dict)
-    context= {
-        'category': category,
-        'brand':brand,
-        'products':products,
-        'attribute_dict': attribute_dict,
-    }   
 
     if request.method == "POST":
         product_title = request.POST['product_title']
@@ -47,28 +30,34 @@ def create_product(request):
         description = request.POST['description']
         category = Category.objects.get(id=category_id)
         brand = Brand.objects.get(id=brand_id)
+
         product = Product(
             product_name = product_title,
             product_catg = category,
             product_brand= brand,
             description  = description, 
         )
-
         product.save()
         messages.success(request, 'Product Added.')
         return redirect('product-create')
-    
+                                                                                     
+    category=Category.objects.all()
+    brand = Brand.objects.all()
 
+    context= {
+        'category': category,
+        'brand':brand,
+    
+    }   
+    print(context)
+        
     return render(request,"admin_templates/add-product-1.html",context)
 
        
 
- 
-
-def create_varient(requset):
-    pass
 
 def create_product_with_variant(request):
+    
     attributes = Atribute.objects.prefetch_related('atribute_value_set').filter(is_active=True)
     attribute_dict = {}
     for attribute in attributes:
@@ -88,21 +77,16 @@ def create_product_with_variant(request):
         product_image=request.FILES.getlist('product_image')
         sale_price = request.POST['sale_price']
         stock = request.POST['stock']      
-        thumbnail_image = request.POST['thumbnail_image']      
+        thumbnail_image = request.FILES.get('thumbnail_image')     
        
-        #getting all atributes
-        attribute_ids=[]
-        for i in range(1,attribute_values_count+1):
-            req_atri = request.POST.get('atributes_'+str(i))
-            if req_atri != 'None':
-                attribute_ids.append(req_atri)
-
-        print(product_image)        
-        print("=============================")        
- 
+        #getting all atributes  
+        attribute_values = request.POST.getlist('attributes')
+       
+        attribute_ids = []
+        for req_atri in attribute_values:
+         if req_atri != 'None':
+           attribute_ids.append(req_atri)    
         product_id =Product.objects.get(id=product)
-
-    
         product_varient = Product_Variant(
             product = product_id,
             sku_id = sku_id,
@@ -111,21 +95,14 @@ def create_product_with_variant(request):
             stock  = stock, 
             thumbnail_image = thumbnail_image
         )   
-        print(product_varient.product)
+     
         product_varient.save()
         product_varient.atributes.set(attribute_ids)
         for image in product_image:
             Additional_Product_Image.objects.create(product_variant=product_varient,image=image)
-            
-        print("++++++++++++++++++++++++++++++++++")
-
         messages.success(request, 'Product variation Added.')
         return redirect('product-create-variant')
     
-
-
-    print(attributes)
-    print(attribute_dict)
     context= {
         'category': category,
         'brand':brand,
@@ -134,6 +111,101 @@ def create_product_with_variant(request):
     }
 
 
-    return render(request,"admin_templates/add-product-1.html",context)
+    return render(request,"admin_templates/add-product-varient.html",context)
 
+def create_varient(request):
+    if request.method == "POST":
+        varient=request.POST['varient']
+        Atribute.objects.create(atribute_name=varient)
     
+    varients=Atribute.objects.all()
+    context={'varients':varients}
+    return render(request,"admin_templates/add-varient.html",context)
+
+def create_varient_value(request):
+    if request.method == "POST":
+        varient_id=request.POST['varient_id']
+        varient_value=request.POST['varient_value']
+        atri=Atribute.objects.get(id=varient_id)
+        atribute=Atribute_value(atribute=atri,atribute_value=varient_value)
+        atribute.save()
+
+
+    varients=Atribute.objects.all()
+    context={'varients':varients}
+    return render(request,"admin_templates/add-varient.html",context)
+
+
+
+def edit_product_with_variant(request,product_id):
+    old_product = Product_Variant.objects.get(id=product_id)
+    products =Product.objects.all()
+
+  
+   
+    attributes = Atribute.objects.prefetch_related('atribute_value_set').filter(is_active=True)
+#    to get the old varient
+    attr_values_list = [item['atribute_value'] for item in old_product.atributes.all().values('atribute_value')]
+  
+
+    attribute_dict = {}
+    for attribute in attributes:
+        attribute_values = attribute.atribute_value_set.filter(is_active=True)
+        attribute_dict[attribute.atribute_name] = attribute_values  
+         #to show how many atribute in fronend
+        attribute_values_count = attributes.count()  
+
+        
+    if request.method == "POST":
+        
+        old_product.delete()
+        product = request.POST['product']
+        sku_id = request.POST['sku_id']
+        max_price = request.POST['max_price']
+        product_image=request.FILES.getlist('product_image')
+        sale_price = request.POST['sale_price']
+        stock = request.POST['stock']      
+        thumbnail_image = request.FILES.get('thumbnail_image')     
+       
+        #getting all atributes  
+        attribute_values = request.POST.getlist('attributes')
+       
+        attribute_ids = []
+        for req_atri in attribute_values:
+         if req_atri != 'None':
+           attribute_ids.append(req_atri)   
+
+        product_id =Product.objects.get(id=product)
+
+        product_varient = Product_Variant(
+            product = product_id,
+            sku_id = sku_id,
+            max_price  = max_price, 
+            sale_price  = sale_price, 
+            stock  = stock, 
+            thumbnail_image = thumbnail_image
+        )   
+        product_varient.update()
+        product_varient.atributes.set(attribute_ids)
+        for image in product_image:
+            Additional_Product_Image.objects.update(product_variant=product_varient,image=image)
+        messages.success(request, 'Product variation Added.')
+        return redirect('product-create-variant')
+     
+    
+    print(attribute_dict)
+    context={
+        "old_product":old_product,
+        "products": products, 
+        'attribute_dict': attribute_dict,
+        'attr':attr_values_list,
+    }
+
+    return render(request,"admin_templates/edit-product-varient.html",context)
+
+def delete_product_with_variant(request,product_id):
+
+    instance= Product_Variant.objects.get(id=product_id)
+    instance.delete()
+    return render(request, "admin_templates/products-variation-list.html")
+

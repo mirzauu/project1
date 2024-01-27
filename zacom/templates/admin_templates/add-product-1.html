@@ -12,7 +12,7 @@
                     </div>
                 </div>
                <!-- Add new product form  -->
-            <form method="POST" action="{% url 'product-create' %}">
+            <form method="POST">
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="card mb-4">
@@ -63,7 +63,7 @@
             </form>
                 <!-- end add new product form  -->
                 <!-- product attribue setting -->
-            <form method="POST" action="{% url 'product-create-variant' %}" enctype="multipart/form-data"> 
+            <!-- <form method="POST" action="{% url 'product-create-variant' %}" enctype="multipart/form-data"> 
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="card mb-4">
@@ -131,7 +131,7 @@
                         </div> <!-- card end// -->
                     </div> <!-- card end// -->
                 </div>
-            </form>   
+            </form>    -->
             </div>
         </section>
 

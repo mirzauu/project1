@@ -32,3 +32,6 @@ class RegistrationForm(forms.ModelForm):
                 'password not match'
             )     
         
+
+
+       

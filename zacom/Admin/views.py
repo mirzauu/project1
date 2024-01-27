@@ -47,35 +47,44 @@ def productdetail(request):
     if request.method == 'POST':
         selected_option = request.POST.get('selectedOption')
         if selected_option =="All category":
-             products = Product_Variant.objects.all().order_by('-id')
+             products = Product.objects.all().order_by('-id')
              product_count = products.count()
         else:
-            products = Product_Variant.objects.filter(product__product_catg__cat_name  = selected_option)
-            print(products)
+            products = Product.objects.filter(product_catg__cat_name  = selected_option)
             product_count = products.count()
-            print(selected_option)
+        
     else:
-        products = Product_Variant.objects.all().order_by('-id')
+        products = Product.objects.all().order_by('-id')
         product_count = products.count()
     context= {
         'products': products,
         'products_count':product_count,
     }
-    return render(request, "admin_templates/add-product-1.html", context)
+    return render(request, "admin_templates/products-list.html", context)
         # products_data = [{'name': product.product_name, 'price': product.price} for product in products]
         # return render(request,"admin_templates/products-list.html", context)
         
 def deactivateproduct(request,product_id):
-    product = Product_Variant.objects.get(id=product_id)
-    product.is_active = False
+    product = Product.objects.get(id=product_id)
+    product.is_available = False
     product.save()
     return redirect('productdetail')
 
 @never_cache
 def activateproduct(request,product_id):
-    product = Product_Variant.objects.get(id=product_id)
-    product.is_active = True
+    product = Product.objects.get(id=product_id)
+    product.is_available = True
     product.save()
     return redirect('productdetail')
 
+def product_varient_detail(request,product_id):
+    product         = Product.objects.get(id=product_id)
+    product_variant = Product_Variant.objects.filter(product=product)
+
+    context = {
+        'product_variant':product_variant,
+        
+    }
+    return render(request, "admin_templates/products-variation-list.html",context)
+     
 

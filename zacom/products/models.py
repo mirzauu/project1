@@ -59,7 +59,7 @@ class Atribute_value(models.Model):
 
 class Product(models.Model):
     product_name    = models.CharField(max_length=200, unique=True)
-    product_catg = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)
+    product_catg = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True,related_name='cate')
     product_brand = models.ForeignKey(Brand,on_delete=models.SET_NULL,null=True)
     product_slug    = models.SlugField(max_length=200, blank=True, unique=True)
     description     = models.TextField(max_length=500, blank=True)
@@ -87,7 +87,7 @@ class Product(models.Model):
 
 
 class Product_Variant(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product')
     sku_id = models.CharField(max_length=30)
     atributes = models.ManyToManyField(Atribute_value,related_name='attributes')
     max_price = models.DecimalField(max_digits=8, decimal_places=2)

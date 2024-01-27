@@ -20,8 +20,9 @@
 </div>
 
 {% else %}
-
-{% include 'includes/alerts.html'%}
+<div class="container ">
+    {% include 'includes/alerts.html'%}
+</div>
 <div class="login_container" id="container">
 	<div class="form-container sign-up-container">
 		
@@ -37,20 +38,20 @@
 			<span>or use your email for registration</span>
 			<div>
 				<input type="text" placeholder="First name" name="first_name" id="first_name"  oninput="validateFname()" />
-				<span class="error"  id="fnameError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+				<span class="error"  id="fnameError" style="font-size:14px;font-weight: 400;color: rgb(54, 50, 50); transition: opacity 0.5s;">  </span>
 				
 				<input type="text" placeholder="Last name" name="last_name" id="last_name" oninput="validateLname()" />
-				<span class="error" id="lnameError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+				<span class="error" id="lnameError" style="font-size:14px;font-weight: 400;color: rgb(54, 50, 50); transition: opacity 0.5s;">  </span>
 				
 				<input type="text" placeholder="Email" name="email" id="email" oninput="validateEmail()"/>
-				<span class="error"  id="emailError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;">  </span>
+				<span class="error"  id="emailError" style="font-size:14px;font-weight: 400;color: rgb(54, 50, 50); transition: opacity 0.5s;">  </span>
                               
 				
 				<input type="password" placeholder="Password" name="password1" id="password1" oninput="validatePassword()" />
-				<span class="error" id="passwordError" style="font-size:14px;font-weight: 400;color: red;width: 190px;transition: opacity 0.5s;"></span>
+				<span class="error" id="passwordError" style="font-size:14px;font-weight: 400;color: rgb(54, 50, 50); transition: opacity 0.5s;"></span>
                             
 				<input type="password" placeholder="Confirm Password" name="password2" id="password2"  oninput="validatePassword2()"/>
-				<span class="error" id="password2Error" style="font-size: 14px; font-weight: 400; color: red; width: 190px; transition: opacity 0.5s;"></span>
+				<span class="error" id="password2Error" style="font-size: 14px; font-weight: 400; color: rgb(54, 50, 50);transition: opacity 0.5s;"></span>
                           
 
 			</div>
@@ -66,14 +67,16 @@
 			<h1>Sign in</h1>
 			<div class="social-container">
 				
-				<a href="{% provider_login_url 'google' %}" class="social"><i class="fab fa-google fa-fade"></i></a>
+				<a href="{% provider_login_url 'google' %}"  class="social"><i class="fab fa-google fa-fade"></i></a>
 				
 			</div>
 			<span>or use your account</span>
-			<input type="email" placeholder="Email" name="email"/>
-			<input type="password" placeholder="Password" name="password" />
+			<input type="email" placeholder="Email" name="email" id="login_email"  oninput="validateloginemail()"/>
+            <span class="error" id="loginemailError" style="font-size: 14px; font-weight: 400; color: rgb(54, 50, 50); width: 190px; transition: opacity 0.5s;"></span>
+			<input type="password" placeholder="Password" name="password" id="login_password"  oninput="validateloginPassword()"/>
+            <span class="error" id="loginepassworError" style="font-size: 14px; font-weight: 400; color: rgb(54, 50, 50); transition: opacity 0.5s;"></span>
 			<a href="{% url 'account_reset_password' %}">Forgot your password?</a>
-			<button type="submit1">Sign In</button>
+			<button type="submit">Sign In</button>
 		</form>
 	</div>
 	<div class="overlay-container">
@@ -94,6 +97,67 @@
 {% endif %}
 
 
+<!-- sinin page -->
+
+<script>
+
+    function validateloginemail() {
+        const loginemail = document.getElementById('login_email').value;
+        const loginemailError = document.getElementById('loginemailError');
+
+        if (loginemail === "") {
+            loginemailError.innerHTML = 'Enter your  email';
+            return false;
+        }
+        if (!loginemail.match(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/)) {
+            loginemailError.innerHTML = 'invalid email address';
+            return false;
+        }
+
+        loginemailError.innerHTML = null;
+        return true;
+    }
+    function validateloginPassword() {
+        const password = document.getElementById('login_password').value;
+        const loginepassworError = document.getElementById('loginepassworError');
+
+        if (password === "") {
+            loginepassworError.innerHTML = "Enter password";
+            return false;
+        }
+      
+        loginepassworError.innerHTML = null;
+        return true;
+    }
+    function loginvalidation() {
+      
+  
+      const isValidEmail = validateloginemail();
+      const isValidPassword = validateloginPassword();
+      
+
+      return  isValidEmail && isValidPassword ;
+  }
+
+
+    
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- signup page -->
 <script>
 
     function validateFname() {
@@ -224,11 +288,12 @@
             }
         });
 
-        signInForm.addEventListener('submit1', function (e) {
+
+        signInForm.addEventListener('submit', function (e) {
             e.preventDefault(); // Prevent the default form submission behavior
 
             // Your validation and other logic here
-            if (validation()) {
+            if ( loginvalidation()) {
                 console.log('Sign in form submitted successfully');
                 this.submit(); // Manually submit the form
             } else {

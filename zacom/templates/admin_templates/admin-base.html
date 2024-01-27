@@ -6,7 +6,7 @@
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:35 GMT -->
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>Admin Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="{% static 'admin_static/imgs/theme/logo.svg' %}" class="logo" alt="Evara Dashboard">
+                <img src="{% static 'user_static/img/logo.png' %}" class="logo" alt="Evara Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -40,14 +40,14 @@
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                     <div class="submenu">
                         <a href="{% url 'productdetail' %}">Product List</a>
-                        <a href="page-products-grid.html">Product grid</a>
-                        <a href="page-products-grid-2.html">Product grid 2</a>
-                        <a href="page-categories.html">Categories</a>
+                        <a href="page-products-grid.html">varient List</a>
+                        <a href="page-products-grid-2.html">category List</a>
+                        
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
@@ -60,25 +60,16 @@
                         <a href="page-orders-detail.html">Order detail</a>
                     </div>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
-                        <span class="text">Sellers</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-sellers-cards.html">Sellers cards</a>
-                        <a href="page-sellers-list.html">Sellers list</a>
-                        <a href="page-seller-detail.html">Seller profile</a>
-                    </div>
-                </li>
+             
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
                         <span class="text">Add product</span>
-                    </a>
+                    </a>     
                     <div class="submenu">
-                        <a href="{% url 'admin-product-edit' %}">Add new product </a>
-                        <a href="page-form-product-2.html">Add new product variation </a>
-                        <a href="page-form-product-3.html">Add product 3</a>
-                        <a href="page-form-product-4.html">Add product 4</a>
+                        <a href="{% url 'product-create' %}">Add new product </a>
+                        <a href="{% url 'product-create-variant' %}">Add new product variation </a>
+                        <a href="{% url 'create-variant' %}">Add new variation</a>
+                        <a href="page-form-product-4.html">Add category</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
@@ -195,10 +186,10 @@
 
 
         
-    <main>{% block content %}
+       {% block content %}
       
       
-          {% endblock %}</main>
+          {% endblock %}
 
 
 
@@ -206,11 +197,7 @@
 
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
-                <div class="col-sm-6">
-                    <script>
-                    document.write(new Date().getFullYear())
-                    </script> ©, Evara - HTML Ecommerce Template .
-                </div>
+           
                 <div class="col-sm-6">
                     <div class="text-sm-end">
                         All rights reserved
@@ -231,5 +218,4 @@
 </body>
 
 
-<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:57 GMT -->
 </html>
