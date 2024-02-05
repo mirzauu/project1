@@ -13,10 +13,10 @@
                     <div class="card-body">
                         <div class="mb-4">
                             <label for="product_title" class="form-label">New varient</label>
-                            <input type="text" placeholder="Type here" name="varient" class="form-control" id="product_title">
+                            <input type="text" placeholder="Type here" name="varient" class="form-control" id="product_title" required>
                         </div>
                         <div>
-                            <button class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;">ADD </button>
+                            <button class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;">ADD VARIENT </button>
                         </div>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                     <div class="card-body">
                         <div class="mb-4">
                             <label class="form-label">varient select</label>
-                            <select class="form-select" name="varient_id">
+                            <select class="form-select" name="varient_id" required>
                                 {% for i in varients %}
                                 <option value="{{i.id}}">{{i.atribute_name}}</option>
                                 {% endfor %}
@@ -42,13 +42,13 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label">value</label>
-                            <input type="text" placeholder="Type here" class="form-control" name="varient_value">
+                            <input type="text" placeholder="Type here" class="form-control" name="varient_value" required>
                         </div>
-                        <button class="btn btn-md rounded font-sm hover-up">ADD </button>
+                        <button class="btn btn-md rounded font-sm hover-up">ADD VALUE </button>
                     </div>
         
         
-                </div>
+                </div>  
             </div>
         </form>
      

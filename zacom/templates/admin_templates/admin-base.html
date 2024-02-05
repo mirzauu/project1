@@ -15,7 +15,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'admin_static/imgs/theme/favicon.svg' %}">
+    
     <!-- Template CSS -->
     <link href="{% static 'admin_static/css/main.css' %}" rel="stylesheet" type="text/css" />
 </head>
@@ -24,7 +24,7 @@
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
+            <a href="{% url 'home' %}" class="brand-wrap">
                 <img src="{% static 'user_static/img/logo.png' %}" class="logo" alt="Evara Dashboard">
             </a>
             <div>
@@ -34,19 +34,20 @@
         <nav>
             <ul class="menu-aside">
                 <!-- SIDEBAR -->
+               
                 <li class="menu-item active">
-                    <a class="menu-link" href="index.html"> <i class="icon material-icons md-home"></i>
+                    <a class="menu-link" href="{% url 'adminhome' %}"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href=""> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
+                        <span class="text">Detail</span>
                     </a>
                     <div class="submenu">
-                        <a href="{% url 'productdetail' %}">Product List</a>
-                        <a href="page-products-grid.html">varient List</a>
-                        <a href="page-products-grid-2.html">category List</a>
+                        <a href="{% url 'productdetail' %}">Product Detail</a>
+                        <a href="{% url 'variant_list' %}">Varient Detail</a>
+                        <a href="{% url 'admin-category' %}">Category Detail</a>
                         
                     </div>
                 </li>
@@ -63,13 +64,13 @@
              
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Add product</span>
+                        <span class="text">Add </span>
                     </a>     
                     <div class="submenu">
-                        <a href="{% url 'product-create' %}">Add new product </a>
-                        <a href="{% url 'product-create-variant' %}">Add new product variation </a>
-                        <a href="{% url 'create-variant' %}">Add new variation</a>
-                        <a href="page-form-product-4.html">Add category</a>
+                        <a href="{% url 'product-create' %}">New product </a>
+                        <a href="{% url 'product-create-variant' %}">New product variation </a>
+                        <a href="{% url 'create-variant' %}">New variation</a>
+                        <a href="{% url 'admin-category-create' %}">New category</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
@@ -86,7 +87,7 @@
                         <span class="text">Account</span>
                     </a>
                     <div class="submenu">
-                        <a href="page-account-login.html">User login</a>
+                        <a href="{% url 'customer-list' %}">Customer list</a>
                         <a href="page-account-register.html">User registration</a>
                         <a href="page-error-404.html">Error 404</a>
                     </div>
@@ -97,7 +98,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
+                    <a class="menu-link" href="{% url 'admin-brand' %}"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Brands</span> </a>
                 </li>
                 <li class="menu-item">
@@ -176,14 +177,16 @@
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                            <a class="dropdown-item text-danger" href="{% url "admin_logout" %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>
             </div>
         </header>
 
-
+        <div class="container ">
+            {% include 'includes/alerts.html'%}
+        </div>
 
         
        {% block content %}

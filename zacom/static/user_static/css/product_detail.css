@@ -1,0 +1,37 @@
+.product__details__button {
+    display: flex;
+    align-items: center;
+}
+
+.quantity {
+    margin-right: 10px; /* Adjust the spacing between Quantity and Add to Cart button */
+}
+
+
+
+.add-to-cart-btn {
+    margin-right: 10px; /* Adjust the spacing between the quantity input field and the Add to Cart button */
+}
+
+.other-actions ul {
+    list-style-type: none; /* Remove default list style */
+    padding: 0;
+    margin: 0;
+}
+
+.other-actions ul li {
+    display: inline-block;
+    margin-right: 10px; /* Adjust the spacing between the heart and adjust icons */
+}
+
+.cart-btn {
+    display: inline-block;
+    background-color: #0e55d8; /* Example background color */
+    color: #fff; /* Example text color */
+    padding: 10px 20px; /* Adjust padding as needed */
+    text-decoration: none;
+}
+
+.cart-btn:hover {
+    background-color: #cc0000; /* Example background color on hover */
+}

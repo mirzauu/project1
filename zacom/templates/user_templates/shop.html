@@ -31,22 +31,24 @@
                                 <h4>Categories</h4>
                             </div>
                             <div class="categories__accordion">
-                                {% for i in category %}
                                 <div class="accordion" id="accordionExample">
+                                    {% for i,j in category.items %}
                                     <div class="card">
                                         <div class="card-heading">
-                                            <a data-toggle="collapse" data-target="#collapseFive">{{ i.cat_name }}</a>
+                                            <a data-toggle="collapse"  data-target="#collapse{{ forloop.counter }}">{{ i }}</a>
                                         </div>
-                                        <div id="collapseFive" class="collapse" data-parent="#accordionExample">
+                                        <div id="collapse{{ forloop.counter }}" class="collapse" data-parent="#accordionExample">
                                             <div class="card-body">
                                                 <ul>
-                                                    <li><a href="#">www{{i.cate.product_name}}</a></li>
+                                                    {% for k in j %}
+                                                    <li><a href="{% url 'product_by_category' product_slug=k.product_slug %}">{{k}}</a></li>
+                                                    {% endfor %}
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
                             </div>
                         </div>
                         <div class="sidebar__filter">
@@ -174,7 +176,7 @@
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><a href="{% url 'product_detail' sku_id=p.sku_id%}">{{ p.product.product_name }}<br>{{ p.sku_id }}</a></h6>
+                                    <h6><a href="{% url 'product_detail' product_variant_slug=p.product_variant_slug %}">{{ p.get_product_name }}<br>{{ p.variant_name }}</a></h6>
                                     <div class="rating">
                                         <i class="fa fa-star"></i>
                                         <i class="fa fa-star"></i>

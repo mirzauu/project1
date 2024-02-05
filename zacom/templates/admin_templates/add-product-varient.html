@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <div class="mb-4">
                             <label class="form-label">Product</label>
-                            <select class="form-select" name="product">
+                            <select class="form-select" name="product" required>
                                 {% for product in products %} 
                                 <option value="{{product.id}}">{{product.product_name}}</option>
                                 {% endfor %}
@@ -21,13 +21,13 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label">SKU ID</label>
-                            <input type="text" placeholder="Type here" class="form-control" name="sku_id">
+                            <input type="text" placeholder="Type here" class="form-control" name="sku_id" required>
                         </div>
                         <div class="row gx-3">
                             {% for attribute_name, attribute_values in attribute_dict.items %}                                        <option>{{atribute. }}</option>
                             <div class="col-md-4  mb-3">
                                 <label class="form-label">{{attribute_name}}</label>
-                                <select class="form-select" name="attributes">
+                                <select class="form-select" name="attributes" >
                                     <option value="None">----------</option>
                                     {% for value in attribute_values %}
                                     <option value="{{ value.id }}">{{ value.atribute_value }}</option>    
@@ -40,17 +40,17 @@
                            
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Max Price</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="max_price">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="max_price" required>
                             </div>
                             
                         
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Sale price</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="sale_price">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="sale_price" required>
                             </div>
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Stock</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="stock">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="stock" required>
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Thumbnail-Images</label>
-                                <input class="form-control" type="file" name="thumbnail_image">
+                                <input class="form-control" type="file" name="thumbnail_image" >
                             </div>
                         </div>
                         <div class="card-body">

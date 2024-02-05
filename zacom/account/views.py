@@ -12,9 +12,13 @@ from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
+@never_cache
 def register(request):
+    if request.user.is_authenticated:
+        return redirect("home")
     if request.method == 'POST':
             first_name = request.POST['first_name']
             last_name = request.POST.get('last_name')
@@ -55,26 +59,32 @@ def register(request):
     return render(request, 'user_templates/login.html',)
 
 
-
+@never_cache
 def login(request):
-
+    if request.user.is_authenticated:
+        return redirect("home")
     if request.method=='POST':
         email=request.POST['email']
         password=request.POST['password']
 
         user = auth.authenticate(email=email, password=password)
-
-        if user is not None:
-            auth.login(request,user)
-            return render(request, 'user_templates/home.html')
+        check=Account.objects.get(email=email)
         
+        if check.is_blocked==False:
+       
+            if user is not None :
+                auth.login(request,user)
+                return render(request, 'user_templates/home.html')
+            
+            else:
+                messages.error(request,'invalid email/password') 
+                return redirect ('login') 
         else:
-            messages.error(request,'invalid email/password') 
+            messages.error(request,'User is blocked') 
             return redirect ('login') 
     return render(request, 'user_templates/login.html')
 
-
-@login_required(login_url = 'login')
+@never_cache
 def logout(request):
     auth.logout(request)
     return render(request, 'user_templates/home.html')

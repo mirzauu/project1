@@ -12,67 +12,76 @@
                 <div class="col-lg-6">
                     <div class="product__details__pic">
                         <div class="product__details__pic__left product__thumb nice-scroll">
-                            {% for i in image %}
-                            <a class="pt active" href="#product-1">
-                                <img src="{{i}}" alt="">
+                            {% for url in image %}
+                            <a class="pt {% if forloop.first %}active{% endif %}" href="#product-{{ forloop.counter }}">
+                                <img src="{{ url }}" alt="">
                             </a>
                             {% endfor %}
-                            
                         </div>
                         <div class="product__details__slider__content">
                             <div class="product__details__pic__slider owl-carousel">
-                                {% for i in image %}
-                                <img data-hash="product-1" class="product__big__img" src="{{i}}" alt="">
-                                
+                                {% for url in image %}
+                                <img data-hash="product-{{ forloop.counter }}" class="product__big__img {% if forloop.first %}active{% endif %}" src="{{ url }}" alt="">
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
+            
+            
+            
+            {% for i in detail %}
                 <div class="col-lg-6">
                     <div class="product__details__text">
-                        {% for i in detail %}
-                        <h3>{{i.product.product_name}} <span>{{ i.sku_id}}</span></h3>
+                        <h3>{{i.product.product_name}} <span>{{ i.variant_name}}</span></h3>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                             <span>( 138 reviews )</span>
                         </div>
                         <div class="product__details__price">{{i.sale_price}} <span>{{i.max_price}}</span></div>
-                        <p>{{i.product.description}}</p>
+                      
                         <div class="product__details__button">
-                            <div class="quantity">
-                                <span>Quantity:</span>
-                                <div class="pro-qty">
-                                    <input type="text" value="1">
+                            <div class="">
+                                <div class="quantity">
+                                    <span>Quantity:</span>
+                                    <div class="pro-qty">
+                                        <input type="text" value="1">
+                                    </div>
                                 </div>
+
+                                <div class="add-to-cart-btn">
+                                    <a href="{% url 'cart' %}" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
+                                </div>
+                                <div class="other-actions">
+                                    <ul>
+                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                        <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
+                                    </ul>
+                                </div>
+
                             </div>
-                            <a href="{% url 'cart' %}" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
-                            <ul>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
-                            </ul>
                         </div>
+                        
                         <div class="product__details__widget">
                             <ul>
                                 <li>
                                     <span>Availability:</span>
-                                    <div class="stock__checkbox">
-                                        <label for="stockin">
-                                           <h4>{{i.stock}}</h4> 
-                                        </label>
-                                    </div>
+                                        <div class="stock__checkbox">
+                                            <label for="stockin">
+                                            <h4>{{i.stock}}</h4> 
+                                            </label>
+                                        </div>
                                 </li>
                                 <span>Available option:</span>
                                 
                                 <div class="col-md-4  mb-3">
                                         {% for value in variants %}
-                                        <button type="button" class="btn btn-light"><a href="{% url 'product_detail' sku_id=value.sku_id %}">{{ value.sku_id }}</a></button>
+                                        <button type="button" class="btn btn-light"><a href="{% url 'product_detail'  product_variant_slug=value.product_variant_slug %}">{{ value.variant_name }}</a></button>
                                         {% endfor %}
                                 </div>
-                                {% endfor%}  
-
-                                     
+                                
+                                
                                 <li>
                                     <span>Promotions:</span>
                                     <p>Free shipping</p>
@@ -97,25 +106,12 @@
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                 <h6>Description</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
+                                <p>{{i.product.description}}</p>
+                               
                             </div>
                             <div class="tab-pane" id="tabs-2" role="tabpanel">
                                 <h6>Specification</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
+                                <p></p>
                                 <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
                                     dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
                                     nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
@@ -128,16 +124,18 @@
                                     Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
                                     voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
                                     consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                consequat massa quis enim.</p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
+                                    consequat massa quis enim.</p>
+                                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                        dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                        nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
+                                        quis, sem.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% endfor%}  
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="related__title">

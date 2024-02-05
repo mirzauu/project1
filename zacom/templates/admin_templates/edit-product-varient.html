@@ -4,7 +4,7 @@
 
 <div class="container mt-3">
     <div class="row">
-        <form method="POST" action="{% url 'product-create-variant' %}" enctype="multipart/form-data"> 
+        <form method="POST" enctype="multipart/form-data"> 
 
             {% csrf_token %}
             <div class="col-lg-6">
@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <div class="mb-4">
                             <label class="form-label">Product</label>
-                            <select class="form-select"  name="product">
+                            <select class="form-select"  name="product" required>
                                 <option selected value="{{old_product.product.id}}">{{old_product.product.product_name}}</option>
                                 {% for product in products %} 
                                 <option value="{{product.id}}">{{product.product_name}}</option>
@@ -22,7 +22,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label">SKU ID</label>
-                            <input type="text" placeholder="Type here" class="form-control" name="sku_id" value="{{old_product.sku_id}}">
+                            <input type="text" placeholder="Type here" class="form-control" name="sku_id" value="{{old_product.sku_id}}" required>
                         </div>
                         <div class="row gx-3">
                             {% for attribute_name, attribute_values in attribute_dict.items %}                                        <option>{{atribute. }}</option>
@@ -44,31 +44,46 @@
                            
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label" >Max Price</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="max_price" value="{{old_product.max_price}}">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="max_price" value="{{old_product.max_price}}" required>
                             </div>
                             
                         
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Sale price</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="sale_price" value="{{old_product.sale_price}}">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="sale_price" value="{{old_product.sale_price}}" required>
                             </div>
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Stock</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="stock" value="{{old_product.stock}}">
+                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="stock" value="{{old_product.stock}}" required>
                             </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <div>
-                                <label class="form-label">Thumbnail-Images</label>
-                                <input class="form-control" type="file" name="thumbnail_image" value="{{old_product.thumbnail_image}}">
+                                <label class="form-label">Thumbnail-Image</label>
+                                {% if old_product.thumbnail_image %}
+                                    <img src="{{ old_product.thumbnail_image.url }}" alt="Thumbnail Image">
+                                    <input type="file" name="existing_product_images" value="{{ old_product.thumbnail_image.url }}">
+                                    <a>{{ old_product.thumbnail_image.url }}</a>
+                                    {% else %}
+                                    <p>No thumbnail image available</p>
+                                    <input type="file" name="existing_product_images" >
+                                {% endif %}
                             </div>
                         </div>
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Product-Images</label>
-                                <input class="form-control" type="file"  name="product_image" id="product_image" multiple value="{{old_product.additional_product_images.image}}" >
+                                {% if old_product.additional_product_images.all %}
+                                    {% for image in old_product.additional_product_images.all %}
+                                        <img src="{{ image.image.url }}" alt="Product Image">
+                                        <a>{{ image.image.url }}</a>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No product images available</p>
+                                {% endif %}
+                                <input class="form-control" type="file" name="product_image" multiple>
                             </div>
                         </div>
                         <div>

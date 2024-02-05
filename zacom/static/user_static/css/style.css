@@ -1761,7 +1761,7 @@ ol {
 
 .pro-qty .qtybtn {
 	font-size: 14px;
-	color: #666666;
+	color: #222222;
 	cursor: pointer;
 	float: left;
 	width: 12px;
@@ -1770,13 +1770,13 @@ ol {
 
 .pro-qty input {
 	font-size: 14px;
-	color: #666666;
+	color: #1b1b1b;
 	font-weight: 500;
 	border: none;
 	float: left;
 	width: 84px;
 	text-align: center;
-	height: 48px;
+	height: 33px;
 }
 
 .product__details__button {

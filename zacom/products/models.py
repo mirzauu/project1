@@ -4,6 +4,11 @@ from django.db.models import UniqueConstraint, Q,F,Avg,Count
 from django.urls import reverse
 
 
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+
+
 
 class Category(models.Model):
     cat_name = models.CharField(max_length=50,unique=True)
@@ -45,7 +50,7 @@ class Atribute(models.Model):
         return self.atribute_name
     
 
-
+    
 
 #black,white and 64gb,128gb
 class Atribute_value(models.Model):
@@ -90,6 +95,7 @@ class Product_Variant(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product')
     sku_id = models.CharField(max_length=30)
     atributes = models.ManyToManyField(Atribute_value,related_name='attributes')
+    variant_name = models.CharField( blank=True,max_length=200)
     max_price = models.DecimalField(max_digits=8, decimal_places=2)
     sale_price = models.DecimalField(max_digits=8, decimal_places=2)
     stock = models.IntegerField()
@@ -99,9 +105,42 @@ class Product_Variant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # objects = models.Manager()
-    # variants = Product_VariantManager()
+
     def save(self, *args, **kwargs):
+        # img=Image.open(self.thumbnail_image.path)
+
+        # if img.height > 300 or img.weight > 300:
+        #     output_size = (300,300)
+        #     img.thumbnail(output_size)
+        #     img.save(self.thumbnail_image.path)
+
+        if self.thumbnail_image:
+            img = Image.open(self.thumbnail_image)
+            max_size = (679, 679)
+
+        # Resize image if it exceeds max_size
+            if img.height > max_size[0] or img.width > max_size[1]:
+                img.thumbnail(max_size, Image.LANCZOS)
+
+                if img.mode == 'RGBA':
+                
+                  img = img.convert('RGB')
+
+                # Save the resized image to a BytesIO buffer
+                buffer = BytesIO()
+                img.save(buffer, format='JPEG')
+                buffer.seek(0)
+
+                # Update the thumbnail image field with the resized image
+                self.thumbnail_image.save(self.thumbnail_image.name, buffer, save=False)    
+
+
+
+
+        
+
+
+       
         product_variant_slug_name = f'{self.product.product_brand.brand_name}-{self.product.product_name}-{self.product.product_catg.cat_name}-{self.sku_id}'
         base_slug = slugify(product_variant_slug_name)
         counter = Product_Variant.objects.filter(product_variant_slug__startswith=base_slug).count()
@@ -120,6 +159,10 @@ class Product_Variant(models.Model):
                 condition=Q(sku_id__isnull=False),
             )
         ]
+
+    def get_product_name(self):
+        return f'{self.product.product_brand} {self.product.product_name} - {", ".join([value[0] for value in self.atributes.all().values_list("atribute_value")])}'    
+   
     def __str__(self):
         return self.product_variant_slug
 
@@ -130,6 +173,33 @@ class Additional_Product_Image(models.Model):
     product_variant = models.ForeignKey(Product_Variant,on_delete=models.CASCADE,related_name='additional_product_images')
     image = models.ImageField(upload_to='photos/product_additional')
     is_active = models.BooleanField(default=True)
+
+
+    
+    def save(self, *args, **kwargs):
+        if self.image:
+            img = Image.open(self.image)
+            max_size = (679, 679)
+
+            # Convert image to RGB mode if it's in RGBA mode
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+
+            # Resize image to the specified dimensions
+            img.thumbnail(max_size, Image.LANCZOS)
+
+            # Save the resized image to a BytesIO buffer
+            buffer = BytesIO()
+            img.save(buffer, format='JPEG')
+            buffer.seek(0)
+
+            # Save the resized image back to the model field
+            self.image.save(self.image.name, ContentFile(buffer.getvalue()), save=False)
+
+        super().save(*args, **kwargs)
+
+
+
 
     def __str__(self):
         return self.image.url

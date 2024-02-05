@@ -83,12 +83,14 @@ form {
 }
 
 input {
-	background-color: #eee;
-	border: none;
-	padding: 12px 15px;
-	margin: 8px 0;
-	width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e6e4e4; /* Add a solid border with color #cccccc */
+    border-radius: 5px; /* Add rounded corners with a radius of 5 pixels */
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
 }
+
 
 .login_container {
 	background-color: #fff;

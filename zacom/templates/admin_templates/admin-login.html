@@ -66,16 +66,21 @@
                 </ul>
             </div>
         </header>
-        <section class="content-main mt-80 mb-80">
+        <section class="content-main mt-80 mb-80"> 
+             <div class="container ">
+               {% include 'includes/alerts.html'%}
+             </div>
+
             <div class="card mx-auto card-login">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Sign in</h4>
-                    <form>
+                    <form method="POST">
+                        {% csrf_token %}
                         <div class="mb-3">
-                            <input class="form-control" placeholder="Username or email" type="text">
+                            <input class="form-control" placeholder="Username or email" type="text" name="email">
                         </div> <!-- form-group// -->
                         <div class="mb-3">
-                            <input class="form-control" placeholder="Password" type="password">
+                            <input class="form-control" placeholder="Password" type="password" name="password">
                         </div> <!-- form-group// -->
                         <div class="mb-3">
                             <a href="#" class="float-end font-sm text-muted">Forgot password?</a>

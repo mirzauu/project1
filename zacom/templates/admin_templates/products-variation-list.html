@@ -43,7 +43,7 @@
                             <div class="card card-product-grid">
                                 <a href="#" class="img-wrap"> <img src="{{ i.additional_product_images.first }}" alt="Product"> </a>
                                 <div class="info-wrap">
-                                    <a href="#" class="title text-truncate">{{i.sku_id}}</a>
+                                    <a href="#" class="title text-truncate">{{i.variant_name}}</a>
                                     <div class="price mb-2">{{i.sale_price|floatformat:0}}</div> <!-- price.// -->
                                     <a href="{% url 'product-edit-variant' product_id=i.id %}" class="btn btn-sm font-sm rounded btn-brand">
                                         <i class="material-icons md-edit"></i> Edit
