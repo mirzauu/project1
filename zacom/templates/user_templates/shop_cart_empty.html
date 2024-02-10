@@ -1,0 +1,185 @@
+{% extends 'user_templates/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                        <span>Shopping cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Shop Cart Section Begin -->
+    <section class="shop-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shop__cart__table" id="cart-table">
+                       
+                    </div>                      
+                </div>
+            </div>
+            <div class="empty-cart-section section-fluid">
+                <div class="emptycart-wrapper">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-3">
+                                <div class="emptycart-content text-center mb-5">
+                                    <div class="image">
+                                        <img class="img-fluid" src="{% static 'assets/images/emprt-cart/empty-cart.png' %}" alt="">
+                                    </div>
+                                    <h4 class="title">Your Cart is Empty</h4>
+                                    <h6 class="sub-title">Sorry Mate... No item Found inside your cart!</h6>
+                                    <a href="{% url 'shop' %}" class="btn btn-lg btn-golden">Continue Shopping</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+           
+           
+        </div>
+    </section>
+    <!-- Shop Cart Section End -->
+<style>
+    .empty-cart-section {
+  background-image: url('{% static "user_static/img/banner/banner-1.jpg"  %}'); /* Add background image */
+  background-size: cover; /* Cover the entire container with the background image */
+  background-position: center; /* Center the background image */
+  padding: 50px 0;
+}
+
+.emptycart-wrapper {
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+}
+
+.emptycart-content {
+  text-align: center; /* Center text */
+}
+
+.image img {
+  max-width: 100%; /* Ensure the image doesn't exceed its container */
+}
+
+.title {
+  font-size: 24px; /* Set font size for the title */
+  margin-bottom: 10px; /* Add space below the title */
+}
+
+.sub-title {
+  font-size: 18px; /* Set font size for the subtitle */
+  margin-bottom: 20px; /* Add more space below the subtitle */
+}
+
+.btn {
+  display: inline-block; /* Ensure the button is displayed as an inline-block element */
+  padding: 10px 20px; /* Add padding to the button */
+  background-color: #ff0707; /* Set button background color */
+  color: #fff; /* Set button text color */
+  border: none; /* Remove button border */
+  border-radius: 5px; /* Add border radius to the button */
+  text-decoration: none; /* Remove default underline from button text */
+  font-size: 18px; /* Set font size for the button */
+  transition: background-color 0.3s; /* Add smooth transition for background color change */
+}
+
+.btn:hover {
+  background-color: #ff9800; /* Change background color on hover */
+}
+
+</style>
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    <script>
+    
+    function updateCart(cartItemId, newQuantity) {
+        if (newQuantity == 0) {
+          deleteCartItem(cartItemId);
+          return;
+      }
+  
+  
+      fetch(`/update_cart/${cartItemId}/${newQuantity}/`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // Update the subtotal in your HTML
+                  const subtotalElement = document.getElementById(`subtotal-${cartItemId}`);
+                  subtotalElement.innerText = `$${data.subtotal}`;
+                  console.log('Updating +++++++++++++++++++++++');
+                  
+  
+                  // Call the endpoint to update the cart total
+                  updateOrderSummary();
+              } else {
+                  console.error(data.message);
+                  // Handle the error, e.g., display an alert to the user
+                  alert(`Error: `);
+              }
+          })
+          .catch(error => {
+              console.error('Fetch error:', error);
+              // Handle the fetch error, e.g., display an alert to the user
+          });
+  }
+
+
+
+  
+
+function deleteCartItem(cartItemId) {
+    fetch(`/delete_cart_item/${cartItemId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the deleted item from the HTML
+                window.location.reload();
+    
+                // Check if the cart is empty
+                const cartTable = document.getElementById('cart-table');
+                if (cartTable && !cartTable.querySelector('tbody tr')) {
+                    // Cart is empty, redirect to the cart page
+                    window.location.reload();
+                }
+            } else {
+                console.error(data.message);
+                
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+        });
+
+    // Prevent the default action (page reload) of the link click
+    // event.preventDefault();
+}
+
+
+
+
+</script>  
+{% endblock content %}

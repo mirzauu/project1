@@ -23,7 +23,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="shop__cart__table">
+                    <div class="shop__cart__table" id="cart-table">
                         <table>
                             <thead>
                                 <tr>
@@ -34,12 +34,14 @@
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody >
+                                {% for i in cart_items %}
+                                
                                 <tr>
-                                    <td class="cart__product__item">
-                                        <img src="{% static 'user_static/img/shop-cart/cp-1.jpg' %}" alt="">
+                                    <td class="cart-item-${{i.id}}" >
+                                        <img src={{i.product.thumbnail_image.url}} style="width: 150px;" alt="">
                                         <div class="cart__product__item__title">
-                                            <h6>Chain bucket bag</h6>
+                                            <h6>{{i.product.get_product_name}}{{i.product.variant_name}}</h6>
                                             <div class="rating">
                                                 <i class="fa fa-star"></i>
                                                 <i class="fa fa-star"></i>
@@ -49,100 +51,30 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price">$ 150.0</td>
+                                    <td class="cart__price">${{i.product.sale_price}}</td>
                                     <td class="cart__quantity">
-                                        <div class="pro-qty">
-                                            <input type="text" value="1">
+                                        <div id='myform' method='POST' class='quantity d-flex' action='#'>
+                                            <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ i.id }}', -1)"  />
+                                            <input type='text' name='quantity' value="{{ i.quantity }}" class='qty' id="quantityInput{{ i.id }}" max='{{i.product.stock}}'/>
+                                            <input type='button' value='+' class='qtyplus plus' field='quantity' onclick="updateQuantity('{{ i.id }}', 1)"  />
                                         </div>
                                     </td>
-                                    <td class="cart__total">$ 300.0</td>
-                                    <td class="cart__close"><span class="icon_close"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="cart__product__item">
-                                        <img src="{% static 'user_static/img/shop-cart/cp-2.jpg' %}" alt="">
-                                        <div class="cart__product__item__title">
-                                            <h6>Zip-pockets pebbled tote briefcase</h6>
-                                            <div class="rating">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 170.0</td>
-                                    <td class="cart__quantity">
-                                        <div class="pro-qty">
-                                            <input type="text" value="1">
-                                        </div>
-                                    </td>
-                                    <td class="cart__total">$ 170.0</td>
-                                    <td class="cart__close"><span class="icon_close"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="cart__product__item">
-                                        <img src="{% static 'user_static/img/shop-cart/cp-3.jpg' %}" alt="">
-                                        <div class="cart__product__item__title">
-                                            <h6>Black jean</h6>
-                                            <div class="rating">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 85.0</td>
-                                    <td class="cart__quantity">
-                                        <div class="pro-qty">
-                                            <input type="text" value="1">
-                                        </div>
-                                    </td>
-                                    <td class="cart__total">$ 170.0</td>
-                                    <td class="cart__close"><span class="icon_close"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="cart__product__item">
-                                        <img src="{% static 'user_static/img/shop-cart/cp-4.jpg' %}" alt="">
-                                        <div class="cart__product__item__title">
-                                            <h6>Cotton Shirt</h6>
-                                            <div class="rating">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 55.0</td>
-                                    <td class="cart__quantity">
-                                        <div class="pro-qty">
-                                            <input type="text" value="1">
-                                        </div>
-                                    </td>
-                                    <td class="cart__total">$ 110.0</td>
-                                    <td class="cart__close"><span class="icon_close"></span></td>
-                                </tr>
+                                    <td class="cart__total"  id="subtotal-{{ i.id }}">{{i.sub_total}}</td>
+                                    <td class="cart__close"><a  onclick="deleteCartItem('{{ i.id }}')"><span class="icon_close"></span></a></td>
+                                </tr>       
+                                {% endfor %}
                             </tbody>
                         </table>
-                    </div>
+                    </div>                      
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="cart__btn">
-                        <a href="#">Continue Shopping</a>
+                        <a href="{% url 'shop' %}">Continue Shopping</a>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="cart__btn update__btn">
-                        <a href="#"><span class="icon_loading"></span> Update cart</a>
-                    </div>
-                </div>
+               
             </div>
             <div class="row">
                 <div class="col-lg-6">
@@ -158,16 +90,18 @@
                     <div class="cart__total__procced">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ 750.0</span></li>
-                            <li>Total <span>$ 750.0</span></li>
+                            <li >Subtotal <span  id="grandtotal" style="font-size: large;">${{grandtotal}}</span></li>
+                            <li>Discount <span id="Discount"  style="font-size: large;">${{Discount}}</span></li>
+                            <li>Total <span id="total" style="font-size: large;">${{total}}</span></li>
                         </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <a href="{% url 'order-address'%}" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
     <!-- Shop Cart Section End -->
+
 
     <!-- Instagram Begin -->
     <div class="instagram">
@@ -225,4 +159,157 @@
         </div>
     </div>
     <!-- Instagram End -->
+
+
+
+
+
+
+
+
+    
+    <script>                     
+        
+  async function updateOrderSummary() {
+      try {
+          const response = await fetch('/order-summary/');
+          const data = await response.json();
+
+          // Update DOM elements with the new data
+          document.getElementById('total').innerText      = `$${data.total}`;
+          document.getElementById('grandtotal').innerText = `$${data.grandtotal}`;
+          document.getElementById('Discount').innerText   = `$${data.Discount}`;
+          document.getElementById('quantity').innerText   = `Subtotal (${data.quantity} items)`;
+          document.getElementById('before_tax').innerText = `$${parseInt(data.shipping) + parseInt(data.total)}`;
+          document.getElementById('tax').innerText        = `$${data.tax}`;
+      } catch (error) {
+          console.error('Error fetching order summary:', error);
+      }
+  }
+
+  // Call the function to update order summary on page load
+  updateOrderSummary();
+
+                           
+         function updateQuantity(cartItemId, change) {
+    const quantityInput = document.getElementById(`quantityInput${cartItemId}`);
+    let newQuantity = parseInt(quantityInput.value) + change;
+
+    // Ensure the new quantity stays within the stock limit
+    const maxStock = parseInt(quantityInput.getAttribute('max'));
+    if (newQuantity < 0) {
+        newQuantity = 1; // Prevent decreasing quantity below 1
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock; // Prevent increasing quantity above maximum stock
+    }
+
+    // Update the quantity input field value
+    quantityInput.value = newQuantity;
+
+    // Call the updateCart function with the new quantity
+    updateCart(cartItemId, newQuantity);
+}
+
+    
+    function updateCart(cartItemId, newQuantity) {
+        if (newQuantity == 0) {
+          deleteCartItem(cartItemId);
+          return;
+      }
+  
+  
+      fetch(`/update_cart/${cartItemId}/${newQuantity}/`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // Update the subtotal in your HTML
+                  const subtotalElement = document.getElementById(`subtotal-${cartItemId}`);
+                //   const grand_total = document.getElementById(`grand_total`);
+                //   grand_total.innerText = `$${{grand_total}}`;
+                  subtotalElement.innerText = `$${data.subtotal}`;
+                
+                  
+  
+                  // Call the endpoint to update the cart total
+                  updateOrderSummary();
+              } else {
+                  console.error(data.message);
+                  // Handle the error, e.g., display an alert to the user
+                  alert(`Error: `);
+              }
+          })
+          .catch(error => {
+              console.error('Fetch error:', error);
+              // Handle the fetch error, e.g., display an alert to the user
+          });
+  }
+
+
+
+  
+
+function deleteCartItem(cartItemId) {
+    fetch(`/delete_cart_item/${cartItemId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the deleted item from the HTML
+                window.location.reload();
+    
+                // Check if the cart is empty
+                const cartTable = document.getElementById('cart-table');
+                if (cartTable && !cartTable.querySelector('tbody tr')) {
+                    // Cart is empty, redirect to the cart page
+                    window.location.reload();
+                }
+            } else {
+                console.error(data.message);
+                
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+        });
+
+    // Prevent the default action (page reload) of the link click
+    // event.preventDefault();
+}
+
+
+
+
+</script>  
+<style>
+  /* Style for the quantity input container */
+.quantity {
+  display: flex;
+  align-items: center;
+}
+
+/* Style for the minus button */
+.qtyminus, .qtyplus {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Style for the text input */
+.qty {
+  flex: 1;
+  height: 30px;
+  text-align: center;
+  border: 1px solid #ccc;
+  margin: 0 5px;
+}
+
+/* Style for the plus button */
+.qtyplus {
+  border-left: none;
+}
+
+
+</style>
 {% endblock content %}

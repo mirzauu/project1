@@ -11,6 +11,10 @@
     <title>Ashion | Template</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha384-xrRm4DfY5Jn498UCrZsA4igb6jc0PpIXt4QFqzXxPqdP5q8Z4JwUc0qkZlM1VJFA" crossorigin="anonymous">
     
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,800">
     <!-- Google Font -->
     <link
@@ -20,8 +24,14 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
-    />
 
+    />
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-light.css" >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-regular.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-solid.css
+    " >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/all.css
+    " >
     <!-- Css Styles -->
     <link
       rel="stylesheet"
@@ -146,7 +156,7 @@
                     <li>
                       <a href="./product-details.html">Product Details</a>
                     </li>
-                    <li><a href="./shop-cart.html">Shop Cart</a></li>
+                    <li><a href="{% url 'cart' %}">Shop Cart</a></li>
                     <li><a href="./checkout.html">Checkout</a></li>
                     <li><a href="./blog-details.html">Blog Details</a></li>
                   </ul>
@@ -173,13 +183,13 @@
               <ul class="header__right__widget">
                 <li><span class="icon_search search-switch"></span></li>
                 <li>
-                  <a href="#"
+                  <a href=""
                     ><span class="icon_heart_alt"></span>
                     <div class="tip">2</div>
                   </a>
                 </li>
                 <li>
-                  <a href="#"
+                  <a href="{% url 'cart' %}"
                     ><span class="icon_bag_alt"></span>
                     <div class="tip">2</div>
                   </a>

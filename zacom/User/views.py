@@ -8,6 +8,7 @@ from django.views.decorators.cache import never_cache
 def home(request):
     return render(request,'user_templates/home.html')
  
+ 
 def product_detail(request, product_variant_slug):
 
 
@@ -115,5 +116,6 @@ def shop(request,  product_slug=None):
 #     }
 #     return render(request,'user_templates/shop.html',context)
 
-def cart(request):
-    return render(request,'dashboard/dashboard.html')
+# def cart(request):
+#     return render(request,'user_templates/shop-cart.html')
+

@@ -61,7 +61,9 @@ def register(request):
 
 @never_cache
 def login(request):
+
     if request.user.is_authenticated:
+        
         return redirect("home")
     if request.method=='POST':
         email=request.POST['email']
@@ -69,9 +71,11 @@ def login(request):
 
         user = auth.authenticate(email=email, password=password)
         check=Account.objects.get(email=email)
-        
+      
         if check.is_blocked==False:
-       
+            if request.GET.get('next'):
+                return redirect(request.GET.get('next'))
+           
             if user is not None :
                 auth.login(request,user)
                 return render(request, 'user_templates/home.html')

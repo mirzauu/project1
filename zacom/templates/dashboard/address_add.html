@@ -1,0 +1,85 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block dashcontent %}
+
+<div class="col-lg-7 col-md-7">
+    <div class="card">
+        <div class="header">
+            <h4 class="title">Add Address<h4>
+        </div>
+        <div class="content">
+            <form>
+                <div class="row">
+                   
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control border-input" placeholder="Name" name="name">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Phone Number</label>
+                            <input type="number" class="form-control border-input" placeholder="Phone" name="phone">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="number" class="form-control border-input" placeholder="Pincode" name="Pincode" >
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Locality</label>
+                            <input type="text" class="form-control border-input" placeholder="Locality" name="Locality">
+                        </div>
+                    </div>
+                </div>
+
+                
+                    <div class="col-md-11">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <textarea  class="form-control border-input" placeholder="Address" name="address"></textarea>
+                        </div>
+                    </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" class="form-control border-input" placeholder="City"  name="city">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" class="form-control border-input" placeholder="State" name="state">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" class="form-control border-input" placeholder="Country" name="Country">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn custom-btn">Add Address</button>
+
+                </div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock dashcontent %}  

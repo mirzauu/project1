@@ -1,0 +1,281 @@
+{% extends 'user_templates/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+/* Resetting */
+.progresses {
+    position: relative;
+    max-width: 70%;
+    margin: auto;
+}
+
+.progresses ul {
+    list-style: none;
+    /* border: 1px solid red; */
+    padding: 0;
+}
+
+.progresses ul li {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    z-index: 200;
+    position: relative;
+}
+
+.progresses ul li.blue {
+    color: #ff6232;
+    background-color: #3268ff;
+}
+
+.progresses ul li::after {
+    position: absolute;
+    top: 35px;
+    left: -15px;
+    font-size: 0.8rem;
+    width: 90px;
+}
+
+#step-1::after {
+    content: "DELIVERY ADDRESS";
+}
+
+#step-2::after {
+    content: "OREDER SUMMARY";
+    left: -5px;
+}
+
+#step-3::after {
+    content: "PAYMENT";
+}
+
+.progresses .progress {
+    height: 0.8rem;
+    width: 100%;
+    top: 33px;
+    position: absolute;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+}
+
+#products-list {
+    height: 250px;
+    overflow-y: scroll;
+}
+
+#products-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#products-list::-webkit-scrollbar-track {
+    background-color: #7c7c7c;
+    border-radius: 5px;
+}
+
+#products-list::-webkit-scrollbar-thumb {
+    border: 2px solid #cfcfcf;
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+#products-list .product .product-img {
+    width: 100%;
+    height: 80px;
+    object-fit: contain;
+    background-color: #e8e8e8;
+}
+
+#products-list .product .btn.btn-primary {
+    font-size: 0.6rem;
+    padding: .2rem;
+    border-radius: 0;
+    width: 20px;
+}
+
+#products-list .product .number {
+    border-radius: 0;
+    width: 20px;
+    text-align: center;
+}
+
+/* #products-list .product {
+    font-size: 0.85rem;
+} */
+
+#products-list .btn.btn-dark {
+    border-radius: 0;
+    border-top-left-radius: 15px;
+    font-size: 0.7rem;
+    width: 50px;
+    border: none;
+    background-color: #616161 !important;
+}
+
+/*button  */
+
+</style>
+<!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                        <span>Shopping cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Breadcrumb End -->
+    <div class="container">
+        <div class="progresses py-4">
+            <ul class="d-flex align-items-center justify-content-between">
+                <li id="step-1" class="blue"></li>
+                <li id="step-2"></li>
+                <li id="step-3"></li>
+            </ul>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="25" aria-valuemin="0"
+                aria-valuemax="100">
+            </div>
+        </div>
+        
+    </div>
+      <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container ">
+            <div class="row ">
+                <div class="col-lg-12">
+                    <h6 class="coupon__link"><span class="icon_tag_alt"></span> <a href="#">Have a coupon?</a> Click
+                        here to enter your code.</h6>
+                </div>
+            <div class="row ">
+            
+                <div class="col-lg-8">
+                    <div class="header">
+                        <h4 class="title">Order</h4>
+                        
+                        <div class="container">
+                            <a id="add-form-button"><i class="fa-solid fa-plus"></i></a>
+            
+                        </div>
+                    </div>
+                    <div class="content">
+                        <ul class="d-flex flex-column justify-content-center" >
+                          
+                            <!-- Single Address Start -->
+                        
+                            {% for i in cart_items %}
+                            <li class="d-flex flex-row p-2"  style="border-bottom: 1px solid #777777 ;">
+                                <td class="cart-item-${{i.id}}" >
+                                    <img src={{i.product.thumbnail_image.url}} style="width: 150px;" alt="">
+                                    <div class="cart__product__item__title">
+                                        <h6>{{i.product.get_product_name}}{{i.product.variant_name}}</h6>
+                                        <div class="rating">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <br>
+                                        <h6 style="color: #000000;">Price: ${{i.product.sale_price}}</h6>
+                                        <br>
+                                        <h6 style="color: #000000;">Quantity: {{ i.quantity }}</h6>
+                                        <div class="container" style="margin-left: 350px;">
+                                            <td class="cart__total"  id="subtotal-{{ i.id }}" style="color: #ff6232;">Total Price:<span style="font-size: medium;">${{i.sub_total}}</span> </td>
+                                        </div>
+                                    </div>
+                                    
+                                    <td class="cart__close"><a  onclick="deleteCartItem('{{ i.id }}')"><span class="icon_close"></span></a></td>
+
+
+                                    <h1></h1>
+                                </td>  
+                                
+                            </li>
+                            {% endfor %}
+                  
+                                    <!-- Single Address End  -->
+                        </ul>
+                        
+                    </div> 
+                </div>
+                     
+                <div class="col-lg-4">
+                    <div class="checkout__order">
+                        <h5>Your order</h5>
+                            <div class="checkout__order__product">
+                                <ul>
+                                    <li>
+                                        <span class="top__text">Product</span>
+                                        <span class="top__text__right">Total</span>
+                                    </li>
+                                    {% for i in cart_items %}
+                                    <li>{{i.product.get_product_name}}<span>{{i.sub_total}}</span></li>
+                                    <b style="font-size: small;">{{i.product.variant_name}}</b>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="checkout__order__total">
+                                <ul>
+                                    <li>Subtotal <span>${{grand_total}}</span></li>
+                                    <li>Discount <span>${{discount}}</span></li>
+                                    <li>Total <span>${{total}}</li>
+                                </ul>
+                            </div>
+                    </div>
+                    <div >
+                       <a href="{% url "order-payment" %}"><button>Next</button></a>
+                    </div>
+                </div>
+            </div>
+                
+        </div>
+</section>
+
+<style>
+ 
+    #myform {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+    /* padding: 5px; */
+    /* border: solid 1px #e8e8e8;  */
+    box-sizing: border-box;
+    border-radius: 5px;
+    /* margin: 2%; */
+    color: #777777;
+}
+.qty {
+    width: 20px;
+    height: 25px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+input.qtyplus { width:15px; height:15px;}
+input.qtyminus { width:15px; height:15px;}
+
+.btn-golden a {
+        color: white;
+        text-decoration: none; /* Optional: Remove underline */
+        /* transition: color 0.3s ease; Add smooth transition effect */
+    }
+
+    .btn-golden:hover a {
+        color: #b19361;
+    }
+
+</style>
+
+  
+{% endblock content %}

@@ -1,0 +1,252 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block dashcontent %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="col-lg-6 col-md-7">
+    <div class="card">
+        <div class="header">
+            <h4 class="title">Address</h4>
+            <div class="container">
+                <a id="add-form-button"><i class="fa-solid fa-plus"></i></a>
+
+            </div>
+        </div>
+        <div class="content">
+            <div id="form-container"></div>
+                    <ul class="d-flex flex-column justify-content-center" >
+                        {% for i in adress %}
+                        <!-- Single Address Start -->
+                        <li class="d-flex flex-row p-2"  style="border-bottom: 1px solid #777777 ;">
+                            <label for="address-{{ i.id }}" class="d-flex ">
+                                <div class="flex-column" >
+                                    <div class="d-flex flex-row px-3 align-content-center " style="width: 400px; height: 100px;">
+                                        <input type="radio" class="address-radio" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}"style="width: 25px; height: 16px;position: relative;bottom: -15px" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %} />
+                                        <div class="col pl-2">
+                                            <h5>{{i.name}}</h5>
+                                            <div class="col">
+                                                <span>{{i.street_address}}</span>,
+                                                <span>{{i.city}}</span>,
+                                                <span>{{i.state}}</span>,
+                                                <span>{{i.country}}</span>,
+                                                <span>{{i.pincode}}</span>
+                                            </div>
+                                            <span>{{i.phone}}</span>
+                                        </div>
+                                    </div>
+                                <div class="btn px-3 align-content-center" onclick="delete_add('{{ i.id }}')"><i class="fa-duotone fa-trash" style="--fa-primary-color: #b19561; --fa-secondary-color: #b19561; "></i></div>                        </div>
+                            </label>
+                            
+                        </li>
+                    {% endfor %}
+                        <!-- Single Address End  -->
+                    </ul>
+          
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+function sweet_alert(addressId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Make this your default address",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#b19361",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+    }).then((result) => {
+        // If the user confirms
+        console.log(addressId);
+        if (result.isConfirmed) {
+            // Make a fetch request to update is_default in the backend
+            fetch('/address/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
+                },
+                // body: JSON.stringify({ 'addressId':addressId }),
+                body: JSON.stringify({ 'addressId':addressId }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the server
+                    console.log(data);
+                    if (data.success) {
+                        // Success message
+                        Swal.fire('Success', data.message, 'success');
+                    } else {
+                        // Error message
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle other errors
+                    Swal.fire('Error', 'An unexpected error occurred', 'error');
+                });
+        }
+    });
+}
+
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Check if the cookie name matches the provided name
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+var isFormVisible = false;
+document.getElementById("add-form-button").addEventListener("click", function() {
+    if (!isFormVisible) {
+        // Create a new form element
+        var newForm = document.createElement("form");
+    
+        // Add form elements, such as inputs, labels, etc.
+        // Example:
+        newForm.innerHTML = `
+        <div class="content">
+                <form id="new-address-form" >
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control border-input" placeholder="Name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Phone Number</label>
+                                <input type="number" class="form-control border-input" placeholder="Phone" name="phone" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Pincode</label>
+                                <input type="number" class="form-control border-input" placeholder="Pincode" name="pincode" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Locality</label>
+                                <input type="text" class="form-control border-input" placeholder="Locality" name="locality" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea  class="form-control border-input" placeholder="Address" name="address" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control border-input" placeholder="City"  name="city">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" class="form-control border-input" placeholder="State" name="state">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" class="form-control border-input" placeholder="Country" name="country">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn custom-btn">Add Address</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        `;
+
+        // Insert the new form into the container element
+        document.getElementById("form-container").appendChild(newForm);
+        isFormVisible = true;
+    } else {
+        var formElement = document.getElementById("new-address-form");
+        if (formElement) {
+            // If the form element exists, remove it
+            formElement.remove();
+        } else {
+            console.error("Element with ID 'new-address-form' not found");
+        }
+
+
+    }    
+
+    // Add form submission event listener
+    newForm.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        // Collect form data
+        var formData = new FormData(this);
+
+        var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        // Send form data via AJAX
+        fetch("/address/add/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
+            body: formData
+        })
+        .then(response => {
+            // Handle response as needed
+            console.log("Form submitted successfully");
+            // Optionally, you can update the UI or perform any other action based on the response
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error("Error submitting form:", error);
+            // Handle error as needed
+        });
+    });
+});
+
+
+
+</script>
+
+
+
+
+{% endblock dashcontent %}  

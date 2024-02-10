@@ -45,14 +45,19 @@
                             <div class="">
                                 <div class="quantity">
                                     <span>Quantity:</span>
-                                    <div class="pro-qty">
-                                        <input type="text" value="1">
+                             
+                                    
+                                    <div id='myform' method='POST' class='quantity d-flex' action='#'>
+                                        <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', -1)"  />
+                                        <input type='text' name='quantity' value="1" class='qty' id="quantityInput{{ cart_item.id }}" max='{{i.stock}}'/>
+                                        <input type='button' value='+' class='qtyplus plus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', 1)"  />
                                     </div>
                                 </div>
 
                                 <div class="add-to-cart-btn">
-                                    <a href="{% url 'cart' %}" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
-                                </div>
+                                    <a href="{% url 'cart-add' product_id=i.id %}" id="addToCartBtn" class="cart-btn">Add to cart</a>
+                                </div> 
+                                  
                                 <div class="other-actions">
                                     <ul>
                                         <li><a href="#"><span class="icon_heart_alt"></span></a></li>
@@ -293,4 +298,39 @@
         </div>
     </div>
     <!-- Instagram End -->
+    <script>
+      document.getElementById('addToCartBtn').addEventListener('click', function () {
+    var quantityInput = document.getElementById('quantityInput');
+    var selectedQuantity = quantityInput.value;
+
+    // Modify the href attribute to include the selected quantity
+    var addToCartBtn = document.getElementById('addToCartBtn');
+    addToCartBtn.href = addToCartBtn.href.split('?')[0] + '?quantity=' + selectedQuantity;
+
+    console.log(selectedQuantity);
+    console.log(quantityInput.value);
+});
+  
+
+function updateQuantity(cartItemId, change) {
+    const quantityInput = document.getElementById(`quantityInput${cartItemId}`);
+    let newQuantity = parseInt(quantityInput.value) + change;
+    console.log(cartItemId)
+
+    // Ensure the new quantity stays within the stock limit
+    const maxStock = parseInt(quantityInput.getAttribute('max'));
+    if (newQuantity < 0) {
+        newQuantity = 1; // Prevent decreasing quantity below 1
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock; // Prevent increasing quantity above maximum stock
+    }
+
+    // Update the quantity input field value
+    quantityInput.value = newQuantity;
+
+    // Call the updateCart function with the new quantity
+   
+}
+
+    </script>
 {% endblock content %} 

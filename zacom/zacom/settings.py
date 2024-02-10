@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     #custom app
-    'User','Admin','products','customers','orders',
+    'User','Admin','products','customers','orders','cart','wallet',
     # google auth
     'allauth',
     'allauth.account',
