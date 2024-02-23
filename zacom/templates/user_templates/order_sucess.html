@@ -1,0 +1,290 @@
+{% extends 'user_templates/base.html' %}
+
+{% load static %}
+
+{% block content %}   
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-light.css" >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-regular.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-solid.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-DLijJriZUd0nJ/1JTp2g8T+3rd5P0bFeLzo3bZ0EOlbIa7um+OuKpjwamMxnoK2PKWqGTmiGBHRsBkT1uS59Nw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+   <style>
+     
+        body {
+            height: auto;
+        
+            background: #31d382;
+        }
+        .container-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+        }
+
+        .container-left, .container-right {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .container-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+           
+            width: 100%;
+        }
+
+        .container-right {
+            background-color: #e6e6e6;
+            max-width: 400px; 
+            height: 100vh;
+        
+            justify-content: space-between;            
+        }
+
+        .content-box {
+            flex: 1;
+            background-color: #e6e6e6;
+            padding: 20px;
+            margin: 5px;
+        }
+
+        .container-left .steps {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .steps-container {
+            background-color: rgb(224, 226, 224);
+            padding: 50px;
+            border-radius: 10px;
+            max-width: 4000px; /* Adjust the max-width here */
+            width: 100%;
+            z-index: 0;
+        }
+        .steps {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .steps .circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 50px;
+            color: #999;
+            font-size: 22px;
+            font-weight: 500;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #e0e0e0;
+            transition: all 200ms ease;
+            transition-delay: 0s;
+        }
+        .steps .circle.active {
+            transition-delay: 100ms;
+            border-color: #4070f4;
+            color: #4070f4;
+        }
+        .steps .progress-bar {
+            position: absolute;
+            height: 4px;
+            width: 100%;
+            background: #c29393;
+            z-index: -1;
+        }
+        .progress-bar .indicator {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: #4070f4;
+            transition: all 300ms ease;
+            z-index: -1; /* Set z-index to -1 to position it behind the background color */
+}
+        .container-left .buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .buttons button {
+            padding: 8px 25px;
+            background: #4070f4;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            transition: all 200ms linear;
+        }
+        .buttons button:active {
+            transform: scale(0.97);
+        }
+        .buttons button:disabled {
+            background: #87a5f8;
+            cursor: not-allowed;
+        }
+
+        /* Media Queries */
+        @media only screen and (min-width: 768px) {
+            .container-wrapper {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper h-auto">
+        <div class="container-left">
+            
+            <img class="avatar border-white" src="{% static 'user_static/img/check logo.png' %}" style="width: 200px;" alt="..."/>
+            <h1 style="color: #fff;">YOUR ORDER IS CONFIRMED</h1>
+
+            
+            <!-- Your box -->
+            <div class="steps-container">
+                <div class="steps">
+                    <span class="circle active"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <div class="progress-bar">
+                        <span class="indicator"></span>
+                    </div>
+                </div>
+                <div class="steps">
+                    <span >ORDER <br> CONFIRMED</span>
+                    <span >PROCESSING</span>
+                    <span >ACCEPTED</span>
+                    <span >DELIVERED</span>
+                    
+                   
+                </div>
+               
+         
+            </div>  
+            <!-- End of your box -->
+            
+        </div>
+        <div class="container-right" style="padding: 20px; height: auto;">
+            <div class="content-box">
+                <span>ORDER DETAIL</span>
+                <h3>#{{order_dtails}}</h3>
+            </div>
+           
+            <div class="container " style="background-color: #f8fafd; max-width: 100%; padding-left: 10px; border: #999 2px solid; height: 200px;">
+                <div  class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-truck" style="color: #e0e2e5;"></i>
+                <h4>DELIVERY ADDRESS</h4>
+                </div>
+                <i class="fa-regular fa-truck" style="color: #2862b9;"></i>
+                {% for i in address %}
+                <span style="font-size: medium;">{{i }}</span>
+                {% endfor %}
+           
+            </div>
+           <div class="container " style="background-color: #f8fafd;  margin-top: 10px; border: #999 2px solid;">
+                <h4>ORDER SUMMARY</h4>
+                {% for i in order_product %}
+                <img class="avatar border-white" src="{{i.images.url}}" style="width: 90px;"/><br>
+                <span>product  {{i.product_variant}}</span><br>          
+                <span>quantity  {{i.quantity}}</span>          
+                <span>price {{i.product_price }}</span><br>         
+     
+               
+                {% endfor %}
+            </div>
+           
+         
+            
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    
+async function fetchDataFromBackend() {
+  try {
+    // Make a GET request to your backend endpoint
+    const response = await fetch('/order-status/?d_id={{order_dtails.id}}');
+    
+    // Check if the response is successful (status code 200)
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from the backend');
+    }
+    
+    // Parse the JSON response body
+    const data = await response.json();
+    
+    // Extract the value of currentStep from the received data
+    const currentStep = data.currentStep;
+    
+    // Return the currentStep value
+    return currentStep;
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching data from backend:', error);
+    return null; // Or return a default value if fetching fails
+  }
+}
+
+
+     //DOM Elements
+const circles = document.querySelectorAll(".circle"),
+  progressBar = document.querySelector(".indicator"),
+  buttons = document.querySelectorAll("button");
+
+let currentStep =1 ;
+
+// function that updates the current step and updates the DOM
+const updateSteps = async () => {
+    // Fetch data from the backend
+  const currentStep = await fetchDataFromBackend();
+//   currentStep = e.target.id === "next" ? ++currentStep : --currentStep;
+
+  // loop through all circles and add/remove "active" class based on their index and current step
+  circles.forEach((circle, index) => {
+    circle.classList[`${index < currentStep ? "add" : "remove"}`]("active");
+  });
+
+  // update progress bar width based on current step
+  progressBar.style.width = `${((currentStep - 1) / (circles.length - 1)) * 100}%`;
+
+  // check if current step is last step or first step and disable corresponding buttons
+  if (currentStep === circles.length) {
+    buttons[1].disabled = true;
+  } else if (currentStep === 1) {
+    buttons[0].disabled = true;
+  } else {
+    buttons.forEach((button) => (button.disabled = false));
+  }
+};
+updateSteps()
+
+// add click event listeners to all buttons
+// buttons.forEach((button) => {
+//   button.addEventListener("click", updateSteps);
+// });
+
+</script>
+
+{% endblock content %}   
+
+
+

@@ -22,7 +22,7 @@ def product_detail(request, product_variant_slug):
     for i in single_product_variant:
       variants = Product_Variant.objects.select_related('product').filter(product=i.product)
       images = Additional_Product_Image.objects.filter(product_variant=i.id)
-  
+   
 
     context = {
         "variants": variants,
@@ -33,7 +33,7 @@ def product_detail(request, product_variant_slug):
 
     return render(request,'user_templates/product-details.html',context)
 
-def shop(request,  product_slug=None):
+def shop(request,product_slug=None):
     categories = None
     products = None
 
@@ -58,6 +58,7 @@ def shop(request,  product_slug=None):
     # Categories
     cat = Category.objects.all()
     product_detail = {}
+    print(product_detail)
     for category in cat:
         products_in_category = Product.objects.filter(product_catg=category.id, is_available=True)
         product_detail[category] = products_in_category

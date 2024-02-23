@@ -1,0 +1,408 @@
+{% extends 'user_templates/base.html' %}
+
+
+
+{% block content %}
+{% load static %}
+
+    <!-- Bootstrap core CSS     -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!--  Paper Dashboard core CSS    -->
+    <link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
+
+    <!--  CSS for Demo Purpose, don't include it in your project     -->
+    <link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
+
+    <!--  Fonts and icons     -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+    <link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
+
+    
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
+            <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
+                
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'profile' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                   <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
+                </li>
+               
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
+                </li>
+              
+        
+            </div>
+        </div>
+      
+    <div class="col-md-10" style="margin-top: 50px;margin-left: 60px; ">
+        
+       
+
+        <div class="content mt-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-4 col-md-5">
+                       
+                        <div class="card card-user">
+                            <div class="image">
+                                <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="..."/>
+                            </div>
+                  
+                            <div class="content">
+                                <div class="author">
+                                  <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="..."/>
+                                 
+                                  <h4 class="title">{{user.first_name}}{{user.last_name}}<br />
+                                     <a href="#"><small>@{{user.username}}</small></a>
+                                  </h4>
+                                </div>
+                                <p class="description text-center">
+                                    {{user.email}} <br>
+                                    {{user.phone_number}} <br>
+                                   
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-offset-1">
+                                        <h5>{{order_dtails}}<br /><small>Orders</small></h5>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>2GB<br /><small>Used</small></h5>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>24,6$<br /><small>Spent</small></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    <div class="col-lg-6 col-md-7">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Profile</h4>
+                                <div class="container">
+                                    <a  id="edit-button" onclick="toggleEdit()">Edit</a>
+
+                                    <!-- <a id="add-form-button"><i class="fa-solid fa-plus"></i></a> -->
+                
+                                </div>
+                            </div>
+                            <div class="content">
+                                <form id="new-address-form" method="POST"  onsubmit="return validateForm()">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label for="name">First name</label>
+                                                <input type="text" class="form-control border-input" id="First_name" placeholder="First name" value="{{user.first_name}}" name="First_name" required>
+                                                <span id="firstNameError" class="error"></span>       </div>                                
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <label for="phone">Last name</label>
+                                                <input type="text" class="form-control border-input" id="Last_name" placeholder="Last_name" value="{{user.last_name}}" name="Last_name" required>
+                                                <span id="lastNameError" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="locality">Username</label>
+                                                <input type="text" class="form-control border-input" id="Username" placeholder="Username" name="Username" value="{{user.username}}" required>
+                                                <span id="UsernameError" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="pincode">Phone</label>
+                                                <input type="number" class="form-control border-input" id="Phone" placeholder="Phone" name="Phone" value="{{user.phone_number}}" >
+                                                <span id="phoneError" class="error"></span>                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-11">
+                                            <div class="form-group">
+                                                <label for="address">Email</label>
+                                                <input type="text" class="form-control border-input" id="Email" placeholder="Email" name="Email" value="{{user.email}}" required>
+                                                <span id="emailError" class="error"></span>
+                                                <div type="submit" id="verify-button" style="display: none;"  onclick="toggleVerify()" >verify</div>
+                                            </div>
+                                        </div>
+                                    </div>
+        
+                                    <div class="text-center">
+                                        <div type="button" id="cancel-button" onclick="toggleEdit()" style="display: none;">Cancel</div>
+                                        <button type="submit" id="submit-button" style="display: none;">Submit</button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                
+                
+
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+    window.onload = function() {
+        toggleEdit(); // Call toggleEdit() when the window loads to set inputs to read-only
+    };
+
+    function toggleEdit() {
+        var inputs = document.querySelectorAll('input, textarea');
+        var editButton = document.getElementById('edit-button');
+        var cancelButton = document.getElementById('cancel-button');
+        var submitButton = document.getElementById('submit-button');
+        var verifyButton = document.getElementById('verify-button');
+        var readOnly = inputs[0].readOnly; // Check the readOnly status of the first input field
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].readOnly = !readOnly; // Toggle readOnly for all input fields
+        }
+        editButton.style.display = readOnly ? 'none' : 'inline-block'; // Show/hide edit button
+        cancelButton.style.display = readOnly ? 'inline-block' : 'none'; // Show/hide cancel button
+        submitButton.style.display = readOnly ? 'inline-block' : 'none'; // Show/hide submit button
+        verifyButton.style.display = readOnly ? 'inline-block' : 'none'; // Show/hide submit button
+    }
+</script>
+<script>
+    function validateFirstName() {
+        const firstName = document.getElementById('First_name').value.trim();
+        const firstNameError = document.getElementById('firstNameError');
+
+        if (firstName ==="") {
+            firstNameError.innerHTML = 'Please enter your first name';
+            return false;
+        }
+        // You can add additional validation rules for first name if needed
+        // Example: Check if first name contains only letters and spaces
+        if (!firstName.match(/^[a-zA-Z\s]+$/)) {
+            firstNameError.innerHTML = 'First name can only contain letters and spaces';
+            return false;
+        }
+
+        if (firstName.length !== 5) {
+        firstNameError.innerHTML = 'First name must be exactly 5 letters';
+        return false;
+        }
+        firstNameError.innerHTML = null;
+        return true;
+        }
+
+    function validateLastName() {
+        const lastName = document.getElementById('Last_name').value.trim();
+        const lastNameError = document.getElementById('lastNameError');
+
+        if (lastName === "") {
+            lastNameError.innerHTML = 'Please enter your last name';
+            return false;
+        }
+        // You can add additional validation rules for last name if needed
+        // Example: Check if last name contains only letters and spaces
+        if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+            lastNameError.innerHTML = 'Last name can only contain letters and spaces';
+            return false;
+        }
+        lastNameError.innerHTML = null;
+        return true;
+    }
+    function validateusername() {
+        const lastName = document.getElementById('Username').value.trim();
+        const lastNameError = document.getElementById('UsernameError');
+
+        if (lastName === "") {
+            lastNameError.innerHTML = 'Please enter your user name';
+            return false;
+        }
+        // You can add additional validation rules for last name if needed
+        // Example: Check if last name contains only letters and spaces
+        if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+            lastNameError.innerHTML = 'User name can only contain letters and spaces';
+            return false;
+        }
+        lastNameError.innerHTML = null;
+        return true;
+    }
+    function validatePhone() {
+    const phone = document.getElementById('Phone').value.trim();
+    const phoneError = document.getElementById('phoneError');
+
+    if (phone === "") {
+        phoneError.innerHTML = 'Please enter your phone number';
+        return false;
+    }
+    // Check if phone number consists of the same digit repeated 10 times
+    if (/^(\d)\1{9}$/.test(phone)) {
+        phoneError.innerHTML = 'Enter a valid number';
+        return false;
+    }
+    // Check if phone number contains exactly 10 digits
+    if (!phone.match(/^\d{10}$/)) {
+        phoneError.innerHTML = 'Phone number must be 10 digits';
+        return false;
+    }
+    phoneError.innerHTML = null;
+    return true;
+    }
+
+    function validateEmail() {
+        const email = document.getElementById('Email').value.trim();
+        const emailError = document.getElementById('emailError');
+
+        if (email === "") {
+            emailError.innerHTML = 'Please enter your email address';
+            return false;
+        }
+        // Check if email is in a valid format using a regular expression
+        if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+            emailError.innerHTML = 'Invalid email address';
+            return false;
+        }
+        emailError.innerHTML = null;
+        return true;
+    }
+
+    // Similar functions can be created for username, phone, and email fields as needed
+
+    function validateForm() {
+        const isValidFirstName = validateFirstName();
+        const isValidLastName = validateLastName();
+        const isValidUserName = validateusername();
+        const isValidPhone = validatePhone();
+        const isValidEmail = validateEmail();
+        // Add similar validation checks for other fields
+
+        return isValidFirstName && isValidLastName && isValidPhone && isValidEmail && isValidUserName/* && other validation checks */;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+            const addressForm = document.getElementById('new-address-form');
+    
+            addressForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission behavior
+    
+                // Your validation and other logic here
+                if (validateForm()) {
+                    console.log('Address form submitted successfully');
+                    this.submit(); // Manually submit the form
+                } else {
+                    console.log('Address form not submitted due to validation error');
+                }
+            });
+        });
+        
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function toggleVerify() {
+        const email = document.getElementById('Email').value;
+
+        // First fetch when the button is clicked
+        fetch('sendotp/', {
+            method: 'POST',
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ email }), // Send phone to the backend
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle the response data if needed
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('First fetch failed:', error);
+        });
+
+        // Show SweetAlert for OTP entry
+        Swal.fire({
+            title: "ENTER YOUR OTP",
+            input: "tel",
+            inputAttributes: {
+                autocapitalize: "off",
+                maxLength: 6,  // Limit input to 6 characters
+                inputmode: "numeric"  // Set input mode to numeric
+            },
+            showCancelButton: true,
+            confirmButtonText: "Submit",
+            showLoaderOnConfirm: true,
+            preConfirm: async (otp) => {
+                try {
+                    // Second fetch when OTP is submitted
+                    const response = await fetch('email/verify/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+
+                        },
+                        body: JSON.stringify({ otp }), // Send OTP to the backend
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: `email verified `,
+                    imageUrl: result.value.avatar_url
+                });
+            }
+        });
+
+}
+
+        
+
+</script>
+
+  
+{% endblock content %}

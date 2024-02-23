@@ -41,11 +41,11 @@
         }
 
         #step-1::after {
-            content: "DELIVERY ADDRESS";
+            content: "OREDER SUMMARY";
         }
 
         #step-2::after {
-            content: "ORDER SUMMARY";
+            content: "DELIVERY ADDRESS ";
             left: -5px;
         }
 
@@ -144,7 +144,7 @@
                 <li id="step-3"></li>
             </ul>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="25" aria-valuemin="0"
+                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="50"
                 aria-valuemax="100">
             </div>
         </div>
@@ -159,49 +159,48 @@
                         here to enter your code.</h6>
                 </div>
             <div class="row ">
-            
                 <div class="col-lg-8">
                     <div class="header">
                         <h4 class="title">Payment</h4>
                     </div>
+           
                     <div class="content">
-                        <ul class="d-flex flex-column justify-content-center">
-                            <!-- Single Address Start -->
-                            <li class="d-flex flex-row p-2" style="border-bottom: 1px solid #777777;">
-                                <input type="radio" class="address-radio" onclick="showDiv('option1')" id="option1" style="width: 25px; height: 16px; position: relative; bottom: 5px" name="address" />
-                                <div>
-                                    <h5>UPI</h5>
+                        <ul class="payment-options">
+                            <li class="payment-option">
+                                <input type="radio" class="address-radio" onclick="showDiv('option1')" id="option1" name="payment-option" />
+                                <label for="option1">UPI</label>
+                                <div id="option1Div" class="payment-details">
+                                    <input type="radio" class="address-radio" name="option1" />
+                                    <label>UPI Option 1</label>
+                                    <input type="radio" class="address-radio" name="option1" />
+                                    <label>UPI Option 2</label>
                                 </div>
                             </li>
-                            <div id="option1Div" style="display: none;">
-                                Content for UPI
-                            </div>
-                            <li class="d-flex flex-row p-2" style="border-bottom: 1px solid #777777;">
-                                <input type="radio" class="address-radio" onclick="showDiv('option2')" id="option2" style="width: 25px; height: 16px; position: relative; bottom: 5px" name="address" />
-                                <div class="col pl-2">
-                                    <h5>WALLET</h5>
+                            <li class="payment-option">
+                                <input type="radio" class="address-radio" onclick="showDiv('option2')" id="option2" name="payment-option" />
+                                <label for="option2"><i class="fa-regular fa-wallet">  WALLET </i></label>
+                                <div id="option2Div" class="payment-details">
+                                    <input type="radio" class="address-radio" name="option2" />
+                                    <label>UPI Option 1</label>
+                                    <input type="radio" class="address-radio" name="option2" />
+                                    <label>UPI Option 2</label>
                                 </div>
                             </li>
-                            <div id="option2Div" style="display: none;">
-                                Content for WALLET
-                            </div>
-                            <li class="d-flex flex-row p-2" style="border-bottom: 1px solid #777777;">
-                                <input type="radio" class="address-radio" onclick="showDiv('option3')" id="option2" style="width: 25px; height: 16px; position: relative; bottom: 5px" name="address" />
-                                <div class="col pl-2">
-                                    <h5>COD</h5>
-                                </div>
-                                <div id="option3Div" style="display: none;">
-                                    <h6>cod is choosen <br>  Content for WALLET</h6>
+                            <li class="payment-option">
+                                <input type="radio" class="address-radio" value="cod" onclick="showDiv('option3')" id="option3" name="payment-option" />
+                                <label for="option3"><i class="fa-regular fa-money-bill"> CASH ON DELIVERY</i></label>
+                                <div id="option3Div" class="payment-details">
+                                  <H6>COD</H6>
                                 </div>
                             </li>
-                            <!-- Repeat for other options -->
-                            <!-- Single Address End  -->
+                            <!-- Repeat for other payment options -->
                         </ul>
+                        
                     </div>
-                    
-                   
-                    
+              
                 </div>
+                
+                
                      
                 <div class="col-lg-4">
                     <div class="checkout__order">
@@ -226,14 +225,15 @@
                                 </ul>
                             </div>
                     </div>
-                    <div >
-                       <a href="{% url "order-review" %}"><button>Next</button></a>
+                    <div>
+                        <button onclick="handlePlaceOrderClick()">Place Order</button>
                     </div>
                 </div>
             </div>
                 
         </div>
 </section>
+
 
 <style>
  
@@ -274,7 +274,7 @@ input.qtyminus { width:15px; height:15px;}
 <script>
     function showDiv(option) {
         // Hide all divs
-        document.querySelectorAll('[id$="Div"]').forEach(div => {
+        document.querySelectorAll('.payment-details').forEach(div => {
             div.style.display = 'none';
         });
 
@@ -283,5 +283,97 @@ input.qtyminus { width:15px; height:15px;}
         document.getElementById(divId).style.display = 'block';
     }
 </script>
+<script>
+    // Function to handle the click event on the "Place Order" button
+    function handlePlaceOrderClick() {
+        // Fetch the selected payment option value
+        const selectedOption = document.querySelector('input[name="payment-option"]:checked');
+
+        if (!selectedOption) {
+            console.error('No payment option selected');
+            return;
+        }
+
+        const selectedOptionId = selectedOption.id;
+
+        // Make a POST request to your Django view
+        fetch('{% url "order-payment" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+            },
+            body: JSON.stringify({ payment_option: selectedOptionId }) // Send selected option ID as JSON data
+        })
+        .then(response => response.json())
+        .then ( data =>{
+            console.log('POST request successful');
+            if (data.url){
+                console.log('iofjfji',data.url)
+                window.location.href = data.url;
+            }
+        })
+        .catch(error => {
+            // Handle error here if needed
+            console.error('Error:', error);
+        });
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Extract CSRF token
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+
+<style>
+    .payment-options {
+    list-style: none;
+    padding: 0;
+}
+
+.payment-option {
+    
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 5px solid #777777;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.payment-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.payment-option label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.payment-details {
+    display: none;
+    padding-left: 30px; /* Indentation for nested options */
+}
+
+/* Show nested options when radio button is checked */
+.payment-option input[type="radio"]:checked + .payment-details {
+    display: block;
+}
+
+</style>
   
 {% endblock content %}

@@ -1,0 +1,104 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order List </h2>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                </div>
+                <div>
+                    <input type="text" placeholder="Search order ID" class="form-control bg-white">
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row gx-3">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <input type="text" placeholder="Search..." class="form-control">
+                        </div>
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select class="form-select">
+                                <option>Status</option>
+                                <option>Active</option>
+                                <option>Disabled</option>
+                                <option>Show all</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select class="form-select">
+                                <option>Show 20</option>
+                                <option>Show 30</option>
+                                <option>Show 40</option>
+                            </select>
+                        </div>
+                    </div>
+                </header> <!-- card-header end// -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col" class="text-end"> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in orders %}
+                                <tr>
+                                    <td>{{i}}</td>
+                                    <td><b>{{i.user.username}}</b></td>
+                                    <td>{{i.user}}</td>
+                                    <td>{{ i.payment.amount_paid }}</td>
+                                    {% if i.order_status == 'New' %}
+                                    <td><span class="badge rounded-pill alert-warning">New</span></td>
+
+                                    {% elif i.order_status == 'Accepted'%}
+                                    <td><span class="badge rounded-pill alert-warning">Accepted</span></td>
+                              
+                                    {% elif  i.order_status == 'Delivered'%}
+                                    <td><span class="badge rounded-pill alert-warning">Delivered</span></td>
+                             
+                                    {% elif  i.order_status == 'Cancelled_Admin'%}
+                                    <td><span class="badge rounded-pill alert-warning">Cancelled_Admin</span></td>
+                             
+                              
+                                    {% elif  i.order_status == 'Cancelled_User'%}
+                                    <td><span class="badge rounded-pill alert-warning">Cancelled_User</span></td>
+                             
+                                    {% else %}
+                                    <td><span class="badge rounded-pill alert-warning">Returned_User</span></td>
+                              
+                                    {% endif %}
+                                    <td>{{i.created_at}}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'admin-order-detail' order_id=i.id %}" class="btn btn-md rounded font-sm">Detail</a>
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">View detail</a>
+                                                <a class="dropdown-item" href="#">Edit info</a>
+                                                <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            </div>
+                                        </div> <!-- dropdown //end -->
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>  
+                        </table>
+                    </div> <!-- table-responsive //end -->
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+          
+        </section> <!-- content-main end// -->
+        
+{% endblock content %}
+        

@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Product,Product_Variant
+from .models import Product,Product_Variant,Additional_Product_Image,Category
 from django import forms
 
 
@@ -83,3 +83,14 @@ class AddProductVariantForm(ModelForm):
         model = Product_Variant
         fields = '__all__'
         exclude = ['product_variant_slug','atributes','additional_images']        
+
+
+
+
+from .models import Image
+
+
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ('image_field', 'cropping', 'cropping_free')

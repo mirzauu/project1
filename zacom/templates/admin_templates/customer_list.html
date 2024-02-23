@@ -50,12 +50,13 @@
                                 {% for i in customer %}
                                 <tr>
                                     <td width="40%">
-                                        <a href="#" class="itemside">
+                                       
+                                        <a href="{% url 'customer_details' %}?userId={{i.id}}" class="itemside">
                                             <div class="left">
                                                 <img src="{% static 'admin_static/imgs/people/avatar2.jpg' %}" class="img-sm img-avatar" alt="Userpic">
                                             </div>
                                             <div class="info pl-3">
-                                                <h6 class="mb-0 title">{{ i.first_name }} {{i.last_name}}</h6>
+                                                <h6 class="mb-0 title" >{{ i.first_name }} {{i.last_name}}</h6>
                                                 <small class="text-muted">{{ i.username }}</small>
                                             </div>
                                         </a>
@@ -78,6 +79,7 @@
                                         </a>
                                         {% endif %}                     
                                                    </td>
+                                                </a>
                                 </tr>
                                 {% endfor %}
                             </tbody>

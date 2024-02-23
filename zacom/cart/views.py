@@ -3,7 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import CartItem,Cart
 from products.models import Product_Variant
 from django.http import JsonResponse
-
+from orders.models import Payment
+from django.contrib import messages
 
 # Create your views here.
 #to get the cart id if present
@@ -17,22 +18,28 @@ def _cart_id(request):
 
 def cart(request,total=0,quantity=0,cart_items=None):
     total_with_orginal_price =0
+
     try:
+
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user,is_active=True)
+          
+
+
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart,is_active=True)
-            
-            print(cart_items)
+           
+        print(cart_items)
+
         for cart_item in cart_items:
             total += cart_item.sub_total()
             # total += ( cart_item.product.sale_price * cart_item.quantity)
             total_with_orginal_price +=( cart_item.product.max_price * cart_item.quantity)
             quantity += cart_item.quantity
             
-        
-            
+
+
     except ObjectDoesNotExist:
         pass
     
@@ -45,30 +52,31 @@ def cart(request,total=0,quantity=0,cart_items=None):
         'cart_items':cart_items,
         'grand_total':grand_total,
         'discount':discount,
-        'total_with_orginal_price':total_with_orginal_price
+        'total_with_orginal_price':total_with_orginal_price,
     }
 
     if total==0:
       return render(request, 'user_templates/shop_cart_empty.html',context)
+
     else:
+      
       return render(request, 'user_templates/shop-cart.html',context)
-    
 
-
-
+ 
 
 def add_cart(request,product_id):
-    
     current_user = request.user
     product = Product_Variant.objects.get(id=product_id)    #get the product
-
+    
     if request.GET.get('quantity'):
         quantity1 = int(request.GET.get('quantity'))
         print(quantity1)
     else:
         quantity1=1
+       
     #if user authenticated
     if current_user.is_authenticated:
+
         try:
             cart = Cart.objects.get(cart_id=_cart_id(request)) # to get the cartid present in the session
         except Cart.DoesNotExist:
@@ -77,12 +85,22 @@ def add_cart(request,product_id):
             )
         cart.save()
         
-        
+
+
         try:
             cart_item = CartItem.objects.get(product=product , user=current_user)
-            cart_item.quantity += quantity1
-            cart_item.save()
+            print('1stttttttttttttttttttttt')
+            maxstock=cart_item.quantity + quantity1
+            if maxstock <= product.stock:
+                cart_item.quantity += quantity1
+                cart_item.save()
+            else:
+                messages.error(request, 'Stock limit exceed')
+    
+
         except CartItem.DoesNotExist:
+            print('12stttttttttttttttttttttt')
+
             cart_item = CartItem.objects.create(
                 product=product,
                 user=current_user,
@@ -94,10 +112,14 @@ def add_cart(request,product_id):
         
     else:
         
-    # ===CART CREATED ===
+        # ===CART CREATED ===
         try:
+            print('3stttttttttttttttttttttt')
+
             cart = Cart.objects.get(cart_id=_cart_id(request)) # to get the cartid present in the session
         except Cart.DoesNotExist:
+            print('13stttttttttttttttttttttt')
+
             cart = Cart.objects.create(
                 cart_id=_cart_id(request)
             )
@@ -105,9 +127,16 @@ def add_cart(request,product_id):
         
         # ===Product saved to cart item
         try:
+            print('assstttttttttttttttttttttt')
+
             cart_item = CartItem.objects.get(product=product , cart=cart)
-            cart_item.quantity += quantity1
-            cart_item.save()
+            maxstock=cart_item.quantity + quantity1
+            if maxstock <= product.stock:
+                cart_item.quantity += quantity1
+                cart_item.save()
+            else:
+                messages.error(request, 'Stock limit exceed')
+
         except CartItem.DoesNotExist:
             cart_item = CartItem.objects.create(
                 product=product,
@@ -119,7 +148,7 @@ def add_cart(request,product_id):
 
 def update_cart(request, cart_item_id, new_quantity):
     try:
-        cart_item = CartItem.objects.get(id=cart_item_id,user=request.user)
+        cart_item = CartItem.objects.get(id=cart_item_id)
         cart_item.quantity = int(new_quantity)
         cart_item.save()
         print(cart_item)
@@ -143,21 +172,23 @@ def update_cart(request, cart_item_id, new_quantity):
 
 
 def delete_cart_item(request, cart_item_id):
-    try:
-        cart_item = CartItem.objects.get(id=cart_item_id, user=request.user)
-        cart_item.delete()
-        print('aaaaa')
-        response_data = {
-            'success': True,
-            'message': 'Item deleted successfully',
-        }
-        print('xxxxxxxxxxxxx')
-    except CartItem.DoesNotExist:
-        response_data = {
-            'success': False,
-            'message': 'Item not found',
-        }
-        print('wndkjnwkd')
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(id=cart_item_id,user=request.user,is_active=True)
+
+
+    else:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True,id=cart_item_id)
+
+    cart_items.delete()
+    print('aaaaa')
+    response_data = {
+        'success': True,
+        'message': 'Item deleted successfully',
+    }
+
+   
+      
 
     return JsonResponse(response_data)
 
@@ -170,8 +201,15 @@ def order_summary(request):
     quantity = 0
     shipping = 100
 
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(user=request.user,is_active=True)
+
+    else:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True)
+
     # Calculate total, quantity, tax, and grandtotal
-    for cart_item in CartItem.objects.filter(user=request.user):
+    for cart_item in cart_items :
         total += round(cart_item.sub_total(), 2)
         quantity += cart_item.quantity
 

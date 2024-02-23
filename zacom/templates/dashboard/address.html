@@ -1,62 +1,292 @@
-{% extends 'dashboard/dashboard_base.html' %}
+{% extends 'user_templates/base.html' %}
 
-{% block dashcontent %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<div class="col-lg-6 col-md-7">
-    <div class="card">
-        <div class="header">
-            <h4 class="title">Address</h4>
-            <div class="container">
-                <a id="add-form-button"><i class="fa-solid fa-plus"></i></a>
 
+
+{% block content %}
+{% load static %}
+
+    <!-- Bootstrap core CSS     -->
+
+  
+
+    <!--  Paper Dashboard core CSS    -->
+    <link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
+
+    <!--  CSS for Demo Purpose, don't include it in your project     -->
+    <link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
+
+    <!--  Fonts and icons     -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+    <link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
+
+    
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
+            <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
+                
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'profile' %}"> <button class="nav-link  rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                   <a href="{% url 'address-detail' %}"> <button class="nav-link active rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
+                </li>
+               
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
+                </li>
+              
+        
             </div>
         </div>
-        <div class="content">
-            <div id="form-container"></div>
-                    <ul class="d-flex flex-column justify-content-center" >
-                        {% for i in adress %}
-                        <!-- Single Address Start -->
-                        <li class="d-flex flex-row p-2"  style="border-bottom: 1px solid #777777 ;">
-                            <label for="address-{{ i.id }}" class="d-flex ">
-                                <div class="flex-column" >
-                                    <div class="d-flex flex-row px-3 align-content-center " style="width: 400px; height: 100px;">
-                                        <input type="radio" class="address-radio" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}"style="width: 25px; height: 16px;position: relative;bottom: -15px" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %} />
-                                        <div class="col pl-2">
-                                            <h5>{{i.name}}</h5>
-                                            <div class="col">
-                                                <span>{{i.street_address}}</span>,
-                                                <span>{{i.city}}</span>,
-                                                <span>{{i.state}}</span>,
-                                                <span>{{i.country}}</span>,
-                                                <span>{{i.pincode}}</span>
-                                            </div>
-                                            <span>{{i.phone}}</span>
-                                        </div>
+      
+    <div class="col-md-10" style="margin-top: 50px;margin-left: 60px; ">
+        
+       
+
+        <div class="content mt-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-4 col-md-5">
+                        {% for i in user %}
+                        <div class="card card-user">
+                            <div class="image">
+                                <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="..."/>
+                            </div>
+                         
+                            <div class="content">
+                                <div class="author">
+                                  <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="..."/>
+                                 
+                                  <h4 class="title">{{i.first_name}}{{i.last_name}}<br />
+                                     <a href="#"><small>@{{i.username}}</small></a>
+                                  </h4>
+                                </div>
+                                <p class="description text-center">
+                                    {{i.email}} <br>
+                                    {{i.phone_number}} <br>
+                                   
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-offset-1">
+                                        <h5>{{order_dtails}}<br /><small>Orders</small></h5>
                                     </div>
-                                <div class="btn px-3 align-content-center" onclick="delete_add('{{ i.id }}')"><i class="fa-duotone fa-trash" style="--fa-primary-color: #b19561; --fa-secondary-color: #b19561; "></i></div>                        </div>
-                            </label>
+                                    <div class="col-md-4">
+                                        <h5>2GB<br /><small>Used</small></h5>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>24,6$<br /><small>Spent</small></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                       
+                    </div>
+                    <div class="col-lg-6 col-md-7">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Address</h4>
+                                <div class="container">
+                                    <a id="add-form-button">fffffffffff</a>
+                
+                                </div>
+                            </div>
+                            <div class="content" id="address-form" >                                  
+                                        <form id="new-address-form" style="display: none;" onsubmit="return validateForm()" >
+                                            {% csrf_token %}
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <div class="form-group">
+                                                        <label>Name</label>
+                                                        <input type="text" id="nameInput" class="form-control border-input" placeholder="Name" name="name" >
+                                                        <span id="nameError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <div class="form-group">
+                                                        <label for="exampleInputEmail1">Phone Number</label>
+                                                        <input type="number" class="form-control border-input" placeholder="Phone" name="phone" id="Phone">
+                                                        <span id="phoneError" class="error"></span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Pincode</label>
+                                                        <input type="number" class="form-control border-input" placeholder="Pincode" name="pincode" id="pincode">
+                                                        <span id="pincodeError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Locality</label>
+                                                        <input type="text" class="form-control border-input" placeholder="Locality" name="locality" id="locality" >
+                                                        <span id="localityError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-11">
+                                                    <div class="form-group">
+                                                        <label>Address</label>
+                                                        <textarea  class="form-control border-input" placeholder="Address" name="address" id="address"></textarea>
+                                                        <span id="addressError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>City</label>
+                                                        <input type="text" class="form-control border-input" placeholder="City" id="city" name="city">
+                                                        <span id="cityError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>State</label>
+                                                        <input type="text" class="form-control border-input" placeholder="State" id="state" name="state">
+                                                        <span id="stateError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Country</label>
+                                                        <input type="text" class="form-control border-input" placeholder="Country" id="country"  name="country">
+                                                        <span id="countryError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <button type="submit" class="btn custom-btn">Add Address</button>
+                          
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </form>
+                                    </div>
+                            </div>
+                                    <div  id="address-list" >
+                                        <ul class="d-flex flex-column justify-content-center" >
+                                            {% for i in adress %}
+                                            <!-- Single Address Start -->
+                                            <li class="d-flex flex-row p-2"  style="border-bottom: 1px solid #777777 ;">
+                                                <label for="address-{{ i.id }}" class="d-flex ">
+                                                    <div class="flex-column" >
+                                                        <div class="d-flex flex-row px-3 align-content-center " style="width: 400px; height: 100px;">
+                                                            <input type="radio" class="address-radio" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}"style="width: 25px; height: 16px;position: relative;bottom: -15px" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %} />
+                                                            <div class="col pl-2">
+                                                                <h5>{{i.name}}</h5>
+                                                                <div class="col">
+                                                                    <span>{{i.street_address}}</span>
+                                                                    <span>{{i.city}}</span>,
+                                                                    <span>{{i.state}}</span>,
+                                                                    <span>{{i.country}}</span>,
+                                                                    <span>{{i.pincode}}</span>
+                                                                </div>
+                                                                <span>{{i.phone}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <div class="btn px-3 align-content-center" onclick="delete_add('{{ i.id }}')"><i class="fa-duotone fa-trash" style="--fa-primary-color: #0f0f0e; --fa-secondary-color: #0f0e0c; "></i></div>                     
+                                                
+                                            </li>
+                                            {% endfor %}
+                                            <!-- Single Address End  --> 
+                                        </ul>
+                                    </div>    
                             
-                        </li>
-                    {% endfor %}
-                        <!-- Single Address End  -->
-                    </ul>
-          
+                            </div>
+                        </div>
+                    </div>
+                
+                
+
+                </div>
+            </div>
         </div>
+
+      </div>
     </div>
-</div>
+  </div>
+</section>
+  
+  
+<style>
+    .custom-btn {
+  background-color: #ee7c7c; /* Change background color */
+  color: #fff; /* Change text color */
+  border-radius: 5px; /* Add rounded corners */
+  padding: 10px 20px; /* Add padding */
+  border: none; /* Remove border */
+  cursor: pointer; /* Add pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Add smooth transition for background color */
+}
 
+.custom-btn:hover {
+  background-color: #ca1515; /* Change background color on hover */
+}
 
+    /* Override Bootstrap classes */
+    .bg-danger {
+      background-color: #ca1515 !important; /* Change background color to grey */
+    }
+  
+    .nav-link {
+      color: rgb(24, 24, 43) !important; /* Change text color to blue */
+    }
+  
+    .nav-link.active {
+      background-color: #ca1515 !important; /* Change background color of active link to grey */
+      color: rgb(255, 255, 255) !important; /* Change text color of active link to blue */
+    }
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
 <script>
+
+    
+function delete_add(addressId){
+
+    fetch(`/delete-address/?id=${addressId}`, {
+    method: 'GET',
+    headers: {
+    'Content-Type': 'application/json',
+    // Other headers as needed
+    },
+    })
+    .then(response => response.json())
+    .then(data => {
+    // Handle the response data
+    console.log(data);
+    window.location.reload();
+    })
+    .catch(error => {
+        // Handle errors
+    window.location.reload();
+    console.error('Error:', error);
+    });
+
+}
+
+
 
 function sweet_alert(addressId) {
     Swal.fire({
         title: "Are you sure?",
         text: "Make this your default address",
         icon: "question",
-        showCancelButton: true,
+        showCancelButton: false,
         confirmButtonColor: "#b19361",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes"
+    
     }).then((result) => {
         // If the user confirms
         console.log(addressId);
@@ -89,8 +319,11 @@ function sweet_alert(addressId) {
                     Swal.fire('Error', 'An unexpected error occurred', 'error');
                 });
         }
+
     });
+
 }
+
 
 
 function getCookie(name) {
@@ -109,144 +342,181 @@ function getCookie(name) {
     return cookieValue;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-var isFormVisible = false;
 document.getElementById("add-form-button").addEventListener("click", function() {
-    if (!isFormVisible) {
-        // Create a new form element
-        var newForm = document.createElement("form");
-    
-        // Add form elements, such as inputs, labels, etc.
-        // Example:
-        newForm.innerHTML = `
-        <div class="content">
-                <form id="new-address-form" >
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" class="form-control border-input" placeholder="Name" name="name" required>
-                            </div>
-                        </div>
-                        <div class="col-md-7">
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">Phone Number</label>
-                                <input type="number" class="form-control border-input" placeholder="Phone" name="phone" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Pincode</label>
-                                <input type="number" class="form-control border-input" placeholder="Pincode" name="pincode" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Locality</label>
-                                <input type="text" class="form-control border-input" placeholder="Locality" name="locality" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                            <div class="form-group">
-                                <label>Address</label>
-                                <textarea  class="form-control border-input" placeholder="Address" name="address" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>City</label>
-                                <input type="text" class="form-control border-input" placeholder="City"  name="city">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>State</label>
-                                <input type="text" class="form-control border-input" placeholder="State" name="state">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Country</label>
-                                <input type="text" class="form-control border-input" placeholder="Country" name="country">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn custom-btn">Add Address</button>
-                    </div>
-                    <div class="clearfix"></div>
-                </form>
-            </div>
-        `;
-
-        // Insert the new form into the container element
-        document.getElementById("form-container").appendChild(newForm);
-        isFormVisible = true;
+    // Toggle the display of form elements
+    var address = document.getElementById("new-address-form");
+    var addresslist = document.getElementById("address-list");
+    if (address.style.display == 'block') {
+        address.style.display = 'none'; 
+        addresslist.style.display='block';
     } else {
-        var formElement = document.getElementById("new-address-form");
-        if (formElement) {
-            // If the form element exists, remove it
-            formElement.remove();
-        } else {
-            console.error("Element with ID 'new-address-form' not found");
-        }
+        address.style.display = 'block'; 
+        addresslist.style.display='none';
+    }
+});
 
+// Create a new form submission event listener
+document.getElementById("new-address-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission behavior
 
-    }    
+    // Collect form data
+    var formData = new FormData(this);
 
-    // Add form submission event listener
-    newForm.addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent default form submission behavior
+    var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
 
-        // Collect form data
-        var formData = new FormData(this);
-
-        var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-
-        // Send form data via AJAX
-        fetch("/address/add/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken
-            },
-            body: formData
-        })
-        .then(response => {
-            // Handle response as needed
-            console.log("Form submitted successfully");
-            // Optionally, you can update the UI or perform any other action based on the response
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error("Error submitting form:", error);
-            // Handle error as needed
-        });
+    // Send form data via AJAX
+    fetch("/address/add/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        // Handle response as needed
+        console.log("Form submitted successfully");
+        // Optionally, you can update the UI or perform any other action based on the response
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error("Error submitting form:", error);
+        // Handle error as needed
     });
 });
 
+function validateusername() {
+ 
+    const lastName = document.getElementById('nameInput').value.trim();
+    const lastNameError = document.getElementById('nameError');
 
+    if (lastName === "") {
+        lastNameError.innerHTML = 'Enter your name';
+        return false;
+    }
+    // Check if last name contains only letters and spaces
+    if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+        lastNameError.innerHTML = 'User name can only contain letters and spaces';
+        return false;
+    }
+    lastNameError.innerHTML = null;
+    return true;
+}
+
+
+function validatePhone() {
+    const phone = document.getElementById('Phone').value.trim();
+    const phoneError = document.getElementById('phoneError');
+
+    if (phone === "") {
+        phoneError.innerHTML = 'Enter your phone number';
+        return false;
+    }
+    // Check if phone number consists of the same digit repeated 10 times
+    if (/^(\d)\1{9}$/.test(phone)) {
+        phoneError.innerHTML = 'Enter a valid number';
+        return false;
+    }
+    // Check if phone number contains exactly 10 digits
+    if (!phone.match(/^\d{10}$/)) {
+        phoneError.innerHTML = 'Phone number must be 10 digits';
+        return false;
+    }
+    phoneError.innerHTML = null;
+    return true;
+}
+
+
+function validatePincode() {
+    const phone = document.getElementById('pincode').value.trim();
+    const phoneError = document.getElementById('pincodeError');
+
+    if (phone === "") {
+        phoneError.innerHTML = 'Enter your pincode';
+        return false;
+    }
+    // Check if phone number consists of the same digit repeated 10 times
+    if (/^(\d)\1{9}$/.test(phone)) {
+        phoneError.innerHTML = 'Enter a valid number';
+        return false;
+    }
+    // Check if phone number contains exactly 10 digits
+    if (!phone.match(/^\d{6}$/)) {
+        phoneError.innerHTML = 'must be 6 digits';
+        return false;
+    }
+    phoneError.innerHTML = null;
+    return true;
+}
+
+
+
+function validatecity() {
+ 
+ const lastName = document.getElementById('city').value.trim();
+ const lastNameError = document.getElementById('cityError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your city';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+function validatestate() {
+ 
+ const lastName = document.getElementById('state').value.trim();
+ const lastNameError = document.getElementById('stateError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your state';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+function validatecountry() {
+ 
+ const lastName = document.getElementById('country').value.trim();
+ const lastNameError = document.getElementById('countryError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your country';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+
+
+
+function validateForm() {
+    const isValidUserName = validateusername();
+    const isValidphone = validatePhone();
+    const isValidpincode = validatePincode();
+    const isValidcity = validatecity();
+    const isValidstate = validatestate();
+    const isValidcountry = validatecountry();
+    return isValidUserName && isValidphone && isValidpincode && isValidcity && isValidstate && isValidcountry /* && other validation checks */;
+}
 
 </script>
 
+{% endblock content %}
 
 
 
-{% endblock dashcontent %}  

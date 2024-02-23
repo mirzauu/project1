@@ -46,8 +46,18 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    # image copper
+     'easy_thumbnails',
+     'image_cropping',
  
 ]
+
+
+from easy_thumbnails.conf import Settings as thumbnail_settings
+THUMBNAIL_PROCESSORS = (
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
 
 SITE_ID = 1
 LOGIN_REDIRECT_URL='/'
@@ -156,6 +166,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'alimirsa123@gmail.com'
 EMAIL_HOST_PASSWORD = 'scyw kake gklv bvns'
 EMAIL_USE_TLS = True
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 
 
 AUTHENTICATION_BACKENDS = [

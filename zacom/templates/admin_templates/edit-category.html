@@ -1,0 +1,85 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Edit New category</h2>
+                      
+                    </div>
+                </div>
+               <!-- Add new product form  -->
+            <form method="POST"  enctype="multipart/form-data" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Title</label>
+                                <input type="text" value={{cat}} placeholder="Type here" name="brand_title" class="form-control" id="brand_title" required>
+                            </div>
+                        </div>
+                    
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Images</label>
+                                {% if cat.cat_image %}
+                                <img src="{{ cat.cat_image.url }}" alt="Thumbnail Image">
+                                <input class="form-control" type="file"  name="brand_imagee" onchange="validateImage(this)" >
+                                {% else %}
+                                <p>No thumbnail image available</p>
+                                <input class="form-control" type="file"  name="brand_imagee" onchange="validateImage(this)" >
+                                {% endif %}
+                            </div>
+                        
+                        </div>      
+                        <div class="card-body">
+                        
+                            <div>
+                                <button type="submit" class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD </button>
+                            </div>
+                        </div>      
+                    </div>
+                </div>
+            </form>
+
+        </section>
+        <script>
+            function validateForm() {
+                // Validate product title
+                var brandTitle = document.getElementById('brand_title');
+                if (brandTitle.value.trim() === "") {
+                    alert("Please enter a title.");
+                    brandTitle.focus();
+                    return false;
+                }
+        
+                // Validate image
+                var brandImageInput = document.querySelector('input[name="brand_image"]');
+                if (!validateImage(brandImageInput)) {
+                    return false;
+                }
+        
+                // Form is valid
+                return true;
+            }
+        
+            function validateImage(fileInput) {
+                const file = fileInput.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        
+                if (file) {
+                    if (!allowedTypes.includes(file.type)) {
+                        alert("Please select a valid image file (JPEG, PNG, or GIF).");
+                        fileInput.value = ''; // Clear the file input
+                        return false;
+                    }
+                }
+        
+                return true;
+            }
+        </script>
+    {% endblock content %} 

@@ -1,0 +1,500 @@
+{% extends 'user_templates/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-light.css" >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-regular.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-solid.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-DLijJriZUd0nJ/1JTp2g8T+3rd5P0bFeLzo3bZ0EOlbIa7um+OuKpjwamMxnoK2PKWqGTmiGBHRsBkT1uS59Nw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+   <style>
+        /* * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        } */
+        .body {
+            height: 100vh;
+            /* display: flex;
+            align-items: center;
+            justify-content: center; */
+            background: #e2d0d0;
+        }
+        .container-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container-left, .container-right {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .container-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+           
+            width: 100%;
+        }
+
+        .container-right {
+            background-color: #e6e6e6;
+            max-width: 400px; 
+        
+            justify-content: space-between;            
+        }
+
+        .content-box {
+            flex: 1;
+            background-color: #e6e6e6;
+            padding: 20px;
+            margin: 5px;
+        }
+
+        .container-left .steps {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .steps-container {
+            background-color: rgb(224, 226, 224);
+            padding: 50px;
+            border-radius: 10px;
+            max-width: 4000px; /* Adjust the max-width here */
+            width: 100%;
+            z-index: 0;
+        }
+        .steps {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .steps .circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 50px;
+            color: #999;
+            font-size: 22px;
+            font-weight: 500;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #e0e0e0;
+            transition: all 200ms ease;
+            transition-delay: 0s;
+        }
+        .steps .circle.active {
+            transition-delay: 100ms;
+            border-color: #4070f4;
+            color: #4070f4;
+        }
+        .steps .progress-bar {
+            position: absolute;
+            height: 4px;
+            width: 100%;
+            background: #c29393;
+            z-index: -1;
+        }
+        .progress-bar .indicator {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: #4070f4;
+            transition: all 300ms ease;
+            z-index: -1; /* Set z-index to -1 to position it behind the background color */
+}
+        .container-left .buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .buttons button {
+            padding: 8px 25px;
+            background: #4070f4;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            transition: all 200ms linear;
+        }
+        .buttons button:active {
+            transform: scale(0.97);
+        }
+        .buttons button:disabled {
+            background: #87a5f8;
+            cursor: not-allowed;
+        }
+
+        /* Media Queries */
+        @media only screen and (min-width: 768px) {
+            .container-wrapper {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body >
+    <div class="container-wrapper , body">
+        <div class="container-left">
+            
+        {% for order in order_product %}
+            {% if order.order_status == "New" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS PROCESSING</h1>
+            {% elif order.order_status == "Accepted" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS CONFIRMED</h1>
+            {% elif order.order_status == "Delivered" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS DELIVERED</h1>
+            {% elif order.order_status == "Cancelled Admin" %}
+            <h1 style="color: #a50a0a;">YOUR ORDER IS CANCELLED BY SELLER</h1>
+            {% elif order.order_status == "Cancelled User" %}
+            <h1 style="color: #911111;">YOUR ORDER IS CANCELLED</h1>
+            {% elif order.order_status == "Returned User" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS Returned</h1>
+            {% endif %}
+
+         
+
+            
+            <!-- Your box -->
+            <div class="steps-container" >
+                <div class="steps">
+                    <span class="circle active"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <span class="circle"><i class="fa-solid fa-check"></i></span>
+                    <div class="progress-bar">
+                        <span class="indicator"></span>
+                    </div>
+                </div>
+                <div class="steps">
+                    <span >PROCESSING</span>
+                    <span >ORDER <br> CONFIRMED</span>
+                    <span >SHIPPING</span>
+                    <span >DELIVERED</span>
+                    
+                   
+                </div>
+               
+         
+            </div>  
+
+            <div class="container " style="background-color: #f8fafd;  margin-top: 10px; border: #999 2px solid;">
+                <h4>ORDERED ITEM</h4>
+
+                {% for i in order_product %}
+                <div class="d-flex align-items-top gap-4 mt-3 mb-3">
+                    
+                <img class="avatar border-white" src="{{i.images.url}}" style="width: 200px;"/><br>
+                <div>
+                <p class="fs-5 fw-bold">product  {{i.product_variant}}</p>          
+                <p>quantity :  {{i.quantity}}</p>          
+                <p>price : {{i.product_price }}</p>
+                </div> 
+                </div>        
+                
+                {% endfor %}
+                <ul>
+                    <li>JJJJ</li>
+                </ul>
+            </div>
+
+
+            <!-- End of your box -->
+            
+        </div>
+        <div class="container-right " style="padding: 20px;">
+            <div class="content-box">
+                <span>ORDER DETAIL</span>
+                <h3>#{{order_dtails}}</h3>
+            </div>
+
+            <div class="container " style="background-color: #f8fafd; max-width: 100%; padding-left: 10px; border: #999 2px solid; height: 200px;">
+                <div  class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-truck" style="color: #e0e2e5;"></i>
+                <h4>DELIVERY ADDRESS</h4>
+                </div>
+                <i class="fa-regular fa-truck" style="color: #2862b9;"></i>
+                <span style="font-size: medium;">{{order_dtails.shipping_address }}</span>
+           
+            </div>
+            <div class="container " style="background-color: #f8fafd;  margin-top: 10px; border: #999 2px solid;">
+              
+                <tbody>
+                    <tr>
+                      
+                        {% if order.order_status == "New" %}
+                            <td>New</td>
+                        {% elif order.order_status == "Accepted" %}
+                            <td>Accepted</td>
+                        {% elif order.order_status == "Delivered" %}
+                            <td>Delivered</td>
+                        {% elif order.order_status == "Cancelled Admin" %}
+                            <td>Seller Cancelled</td>
+                        {% elif order.order_status == "Cancelled User" %}
+                        <td>Cancelled</td>
+                        {% elif order.order_status == "Returned User" %}
+                            <td>Returned</td>
+                        {% endif %}
+                        <td>
+                            {% if order.order_status == 'Delivered' %}
+                            <a href="#" class="return-order" onclick="ReturnOrderConfirmation('{{ order.id }}')" data-order-id="{{ order.order.id }}" data-order-created-at='{{ order.created_at|date:"Y-m-d\TH:i:s" }}'>Return</a>
+                            {% elif order.order_status == 'Cancelled User' %}
+                            <a  class="view">Cancelled</a>
+                            {% elif order.order_status == 'Returned' %}
+                            <a href="" class="view">Returned</a>
+                            {% else %}
+                            <a href="#" class="view" onclick="cancelOrderConfirmation('{{ order.id }}')">Cancel</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+        {% endfor %}
+                </tbody>
+            </div>
+          
+         
+            
+        </div>
+    </div>
+  
+</body>
+</html>
+
+<script>
+    function cancelOrderConfirmation(orderId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to cancel the order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var data = {
+                            order_id: orderId,
+                            new_status: "Cancelled User"
+                        };
+                fetch('{% url "update_orderitem_status" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                },
+                body: JSON.stringify(data), // Send selected option ID as JSON data
+            })
+            .then(response => response.json())
+            .then ( data =>{
+                console.log('POST request successful');
+                window.location.reload()              
+            })
+            .catch(error => {
+                // Handle error here if needed
+                console.error('Error:', error);
+            });
+        
+            }
+        });
+    }
+
+    function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Extract CSRF token
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+</script>
+
+
+<script>
+    
+async function fetchDataFromBackend() {
+  try {
+    // Make a GET request to your backend endpoint
+    const response = await fetch('/order-status/?d_id={{order_dtails.id}}');
+    
+    // Check if the response is successful (status code 200)
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from the backend');
+    }
+    
+    // Parse the JSON response body
+    const data = await response.json();
+    
+    // Extract the value of currentStep from the received data
+    const currentStep = data.currentStep;
+    
+    // Return the currentStep value
+    return currentStep;
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching data from backend:', error);
+    return null; // Or return a default value if fetching fails
+  }
+}
+
+
+     //DOM Elements
+const circles = document.querySelectorAll(".circle"),
+  progressBar = document.querySelector(".indicator"),
+  buttons = document.querySelectorAll("button");
+
+let currentStep =1 ;
+
+// function that updates the current step and updates the DOM
+const updateSteps = async () => {
+    // Fetch data from the backend
+  const currentStep = await fetchDataFromBackend();
+//   currentStep = e.target.id === "next" ? ++currentStep : --currentStep;
+
+  // loop through all circles and add/remove "active" class based on their index and current step
+  circles.forEach((circle, index) => {
+    circle.classList[`${index < currentStep ? "add" : "remove"}`]("active");
+  });
+
+  // update progress bar width based on current step
+  progressBar.style.width = `${((currentStep - 1) / (circles.length - 1)) * 100}%`;
+
+  // check if current step is last step or first step and disable corresponding buttons
+  if (currentStep === circles.length) {
+    buttons[1].disabled = true;
+  } else if (currentStep === 1) {
+    buttons[0].disabled = true;
+  } else {
+    buttons.forEach((button) => (button.disabled = false));
+  }
+};
+updateSteps()
+
+// add click event listeners to all buttons
+// buttons.forEach((button) => {
+//   button.addEventListener("click", updateSteps);
+// });
+
+</script>
+<script>
+     function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+
+    function ReturnOrderConfirmation(orderId) {
+
+        // Show SweetAlert for OTP entry
+        Swal.fire({
+            title: "WHY YOU RETURNING",
+            html: '<textarea id="customTextArea" style="width: 93%; height: 200px; font-size: 16px; padding: 10px; box-sizing: border-box; line-height: normal;"></textarea>',
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            showLoaderOnConfirm: true,
+           
+            preConfirm: async () => {
+            const returnReason = document.getElementById('customTextArea').value.trim();
+            if (!returnReason) {
+                Swal.showValidationMessage('Please enter a return reason');
+                return;
+            }
+
+            try {
+                // Second fetch when return reason is submitted
+                const response = await fetch('/order-return/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({ orderId, returnReason }),    
+                         });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                Swal.showValidationMessage(`Request failed: ${error}`);
+            }
+        },
+
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: `return processing`,
+                    imageUrl: result.value.avatar_url
+                });
+            }
+        });
+        customTextAreaWrapper.style.display = 'block';
+    }
+</script>
+<style>
+ #customTextAreaWrapper {
+    width: 100%; /* Adjust width as needed */
+    height: 300px; /* Adjust height as needed */
+    padding: 10px;
+    box-sizing: border-box;
+    line-height: normal;
+    overflow: auto; /* Add scrollbars if content overflows */
+}
+
+#customTextArea {
+    width: 100%;
+    height: 90%;
+    font-size: 16px; /* Adjust font size as needed */
+    border: 1px solid #ccc; /* Add border for better visibility */
+    border-radius: 5px; /* Optional: Add border-radius for aesthetics */
+    resize: vertical; /* Allow vertical resizing if needed */
+}
+
+</style>
+{% endblock content %}

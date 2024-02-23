@@ -12,7 +12,7 @@
                     </div>
                 </div>
                <!-- Add new product form  -->
-            <form method="POST">
+            <form method="POST"  onsubmit="return validateForm()" >
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="card mb-4">
@@ -48,7 +48,7 @@
                             <div class="card-body">
                                 <div>
                                     <label class="form-label" >Description</label>
-                                    <textarea placeholder="Type here" class="form-control" rows="4"  name="description" required></textarea>
+                                    <textarea placeholder="Type here" class="form-control" rows="4"  name="description"  id='description' required></textarea>
                                 </div>
                             </div>
                             <div>
@@ -131,5 +131,47 @@
             </form>   
             </div>
         </section>
+
+        <script>
+            function validateForm() {
+                // Get form elements
+                var productTitle = document.getElementById('product_title');
+                var category = document.getElementsByName('category_id')[0];
+                var brand = document.getElementsByName('Brand')[0];
+                var description = document.getElementsByName('description')[0];
+        
+                // Validate product title
+                if (productTitle.value.trim() === "") {
+                    alert("Please enter a product title.");
+                    productTitle.focus();
+                    return false;
+                }
+        
+                // Validate category
+                if (category.value === "") {
+                    alert("Please select a category.");
+                    category.focus();
+                    return false;
+                }
+        
+                // Validate brand
+                if (brand.value === "") {
+                    alert("Please select a brand.");
+                    brand.focus();
+                    return false;
+                }
+        
+                // Validate description
+                if (description.value.trim() === "") {
+                    alert("Please enter a description.");
+                    description.focus();
+                    return false;
+                }
+        
+                // Form is valid
+                return true;
+            }
+        </script>
+        
 
 {% endblock content %} 

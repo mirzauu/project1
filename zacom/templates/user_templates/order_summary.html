@@ -42,11 +42,11 @@
 }
 
 #step-1::after {
-    content: "DELIVERY ADDRESS";
+    content: "OREDER SUMMARY";
 }
 
 #step-2::after {
-    content: "OREDER SUMMARY";
+    content: "DELIVERY ADDRESS ";
     left: -5px;
 }
 
@@ -141,7 +141,7 @@
                 <li id="step-3"></li>
             </ul>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="25" aria-valuemin="0"
+                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0"
                 aria-valuemax="100">
             </div>
         </div>
@@ -156,6 +156,7 @@
                         here to enter your code.</h6>
                 </div>
             <div class="row ">
+        
             
                 <div class="col-lg-8">
                     <div class="header">
@@ -193,10 +194,16 @@
                                         </div>
                                     </div>
                                     
-                                    <td class="cart__close"><a  onclick="deleteCartItem('{{ i.id }}')"><span class="icon_close"></span></a></td>
+                                    <td class="cart__close">
+                                        <button type="button" class="custom-btn custom-btn-danger rounded-circle" onclick="deleteCartItem('{{ i.id }}')" data-toggle="tooltip" data-placement="top" title="Delete Item">
+                                            <span class="icon_close"></span>
+                                        </button>
+                                    </td>
+                                    
+                                    
 
 
-                                    <h1></h1>
+                                    <h1>  </h1>
                                 </td>  
                                 
                             </li>
@@ -232,13 +239,43 @@
                             </div>
                     </div>
                     <div >
-                       <a href="{% url "order-payment" %}"><button>Next</button></a>
+                       <a href="{% url "order-address" %}"><button>Next</button></a>
                     </div>
                 </div>
             </div>
                 
         </div>
 </section>
+<script>
+    
+    function deleteCartItem(cartItemId) {
+        fetch(`/delete_cart_item/${cartItemId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the deleted item from the HTML
+                    window.location.reload();
+    
+                    // Check if the cart is empty
+                    const cartTable = document.getElementById('cart-table');
+                    if (cartTable && !cartTable.querySelector('tbody tr')) {
+                        // Cart is empty, redirect to the cart page
+                        window.location.reload();
+                    }
+                } else {
+                    console.error(data.message);
+                    // Handle the error, e.g., display an alert to the user
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle the fetch error, e.g., display an alert to the user
+                alert('Error deleting item. Please try again later.');
+            });
+    }
+    
+</script>
 
 <style>
  
@@ -274,6 +311,49 @@ input.qtyminus { width:15px; height:15px;}
     .btn-golden:hover a {
         color: #b19361;
     }
+
+
+/* Custom styles for the round button */
+/* Custom styles for the custom button */
+.custom-btn {
+    /* Define your custom button styles here */
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+/* Custom styles for the danger variant of the custom button */
+.custom-btn-danger {
+    /* Define your custom button danger styles here */
+    color: #fff;
+    background-color: #7c7070;
+    border-color: #ffffff;
+}
+
+/* Additional styles for the round shape of the custom button */
+.custom-btn.rounded-circle {
+    /* Define styles for the rounded shape */
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+/* Custom hover state for the custom button */
+.custom-btn:hover {
+    /* Define hover styles */
+    opacity: 0.9;
+}
+
+/* Custom active state for the custom button */
+.custom-btn:active {
+    /* Define active styles */
+    transform: translateY(1px);
+}
+
 
 </style>
 

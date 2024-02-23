@@ -72,7 +72,7 @@ class Product(models.Model):
     created_date    = models.DateField(auto_now_add=True)
     modified_date   = models.DateTimeField(auto_now=True)
 
-
+    
 
     def save(self, *args, **kwargs):
         product_slug_name = f'{self.product_brand.brand_name}-{self.product_name}-{self.product_catg.cat_name}'
@@ -83,6 +83,8 @@ class Product(models.Model):
         else:
             self.product_slug = base_slug
         super(Product, self).save(*args, **kwargs)
+
+  
 
 
     def __str__(self):
@@ -203,3 +205,26 @@ class Additional_Product_Image(models.Model):
 
     def __str__(self):
         return self.image.url
+    
+
+
+
+from django.db import models
+from image_cropping import ImageRatioField, ImageCropField
+
+class Image(models.Model):
+    image_field = ImageCropField(upload_to='image/')
+    cropping = ImageRatioField('image_field', '120x100', allow_fullsize=True)
+    cropping_free = ImageRatioField('image_field', '300x230',
+                                    free_crop=True, size_warning=True)
+
+    def get_cropping_as_list(self):
+        if self.cropping:
+            return list(map(int, self.cropping.split(',')))
+
+class ImageFK(models.Model):
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    cropping = ImageRatioField('image__image_field', '120x100')
+
+
+    

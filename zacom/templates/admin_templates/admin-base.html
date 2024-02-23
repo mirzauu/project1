@@ -15,7 +15,12 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-light.css" >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-regular.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/sharp-solid.css
+    " >
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/all.css
+    " >
     <!-- Template CSS -->
     <link href="{% static 'admin_static/css/main.css' %}" rel="stylesheet" type="text/css" />
 </head>
@@ -56,8 +61,8 @@
                         <span class="text">Orders</span>
                     </a>
                     <div class="submenu">
-                        <a href="page-orders-1.html">Order list 1</a>
-                        <a href="page-orders-2.html">Order list 2</a>
+                        <a href="{% url 'admin-order-list' %}">Order list 1</a>
+                        <a href="">Order list 2</a>
                         <a href="page-orders-detail.html">Order detail</a>
                     </div>
                 </li>
@@ -168,6 +173,7 @@
                             <a class="dropdown-item" href="#"><img src="{% static 'admin_static/imgs/theme/flag-cn.png' %}" alt="Français">中国人</a>
                         </div>
                     </li>
+                    <ul>
                     <li class="dropdown nav-item">
                         <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'admin_static/imgs/people/avatar2.jpg' %}" alt="User"></a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
@@ -177,7 +183,7 @@
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="{% url "admin_logout" %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                            <a class="dropdown-item text-danger" href="{% url 'admin_logout' %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>

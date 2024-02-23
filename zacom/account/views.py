@@ -14,6 +14,10 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.views.decorators.cache import never_cache
 
+from cart.models import Cart,CartItem
+from cart.views import _cart_id
+from django.core.exceptions import ObjectDoesNotExist
+
 # Create your views here.
 @never_cache
 def register(request):
@@ -63,30 +67,79 @@ def register(request):
 def login(request):
 
     if request.user.is_authenticated:
-        
         return redirect("home")
+    
     if request.method=='POST':
         email=request.POST['email']
         password=request.POST['password']
 
-        user = auth.authenticate(email=email, password=password)
+       
         check=Account.objects.get(email=email)
       
-        if check.is_blocked==False:
-            if request.GET.get('next'):
-                return redirect(request.GET.get('next'))
-           
-            if user is not None :
-                auth.login(request,user)
-                return render(request, 'user_templates/home.html')
-            
-            else:
-                messages.error(request,'invalid email/password') 
-                return redirect ('login') 
-        else:
-            messages.error(request,'User is blocked') 
+
+        if check.is_blocked==True :
+            messages.error(request,"You are blocked by admin ! Please contact admin") 
             return redirect ('login') 
+        
+        if not Account.objects.filter(email=email).exists():
+            messages.error(request, "Invalid Email Adress")
+            return redirect('login')
+        
+        if not Account.objects.filter(email=email,is_active=True).exists():
+            messages.error(request, "Email Not Verified Yet !")
+            return redirect('login')
+        
+        user = auth.authenticate(email=email, password=password)
+        
+        if user is  None :
+                messages.error(request, "Invalid Password")
+                return redirect('login')
+        else:       
+                try:
+                    cart = Cart.objects.get(cart_id=_cart_id(request))
+                    is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                    if is_cart_item_exists:
+                        cart_items = CartItem.objects.filter(cart=cart)
+                        try:
+                            user_cart = CartItem.objects.filter(user=user)
+                            if user_cart.exists():
+                                current_user_cart = user_cart[0].cart  # user's current cart
+                                
+                                for item in cart_items:
+                                    matching_user_item = user_cart.filter(product=item.product).first()
+                                    if matching_user_item:
+                                        matching_user_item.quantity += item.quantity
+                                        matching_user_item.save()
+                                        item.delete()
+                                        print("Deleted item")
+                                    else:
+                                        item.user = user
+                                        item.cart = current_user_cart
+                                        item.save()
+                                        print("Moved item to current user's cart")
+                            else:
+                                raise ObjectDoesNotExist
+                            
+                        except ObjectDoesNotExist:
+                            print("User cart doesn't exist")
+                            for item in cart_items:
+                                item.user = user
+                                item.cart = cart
+                                item.save()
+                except:
+                    pass
+
+
+                auth.login(request,user)
+                
+                if request.GET.get('next'):
+                    return redirect(request.GET.get('next'))
+                else:
+                    return redirect('home')
+                  
     return render(request, 'user_templates/login.html')
+
+
 
 @never_cache
 def logout(request):
@@ -111,4 +164,6 @@ def activate(request,uidb64, token):
         messages.error(request,'invalid activation link')
         return redirect('register')
 
-  
+def otp_activate():
+    
+    pass 

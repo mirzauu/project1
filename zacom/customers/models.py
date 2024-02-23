@@ -87,11 +87,11 @@ class AdressBook(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_default = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)   
     
     def save(self, *args, **kwargs):
-        if self.is_default:
             # Set is_default=False for other addresses of the same user
+        if self.is_default:
             AdressBook.objects.filter(user=self.user).exclude(pk=self.pk).update(is_default=False)
         super(AdressBook, self).save(*args, **kwargs)
         

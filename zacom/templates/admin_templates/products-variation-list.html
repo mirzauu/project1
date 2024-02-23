@@ -48,9 +48,17 @@
                                     <a href="{% url 'product-edit-variant' product_id=i.id %}" class="btn btn-sm font-sm rounded btn-brand">
                                         <i class="material-icons md-edit"></i> Edit
                                     </a>
-                                    <a href="{% url 'product-delete-variant' product_id=i.id %}" class="btn btn-sm font-sm btn-light rounded">
-                                        <i class="material-icons md-delete_forever"></i> Delete
+                                    
+                                    {% if i.is_active   == True %}
+                                    <a   href="{% url 'deactivatevarient' product_id=i.id %}"  class="btn btn-sm font-sm alert-danger rounded block-user-btn">
+                                        Unlist
                                     </a>
+                                    {% else %}
+                                    <a   href="{% url 'activatevarient' product_id=i.id %}" class="btn btn-sm font-sm alert-success rounded unblock-user-btn">
+                                        List
+                                    </a>
+                                    {% endif %}
+                                
                                 </div>
                             </div> <!-- card-product  end// -->
                         </div> <!-- col.// -->

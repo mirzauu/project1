@@ -42,13 +42,15 @@
                         <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                             <figure class="card border-1">
                                 <div class="card-header bg-white text-center">
-                                    <img height="76" src="{{    i.cat_image.url }}" class="img-fluid" alt="Logo">
+                                    <img height="76" src="{{ i.cat_image.url }}" class="img-fluid" alt="Logo">
                                 </div>
                                 <figcaption class="card-body text-center">
                                     <h6 class="card-title m-0">{{i}}</h6>
-                                    <a href="#">{{ j|length }}  </a>
+                                    <a href="#">{{ j|length }}</a>
                                 </figcaption>
+                               <div style="align-content: center;"> <a href="{% url 'admin-category-edit' cat_id=i.id %}"><i  class="fa-solid fa-pen-to-square"></i></a>  </div>
                             </figure>
+
                         </div> <!-- col.// -->
                         {% endfor %}   
                        

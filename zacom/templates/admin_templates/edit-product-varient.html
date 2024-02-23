@@ -4,8 +4,7 @@
 
 <div class="container mt-3">
     <div class="row">
-        <form method="POST" enctype="multipart/form-data"> 
-
+        <form method="POST" enctype="multipart/form-data" id="form1"  onsubmit="return validateForm()" > 
             {% csrf_token %}
             <div class="col-lg-6">
                 <div class="card mb-4">
@@ -36,20 +35,19 @@
                                     {% endif %}
                                     {% endfor %}
                                 </select>
-                            </div>
+                            </div>  
+                             
                             {% endfor %}
                         </div>
                         <div class="row gx-3">
                            
-                            <div class="col-md-4  mb-3">
-                                <label for="product_size" class="form-label" >Max Price</label>
-                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="max_price" value="{{old_product.max_price}}" required>
+                            <div class="col-md-4 mb-3">
+                                <label for="product_size" class="form-label">Max Price</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="max_price" value="{{old_product.max_price}}" required >
                             </div>
-                            
-                        
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Sale price</label>
-                                <input type="number" placeholder="Type here" class="form-control" id="product_size" name="sale_price" value="{{old_product.sale_price}}" required>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="sale_price" value="{{old_product.sale_price}}" required>
                             </div>
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Stock</label>
@@ -63,7 +61,7 @@
                                 <label class="form-label">Thumbnail-Image</label>
                                 {% if old_product.thumbnail_image %}
                                     <img src="{{ old_product.thumbnail_image.url }}" alt="Thumbnail Image">
-                                    <input type="file" name="existing_product_images" value="{{ old_product.thumbnail_image.url }}">
+                                    <input type="file" name="existing_product_images" value="{{ old_product.thumbnail_image.url }}"  accept="image/*"  onchange="validateImage(this)" >
                                     <a>{{ old_product.thumbnail_image.url }}</a>
                                     {% else %}
                                     <p>No thumbnail image available</p>
@@ -82,7 +80,7 @@
                                 {% else %}
                                     <p>No product images available</p>
                                 {% endif %}
-                                <input class="form-control" type="file" name="product_image" multiple>
+                                <input class="form-control" type="file" name="product_image" multiple  accept="image/*" onchange="validateImage(this)" >
                             </div>
                         </div>
                         <div>
@@ -97,6 +95,70 @@
     </div>
 </div>
 
+
+<script>
+    function validateForm(formId) {
+       const form = document.getElementById(formId);
+       const product = form.querySelector('select[name="product"]');
+       const skuId = form.querySelector('input[name="sku_id"]');
+       const maxPrice = form.querySelector('input[name="max_price"]');
+       const salePrice = form.querySelector('input[name="sale_price"]');
+       const stock = form.querySelector('input[name="stock"]');
+       
+       // Perform validation checks
+       if (product.value === "") {
+           alert("Please select a product");
+           return false;
+       }
+       if (skuId.value.trim() === "") {
+           alert("Please enter SKU ID");
+           return false;
+       }
+       if (maxPrice.value.trim() === "" || isNaN(maxPrice.value.trim()) || parseFloat(maxPrice.value.trim()) <= 0 || !/^\d{1,6}(\.\d{0,2})?$/.test(maxPrice.value.trim())) {
+            alert("Please enter a valid max price ");
+            return false;
+        }
+       if (salePrice.value.trim() === "" || isNaN(salePrice.value.trim()) || parseFloat(salePrice.value.trim()) <= 0 || salePrice.value.trim().length > 8 || !/^\d{1,6}(\.\d{0,2})?$/.test(salePrice.value.trim())) {
+           alert("Please enter a valid sale price ");
+           return false;
+       }
+       if (stock.value.trim() === "" || isNaN(stock.value.trim()) || parseFloat(stock.value.trim()) < 0) {
+           alert("Please enter a valid stock ");
+           return false;
+       }
+
+       // If all validations pass
+       return true;
+   }
+   
+   document.addEventListener('DOMContentLoaded', function() {
+       // Add event listeners for form submissions
+       document.getElementById('form1').addEventListener('submit', function(event) {
+           event.preventDefault();
+           if (validateForm('form1')) {
+               this.submit();
+           }
+       
+
+       });
+   });
+
+   function validateImage(fileInput) {
+   const file = fileInput.files[0];
+   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+   if (file) {
+       if (!allowedTypes.includes(file.type)) {
+           alert("Please select a valid image file (JPEG, PNG, or GIF).");
+           fileInput.value = ''; // Clear the file input
+           return false;
+       }
+   }
+
+   return true;
+}
+
+</script>
 
 
 {% endblock content %} 

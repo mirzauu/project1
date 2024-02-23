@@ -1,0 +1,118 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Add New Product</h2>
+                      
+                    </div>
+                </div>
+               <!-- Add new product form  -->
+            <form method="POST"  onsubmit="return validateForm()" >
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" name="product_title" class="form-control" id="product_title" value="{{product.product_name}}" required>
+                            </div>
+                            <div class="row gx-3">
+                                <div class="col-md-4  mb-3">
+                                    <label class="form-label">category</label>
+
+                                    <select class="form-select" name="category_id" required>
+                                    {% for i in category %}    
+                                     {% if i == product.product_catg %}
+                                        <option selected value="{{i.id}}">{{i.cat_name}}</option>
+                                        {% else %}
+                                        <option value="{{i.id}}">{{i.cat_name}}</option>
+                                        {% endif %}   
+                                    {% endfor %}
+                                    </select>
+                            </div>
+                            <div class="col-md-4  mb-3">
+                                <label class="form-label">Brand</label>
+                                <select class="form-select" name="Brand" required>
+                                    {% for brand in brand %} 
+                                       {% if brand == product.product_brand %}
+                                        <option selected value="{{brand.id}}">{{brand.brand_name}}</option>
+                                        {% else %}
+                                        <option value="{{brand.id}}">{{brand.brand_name}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                         
+                             
+                            </div>
+                          
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label" >Description</label>
+                                    <textarea placeholder="Type here" class="form-control" rows="4"  name="desc" id='description'  >{{product.description}}</textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD </button>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </form>
+               
+        </section>
+
+        <script>
+            function validateForm() {
+                // Get form elements
+                var productTitle = document.getElementById('product_title');
+                var category = document.getElementsByName('category_id')[0];
+                var brand = document.getElementsByName('Brand')[0];
+                var description = document.getElementsByName('desc')[0];
+        
+                // Validate product title
+                if (productTitle.value.trim() === "") {
+                    alert("Please enter a product title.");
+                    productTitle.focus();
+                    return false;
+                }
+        
+                // Validate category
+                if (category.value === "") {
+                    alert("Please select a category.");
+                    category.focus();
+                    return false;
+                }
+        
+                // Validate brand
+                if (brand.value === "") {
+                    alert("Please select a brand.");
+                    brand.focus();
+                    return false;
+                }
+        
+                // Validate description
+                if (description.value.trim() === "") {
+                    alert("Please enter a description.");
+                  
+                    return false;
+                }
+                if (description.value.trim().length < 250) {
+                    alert("Please enter a description with at least 250 characters.");
+                    description.focus();
+                    return false;
+                }
+        
+                // Form is valid
+                return true;
+            }
+        </script>
+        
+
+{% endblock content %} 

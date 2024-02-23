@@ -1,45 +1,165 @@
 {% extends 'admin_templates/admin-base.html' %}
-
-{% load static  %}
+{% load static %}
 
 {% block content %}
-        <section class="content-main">
-            <div class="row">
-                <div class="col-9">
-                    <div class="content-header">
-                        <h2 class="content-title">Add New category</h2>
-                      
-                    </div>
-                </div>
-               <!-- Add new product form  -->
-            <form method="POST"  enctype="multipart/form-data">
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New category</h2>
+            </div>
+        </div>
+        <div class="container mt-3">
+            <div id="alert-box"></div>
+            <div id="image-box" class="mb-3"></div>
+            <form method="POST" enctype="multipart/form-data" id="image-form" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="mb-4">
-                                <label for="product_title" class="form-label">Title</label>
-                                <input type="text" placeholder="Type here" name="brand_title" class="form-control" id="brand_title" required>
+                                <label for="brand_title" class="form-label">Title</label>
+                                <input type="text" placeholder="Type here" name="brand_title" class="form-control"
+                                    id="brand_title" required>
                             </div>
                         </div>
-                    
+
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Images</label>
-                                <input class="form-control" type="file"  name="brand_imagee" required >
+                                <input class="form-control" type="file" name="brand_imagee" required
+                                    onchange="validateImage(this)">
                             </div>
-                        
-                        </div>      
+
+                        </div>
                         <div class="card-body">
-                        
                             <div>
-                                <button type="submit" class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD </button>
+                                <button type="submit"
+                                    class="btn btn-md rounded font-sm hover-up">ADD</button>
                             </div>
-                        </div>      
+                        </div>
                     </div>
                 </div>
             </form>
+            <button class="btn btn-primary mt-3 not-visible" id="confirm-btn">confirm</button>
+        </div>
+    </div>
+</section>
+</div>
+</div>
+</body>
 
-        </section>
+        <script>
+            function validateForm() {
+                // Validate product title
+                var brandTitle = document.getElementById('brand_title');
+                if (brandTitle.value.trim() === "") {
+                    alert("Please enter a title.");
+                    brandTitle.focus();
+                    return false;
+                }
+        
+                // Validate image
+                var brandImageInput = document.querySelector('input[name="brand_image"]');
+                if (!validateImage(brandImageInput)) {
+                    return false;
+                }
+        
+                // Form is valid
+                return true;
+            }
+        
+            function validateImage(fileInput) {
+                const file = fileInput.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        
+                if (file) {
+                    if (!allowedTypes.includes(file.type)) {
+                        alert("Please select a valid image file (JPEG, PNG, or GIF).");
+                        fileInput.value = ''; // Clear the file input
+                        return false;
+                    }
+                }
+        
+                return true;
+            }
+            const alertBox = document.getElementById('alert-box')
+    const imageBox = document.getElementById('image-box')
+    const imageForm = document.querySelector('form')
+    const confirmBtn = document.querySelector('#confirm-btn')
+    const input = document.querySelector('input[name="brand_imagee"]')
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
 
+    // Event listener for file input change
+    input.addEventListener('change', () => {
+        alertBox.innerHTML = ""
+        confirmBtn.classList.remove('not-visible')
+        const imgData = input.files[0]
+        const url = URL.createObjectURL(imgData)
+
+        imageBox.innerHTML = `<img src="${url}" id="image" width="700px">`
+        var $image = $('#image')
+
+        $image.cropper({
+            aspectRatio: 16 / 9,
+            crop: function (event) {
+                console.log(event.detail.x);
+                console.log(event.detail.y);
+                console.log(event.detail.width);
+                console.log(event.detail.height);
+                console.log(event.detail.rotate);
+                console.log(event.detail.scaleX);
+                console.log(event.detail.scaleY);
+            }
+        });
+
+        var cropper = $image.data('cropper');
+
+
+    $image.cropper({
+        aspectRatio: 16 / 9,
+        crop: function (event) {
+            console.log(event.detail.x);
+            console.log(event.detail.y);
+            console.log(event.detail.width);
+            console.log(event.detail.height);
+            console.log(event.detail.rotate);
+            console.log(event.detail.scaleX);
+            console.log(event.detail.scaleY);
+        }
+    });
+
+    var cropper = $image.data('cropper');
+    confirmBtn.addEventListener('click', () => {
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            console.log('confirmed')
+            const fd = new FormData();
+            fd.append('csrfmiddlewaretoken', csrf[0].value)
+            fd.append('file', blob, 'my-image.png');
+
+            $.ajax({
+                type: 'POST',
+                url: imageForm.action,
+                enctype: 'multipart/form-data',
+                data: fd,
+                success: function (response) {
+                    console.log('success', response)
+                    alertBox.innerHTML = `<div class="alert alert-success" role="alert">
+                                            Successfully saved and cropped the selected image
+                                        </div>`
+                },
+                error: function (error) {
+                    console.log('error', error)
+                    alertBox.innerHTML = `<div class="alert alert-danger" role="alert">
+                                            Ups...something went wrong
+                                        </div>`
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+            })
+        })
+    })
+})
+        </script>
     {% endblock content %} 

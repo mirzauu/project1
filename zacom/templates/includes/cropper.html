@@ -1,0 +1,33 @@
+
+{% load static %}
+
+
+{% load cropping thumbnail %}</p>
+<div class="container justify-content-center row">
+<form method="post" id="cropping_form" action="." class="col-md-8 m-v-2" enctype="multipart/form-data">{% csrf_token %}<br />
+    {{ form.as_p }}<br />
+    <input type="submit" value="Save"/><br />
+  </form>
+<p>  {% if image %}</p>
+<div class="row">
+<h4>Preview</h4>
+<div class="col-12">
+            <span>using cropped_thumbnail tag - ratio crop</span><br />
+            <img decoding="async" src="{% cropped_thumbnail image "cropping" %}" />
+        </div>
+<div class="col-12">
+            <span>using cropped_thumbnail tag - free crop </span><br />
+            <img decoding="async" src="{% cropped_thumbnail image "cropping_free" max_size="200x200" %}" />
+        </div>
+<div class="col-12">
+            <span>using standard thumbnail tag with a cropping field value (string) as box argument</span><br />
+            <img decoding="async" src="{% thumbnail image.image_field 120x100 box=image.cropping crop detail %}">
+        </div>
+<div class="col-12">
+            <span>using standard thumbnail tag with a list of integers as box argument</span><br />
+            <img decoding="async" src="{% thumbnail image.image_field 120x100 box=image.get_cropping_as_list crop detail %}">
+        </div>
+</p></div>
+<p>  {% endif %}
+</p></div>
+
