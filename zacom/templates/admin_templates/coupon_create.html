@@ -1,0 +1,51 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row">
+        <form method="POST" action="{% url 'admin-create' %}" id="form1"> 
+            {% csrf_token %}
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="form-label">Coupon Code</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="coupon_code">
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="discount" class="form-label">Discount</label>
+                                <input type="number" placeholder="Type here" class="form-control" id="discount" name="discount">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" placeholder="Type here" class="form-control" id="amount" name="amount">
+                            </div>     
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="user_limit" class="form-label">User limit</label>
+                                <input type="number" placeholder="Type here" class="form-control" id="user_limit" name="user_limit">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="expire_date" class="form-label">Expire Date</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="expire_date" name="expire_date">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="coupon_count" class="form-label">Coupon Count</label>
+                                <input type="number" placeholder="Type here" class="form-control" id="coupon_count" name="coupon_count">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-md rounded font-sm hover-up" style="margin-left: 20px;">ADD</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+          
+    </div>
+</div>
+
+{% endblock content %} 

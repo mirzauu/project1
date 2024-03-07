@@ -1,12 +1,13 @@
 from django.db import models
-from products.models import Product_Variant 
+from products.models import Product_Variant ,UserCoupon
 from customers.models import Account
+
 # Create your models here.
 class Cart(models.Model):
     
     cart_id = models.CharField(max_length=250,blank=True)
+    coupon = models.ForeignKey(UserCoupon,on_delete=models.SET_NULL,null=True)
     date_added = models.DateField(auto_now_add=True)
-    
     
     def __str__(self):
         return self.cart_id

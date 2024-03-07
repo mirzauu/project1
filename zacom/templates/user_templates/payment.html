@@ -4,6 +4,7 @@
 
 {% block content %}
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 /* Resetting */
@@ -118,7 +119,7 @@
             background-color: #616161 !important;
         }
 
-/*button  */
+/*button */
 
 </style>
 <!-- Breadcrumb Begin -->
@@ -171,19 +172,16 @@
                                 <label for="option1">UPI</label>
                                 <div id="option1Div" class="payment-details">
                                     <input type="radio" class="address-radio" name="option1" />
-                                    <label>UPI Option 1</label>
-                                    <input type="radio" class="address-radio" name="option1" />
-                                    <label>UPI Option 2</label>
+                                    <label>RAZORPAY</label>
+                                    <!-- <input type="radio" class="address-radio" name="option2" />
+                                    <label>UPI Option 2</label> -->
                                 </div>
                             </li>
                             <li class="payment-option">
                                 <input type="radio" class="address-radio" onclick="showDiv('option2')" id="option2" name="payment-option" />
-                                <label for="option2"><i class="fa-regular fa-wallet">  WALLET </i></label>
+                                <label for="option2"><i class="fa-regular fa-wallet"> WALLET </i></label>
                                 <div id="option2Div" class="payment-details">
-                                    <input type="radio" class="address-radio" name="option2" />
-                                    <label>UPI Option 1</label>
-                                    <input type="radio" class="address-radio" name="option2" />
-                                    <label>UPI Option 2</label>
+                                    {{wallet}}
                                 </div>
                             </li>
                             <li class="payment-option">
@@ -219,9 +217,9 @@
                             </div>
                             <div class="checkout__order__total">
                                 <ul>
-                                    <li>Subtotal <span>${{grand_total}}</span></li>
+                                    <li>Subtotal <span>${{total}}</span></li>
                                     <li>Discount <span>${{discount}}</span></li>
-                                    <li>Total <span>${{total}}</li>
+                                    <li>Total <span>${{grand_total}}</li>
                                 </ul>
                             </div>
                     </div>
@@ -233,6 +231,11 @@
                 
         </div>
 </section>
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 
 <style>
@@ -291,6 +294,7 @@ input.qtyminus { width:15px; height:15px;}
 
         if (!selectedOption) {
             console.error('No payment option selected');
+            alert('No payment option selected')
             return;
         }
 
@@ -307,11 +311,73 @@ input.qtyminus { width:15px; height:15px;}
         })
         .then(response => response.json())
         .then ( data =>{
-            console.log('POST request successful');
+            console.log('POST request successful',data);
             if (data.url){
                 console.log('iofjfji',data.url)
                 window.location.href = data.url;
+
             }
+
+            const paymentOrderId = data.context.id;
+                const paymentAmount = data.context.amount;
+                console.log('Payment information:', paymentOrderId);
+                // e.preventDefault();
+                var razorpayKeyId = '{{ RAZOR_PAY_KEY_ID }}';
+                console.log(razorpayKeyId);
+                console.log(paymentAmount);
+                console.log(paymentOrderId);
+                var callbackURL = `http://127.0.0.1:8000/paymenthander/`;
+                var options = {
+                    
+                    "key": "rzp_test_vAeyohaspEahRA", // Enter the Key ID generated from the Dashboard
+                    "amount": paymentAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "name": "ASHION",
+                    "description": "Test Transaction",
+                    "image": "https://example.com/your_logo",
+                    "order_id": paymentOrderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+
+                    "callback_url": callbackURL,
+
+
+                    "prefill": {
+                        "name": "{{request.user.get_usernme}}",
+                        "email": "{{request.user.email}}",
+                        "contact": "{{request.user.phone_number}}"
+                    },
+                    "theme": {
+                        "color": "#b19361"
+                    }
+                };
+                // var options = {
+                //     'X-CSRFToken': getCookie('csrftoken'),
+                //     "key": "rzp_test_vAeyohaspEahRA", // Enter the Key ID generated from the Dashboard
+                //     "amount": paymentAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                //     "currency": "INR",
+                //     "name": "Acme Corp",
+                //     "description": "Test Transaction",
+                //     "image": "https://example.com/your_logo",
+                //     "order_id": paymentOrderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                //     "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                //     "prefill": {
+                //         "name": "Gaurav Kumar",
+                //         "email": "gaurav.kumar@example.com",
+                //         "contact": "9000090000"
+                //     },
+                //     "notes": {
+                //         "address": "Razorpay Corporate Office"
+                //     },
+                //     "theme": {
+                //         "color": "#3399cc"
+                //     }
+                // };
+                var rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function(response) {
+                    alert(response.error.code);
+                });
+
+                rzp1.open();
+                e.preventDefault();
+
         })
         .catch(error => {
             // Handle error here if needed

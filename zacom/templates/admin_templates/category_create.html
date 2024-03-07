@@ -7,11 +7,12 @@
         <div class="col-9">
             <div class="content-header">
                 <h2 class="content-title">Add New category</h2>
+                
             </div>
         </div>
         <div class="container mt-3">
             <div id="alert-box"></div>
-            <div id="image-box" class="mb-3"></div>
+          
             <form method="POST" enctype="multipart/form-data" id="image-form" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="col-lg-6">
@@ -41,7 +42,6 @@
                     </div>
                 </div>
             </form>
-            <button class="btn btn-primary mt-3 not-visible" id="confirm-btn">confirm</button>
         </div>
     </div>
 </section>

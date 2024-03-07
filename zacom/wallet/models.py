@@ -10,14 +10,16 @@ class Wallet(models.Model):
     user = models.OneToOneField(Account,on_delete=models.CASCADE)
     balance = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+  
     
     def __str__(self):
         return self.user.first_name + str(self.balance)
+    
 
 class WalletTransaction(models.Model):
     TRANSACTION_TYPE_CHOICES =(
-        ("CREDIT", "Credit"),
-        ("DEBIT", "Debit"),
+        ("CREDIT", "CREDIT"),
+        ("DEBIT", "DEBIT"),
         )
     wallet = models.ForeignKey(Wallet,on_delete=models.CASCADE)
     transaction_type= models.CharField(choices = TRANSACTION_TYPE_CHOICES,max_length=10)

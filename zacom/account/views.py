@@ -74,10 +74,8 @@ def login(request):
         password=request.POST['password']
 
        
-        check=Account.objects.get(email=email)
-      
-
-        if check.is_blocked==True :
+       
+        if Account.objects.filter(email=email,is_blocked=True).exists() :
             messages.error(request,"You are blocked by admin ! Please contact admin") 
             return redirect ('login') 
         
@@ -89,12 +87,12 @@ def login(request):
             messages.error(request, "Email Not Verified Yet !")
             return redirect('login')
         
-        user = auth.authenticate(email=email, password=password)
+        user = auth.authenticate(email=email,password=password)
         
         if user is  None :
                 messages.error(request, "Invalid Password")
                 return redirect('login')
-        else:       
+        else:           
                 try:
                     cart = Cart.objects.get(cart_id=_cart_id(request))
                     is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()

@@ -1,0 +1,185 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+        <section class="content-main">
+            <div class="content-header">
+
+                <div>
+                    <h2 class="content-title card-title">Category List</h2>
+                </div>
+                <div>
+                    <a href="{% url 'admin-create-category-offer'%}" class="btn btn-primary btn-sm rounded">Create new</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                       
+                       
+                        
+                       
+                        
+                    </div>
+                </header> <!-- card-header end// -->
+
+                <div class="card-body">
+                    {% for i in category_offers %}
+                    <article class="itemlist">
+                        <div class="row align-items-center">
+                            
+                            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                <a class="itemside" href="#">
+                                  
+                                    <div class="info">
+                                        <h6 class="mb-0">{{i.offer_name}}    <span>{{ i.discount_percentage}}%</span></h6>
+                                    </div>
+                                    
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>{{ i.expire_date}}%</span> </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                {% if i.is_active == True %}
+                                <span class="badge rounded-pill alert-success">Active</span>
+                                {% else %}
+
+                                <span class="badge rounded-pill alert-danger">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-status" style="width: 8px;">
+                                <a href="{% url  'admin-edit-category-offer' offer_id=i.id %} "><i class="fa-solid fa-pen-to-square"></i></a>
+                            </div>
+                            <div class="col-lg-3 col-sm-2 col-5 col-action text-end d-flex justify-content-center">
+                                <div class="col-lg-3 col-sm-2 col-5 col-action text-end">
+                                {% if i.is_active   == True %}
+                                <a   href="{% url 'deactivateCatOffer' offer_id=i.id %}"  class="btn btn-sm font-sm alert-danger rounded block-user-btn">
+                                    Unlist
+                                </a>
+                                {% else %}
+                                <a   href="{% url 'activateCatOffer' offer_id=i.id %}" class="btn btn-sm font-sm alert-success rounded unblock-user-btn">
+                                    List
+                                </a>
+                                {% endif %}
+                            </div>
+                            </div>
+                         
+                        </div> <!-- row .// -->
+
+                    </article> <!-- itemlist  .// -->
+                    {% endfor %}
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+            <!-- <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div> -->
+        </section> <!-- content-main end// -->
+
+
+
+   
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    var selectedOption = "{{ selectedOption }}";
+    var category_select = document.getElementById('category_select');
+    console.log(category_select)
+    for (var i = 0; i < category_select.options.length; i++) {
+            if (category_select.options[i].value === selectedOption) {
+                category_select.options[i].selected = true; // Set the selected attribute
+                break; // Exit the loop once the option is found
+            }
+        }
+});
+
+
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     document.getElementById('category_select').addEventListener('change', function (e) {
+    //         console.log(e.target.value);
+
+    //         const selectedOption = e.target.value;
+    //         const formData = new FormData();
+    //         formData.append('selectedOption', selectedOption);
+    //         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    //         fetch('/admin/product/', {
+    //             method: 'POST',
+    //             body: formData
+    //         })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
+    //             // $('#product_container').html(response); 
+    //             return response.json(); 
+    //         })
+    //         .then(data => {
+    //             console.log('Option sent successfully');
+              
+    //               console.log(data,'ssssssssssssss');
+    //         })
+    //         .catch(error => {
+    //             console.error('Error sending option: ', error);
+    //         });
+    //     });
+    // });
+</script>
+
+<!-- 
+
+<script>
+    $(document).ready(function () {
+
+        $('#category_select').on('change', function (e) {
+
+            console.log($(this).val());
+            
+              selectedOption = $(this).val(); // Get the selected option value
+            // Send the selected option to the server using AJAX
+            
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/product/',  // Replace with the actual URL endpoint in your Django views.py
+                data: {
+                    'selectedOption': selectedOption,
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val() // Include CSRF token for security
+                },
+                success: function (data) {
+                    // Handle the success response from the server
+                    console.log('Option sent successfully');
+                    // console.log(data,'dddddddddddddddddddd')
+                    $('html').html(data);
+                    console.log(data,'dddddddddddddddddddd');
+                    // console.log('Server response:', data);
+                },
+                error: function (error) {
+                    // Handle the error response from the server
+                    console.error('Error sending option: ', error);
+                }
+            });
+        
+        })
+
+        
+    });
+</script> -->
+
+
+    
+        
+ {% endblock content %}

@@ -50,7 +50,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price">${{i.product.sale_price}}</td>
+                                    <td class="cart__price">${{i.product.apply_category_offer_discount}}</td>
                                     <td class="cart__quantity">
                                         <div id='myform' method='POST' class='quantity d-flex' action='#'>
                                             <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ i.id }}', -1)"  />
@@ -78,11 +78,20 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="discount__content">
-                        <h6>Discount codes</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Enter your coupon code">
-                            <button type="submit" class="site-btn">Apply</button>
-                        </form>
+                     
+                        {% if coupon_detail is not None %}
+                          <h6>  {{coupon_detail.coupon_code}}  is applied {{coupon_detail.minimum_amount}} </h6><br>
+                          <h>{{coupon_detail.discount}}rs off on this order</h>
+                          <br>  {{coupon_detail.code}}
+                        coupon applied
+                        <td class="cart__close"><a  onclick="deleteCoupon('{{cart}}')"><span class="icon_close"></span></a></td>
+                        <div id="minimumAmount" data-minimum-amount="{{ coupon_detail.minimum_amount }}" style="display: none;"></div>
+                        {% else %}
+                            <div action="#" class="d-flex align-items-center gap-2" >
+                                    <input class="w-75 rounded-5" type="text" placeholder="Enter your coupon code" id="coupon">
+                                <button  onclick="applyCoupon()" class="site-btn" style="height: 50px;">Applycoupon</button>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-lg-4 offset-lg-2">
@@ -91,12 +100,16 @@
                         <ul>
                             <li>Subtotal <span id="total" style="font-size: large;">$0.00</span></li>
                             <li>Quantity <span id="quantity">Subtotal (0 items)</span></li>
-                            <li>Shipping <span id="shipping" style="font-size: large;">$0.00</span></li>
-                            <li>Before Tax <span id="before_tax" style="font-size: large;">$0.00</span></li>
-                            <li>Tax <span id="tax" style="font-size: large;">$0.00</span></li>
+                            <li style="display: none;">Shipping <span id="shipping" style="font-size: large;">$0.00</span></li>
+                            <li>Discount <span id="Discount" style="font-size: large;">$0.00</span></li>
+                            <li style="display: none;">Tax <span id="tax" style="font-size: large;">$0.00</span></li>
                             <li>Grand Total <span id="grandtotal" style="font-size: large;">$0.00</span></li>
                         </ul>
+                        {% if limit == 0 %}
                         <a href="{% url 'order-review' %}" class="primary-btn">Proceed to checkout</a>
+                        {% else %}
+                        <a href="#" class="primary-btn" id="checkoutBtn">Proceed to checkout</a>
+                        {% endif %}
                     </div>
                 </div>
                 
@@ -105,14 +118,17 @@
     <!-- Shop Cart Section End -->
 
 
-
-
-
-
-
-
-
     <script>
+        document.getElementById("checkoutBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent the default behavior of following the link
+            alert('Reduce the stock to checkout', "error");
+            // Reload the current page
+            window.location.reload();
+        });
+    </script>
+
+
+<script>
   async function updateOrderSummary() {
     try {
         // Fetch order summary data from the server
@@ -131,9 +147,18 @@
         document.getElementById('total').innerText = formatCurrency(data.total);
         document.getElementById('quantity').innerText = `(${data.quantity} items)`;
         document.getElementById('shipping').innerText = formatCurrency(data.shipping);
-        document.getElementById('before_tax').innerText = formatCurrency(data.shipping + data.total);
+        document.getElementById('Discount').innerText = formatCurrency(data.Discount);
         document.getElementById('tax').innerText = formatCurrency(data.tax);
         document.getElementById('grandtotal').innerText = formatCurrency(data.grandtotal);
+        const cartId = data.cart_id;
+        const minimumAmountElement = document.getElementById('minimumAmount');
+        const DEFAULT_MINIMUM_AMOUNT = 0;
+        const minimumAmount = minimumAmountElement ? parseInt(minimumAmountElement.getAttribute('data-minimum-amount')) || DEFAULT_MINIMUM_AMOUNT : DEFAULT_MINIMUM_AMOUNT;
+        if (parseInt(minimumAmount) >= data.total) {
+           
+            deleteCoupon(cartId);
+            window.location.reload();
+        }
     } catch (error) {
         alert('fail')
         console.error('Error fetching or updating order summary:', error);
@@ -161,7 +186,7 @@ updateOrderSummary();
     function updateQuantity(cartItemId, change) {
         const quantityInput = document.getElementById(`quantityInput${cartItemId}`);
         let newQuantity = parseInt(quantityInput.value) + change;
-    
+
         // Ensure the new quantity stays within the stock limit
         const maxStock = parseInt(quantityInput.getAttribute('max'));
         if (newQuantity < 0) {
@@ -169,9 +194,11 @@ updateOrderSummary();
         } else if (newQuantity > maxStock) {
             newQuantity = maxStock; // Prevent increasing quantity above maximum stock
         }
-    
         // Update the quantity input field value
         quantityInput.value = newQuantity;
+        
+       
+        
     
         // Call the updateCart function with the new quantity
         updateCart(cartItemId, newQuantity);
@@ -179,10 +206,10 @@ updateOrderSummary();
     
     function updateCart(cartItemId, newQuantity) {
         if (newQuantity == 0) {
-            deleteCartItem(cartItemId);
+                (cartItemId);
             return;
         }
-    
+   
         fetch(`/update_cart/${cartItemId}/${newQuantity}/`)
             .then(response => response.json())
             .then(data => {
@@ -190,7 +217,6 @@ updateOrderSummary();
                     // Update the subtotal in your HTML
                     const subtotalElement = document.getElementById(`subtotal-${cartItemId}`);
                     subtotalElement.innerText = `$${data.subtotal}`;
-    
                     // Call the endpoint to update the order summary
                     updateOrderSummary();
                 } else {
@@ -213,7 +239,6 @@ updateOrderSummary();
                 if (data.success) {
                     // Remove the deleted item from the HTML
                     window.location.reload();
-    
                     // Check if the cart is empty
                     const cartTable = document.getElementById('cart-table');
                     if (cartTable && !cartTable.querySelector('tbody tr')) {
@@ -233,8 +258,80 @@ updateOrderSummary();
             });
     }
     
+    function deleteCoupon(cartItemId) {
+        fetch(`/delete_applied_coupon/${cartItemId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                // Reload the page
+                window.location.reload();
+                } else {
+                    console.error(data.message);
+                    // Handle the error, e.g., display an alert to the user
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle the fetch error, e.g., display an alert to the user
+                alert('Error deleting item. Please try again later.');
+            });
+    }
+    
     // Call the function to update order summary on page load
     updateOrderSummary();
+
+
+    function getCookie(name) {
+    // Function to retrieve a cookie value by name
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+
+
+    function applyCoupon() {
+        var couponCode = document.getElementById('coupon').value;
+        var csrftoken = getCookie('csrftoken'); 
+
+        fetch('{% url "apply_coupon" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ coupon: couponCode})
+        })
+        .then(response => {
+             console.log(response,'reeeeeeeeeeeeeeeee');
+            if (response.ok) {
+                response.json().then(data => {
+                console.log(data);  
+                if (data.success === "Coupon Applied") {
+                    window.location.reload();
+                    updateOrderSummary();
+                    alert(cc);
+                    document.querySelector('.success-message').textContent = data.success;
+                    document.querySelector('.error-message').textContent = ''; 
+                } else {
+                    window.location.reload();
+                    updateOrderSummary();
+
+                    console.error("Coupon application failed:", data.message);
+                    document.querySelector('.error-message').textContent = data.error;
+                    document.querySelector('.success-message').textContent = '';
+                }
+            });
+            } else {
+                console.error("Failed to apply coupon. Server returned status:", response.status);
+            }
+        })
+        .catch(error => {
+            console.error("Network error:", error);
+        });
+    }
+
 </script>
 
 <style>

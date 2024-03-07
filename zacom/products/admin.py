@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category,Product,Product_Variant,Atribute,Atribute_value,Brand
+from .models import Category,Product,Product_Variant,Atribute,Atribute_value,Brand,Coupon,UserCoupon
 
 # Register your models here.
 # class CategoryAdmin(admin.ModelAdmin):
@@ -15,6 +15,8 @@ admin.site.register(Product_Variant)
 admin.site.register(Atribute)
 admin.site.register(Atribute_value)
 admin.site.register(Brand)
+admin.site.register(Coupon)
+admin.site.register(UserCoupon)
 
 # class ProductAdmin(admin.ModelAdmin):
 #     list_display=('product_name','price','stock','category','created_date','is_available')

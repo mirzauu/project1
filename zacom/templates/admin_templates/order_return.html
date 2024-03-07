@@ -1,0 +1,36 @@
+{% extends 'admin_templates/admin-base.html' %}
+
+{% load static  %}
+
+{% block content %}
+
+
+    <section class="content-main">
+        <div class="card mb-4">
+            <header class="card-header">
+                <h4>Return Request</h4>
+            </header>
+            <div class="card-body">
+                <h5 class="card-title">Reason</h5>
+                <div class="mt-4">
+                    <div class="text-muted font-size-14">
+                        <p>{{return_instance.reason}}</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- card end// -->
+        <div class="container" style="flex: content;">
+           
+            <a href="{% url 'order-return-approve' return_id=return_instance.id %}"><div  type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                Approve
+            </div></a>
+            <a href="{% url 'order-return-reject' return_id=return_instance.id  %}"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                Reject
+            </button></a>
+        </div>    
+    </section>
+ 
+ 
+
+
+{% endblock %}

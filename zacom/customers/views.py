@@ -6,7 +6,9 @@ from django.contrib.auth.decorators import login_required
 from requests import request
 from customers.models import Account,AdressBook
 from orders.models import Order,OrderProduct
-from orders.models import OrderProduct
+from orders.models import OrderProduct,Payment,PaymentMethod
+from products.models import Coupon,UserCoupon
+
 from django.shortcuts import get_object_or_404, redirect
 import random 
 from django.core.exceptions import PermissionDenied
@@ -20,7 +22,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 @receiver(pre_social_login)
-def check_user_blocked(sender, request, sociallogin, **kwargs):
+def check_user_blocked(sender,request, sociallogin, **kwargs):
     user = sociallogin.user
     if user.is_blocked:
         # If user is blocked, prevent the login attempt
@@ -95,8 +97,8 @@ def Address_detail(request):
             return JsonResponse({'success': False, 'message': 'No address ID provided'})
 
     context = {'adress': address,
-               'user':user_detail,
-               'order_dtails':order_dtails}
+               'user': user_detail,
+               'order_dtails' : order_dtails}
 
     
         
@@ -122,17 +124,55 @@ def Address_add(request):
         city = request.POST.get("city")
         state = request.POST.get("state")
         country = request.POST.get("country")
-   
+
         address_new=AdressBook(user=account,name=name,phone=phone,address_line_1=address,locality=locality,city=city,state=state,country=country,pincode=pincode)
 
         address_new.save()
-    
-       
 
         return JsonResponse({"message": "Address submitted successfully!"})
     else:
         return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+def Address_edit(request,id):
+    user = request.user.id
+    address = AdressBook.objects.get(id=id)
+    account = Account.objects.filter(id=user)
+    order_dtails=OrderProduct.objects.filter(user=user).count()
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        phone = request.POST.get("phone")
+        pincode = request.POST.get("pincode")
+        locality = request.POST.get("locality")
+        addres = request.POST.get("address")
+        city = request.POST.get("city")
+        state = request.POST.get("state")
+        country = request.POST.get("country")
+
+        address = AdressBook.objects.get(id=id)
+
+        address.name = name
+        address.phone = phone
+        address.address_line_1 = addres
+        address.locality = locality
+        address.city = city
+        address.state = state
+        address.country = country
+        address.pincode = pincode
+        address.save()
+        messages.success(request, 'Address deleted successfully.')
+        return redirect('address-detail')  
+
+    context = {
+               'user':account,
+               'address':address
+
+               }    
+
+    return render(request,'dashboard/address_edit.html',context)
     
+
 def delete_address(request):
     address_id = request.GET.get('id')
     
@@ -162,7 +202,8 @@ def profile(request):
        
     context = {
                'user':user_detail,
-               'order_dtails':order_dtails}
+               'order_dtails':order_dtails
+               }
         
     return render(request,'dashboard/profile.html',context)
 
@@ -193,21 +234,31 @@ def orders(request):
 def orders_detail(request,product_id):
     user = request.user.id
 
-    
-    draft_order=Order.objects.filter(user=user).order_by('-created_at').first()
-    
+    print('===================================')
+   
     order_dtails=OrderProduct.objects.filter(user=user,id=product_id)
-        
-    
-        
-    context = {
-                'order_dtails' : draft_order,
-                # 'address' : address,
-                'order_product' : order_dtails
-                }
 
-  
-        
+    order_dt=OrderProduct.objects.get(user=user,id=product_id)
+
+    payment_method=order_dt.order.payment.payment_method
+
+    for i in order_dtails:
+            address=i.order.shipping_address
+
+    cleaned_string = address.replace('[', '').replace(']', '')
+
+    # Split the string by comma and remove empty strings and 'None' values
+    split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+    # Remove single quotes from each item
+    cleaned_data = [item.replace("'", "") for item in split_data]
+
+    context = {
+                'order' : order_dt,
+                'address' : cleaned_data,
+                'payment' :payment_method,
+                }
+    
     return render(request,'dashboard/order_detail.html',context)
 
 
@@ -253,12 +304,34 @@ def email_activate(request):
             user_instance.email=storedemail
             user_instance.save()
             print('mmmmmm',user_instance)
-    else:
-        print('oooooooo')        
-            
-
-    response_data = {
+            response_data = {
             'success': True,
-            'message': 'verified',
-        }
-    return JsonResponse(response_data)
+            'message': 'Verified',
+            }
+            return JsonResponse(response_data)
+    else:
+        print('fffff')
+        response_data = {
+            'success': False,
+            'message': 'Not Verified',
+            }
+        return JsonResponse(response_data)      
+            
+def coupon(request):
+
+   
+    # all_coupon=Coupon.objects.all()
+    user = request.user.id
+    user_detail= Account.objects.filter(id=user)
+    order_dtails=OrderProduct.objects.filter(user=user).count()
+    available_coupon=UserCoupon.objects.filter(user=user)
+   
+       
+    context = {
+               'user':user_detail,
+               'order_dtails':order_dtails,
+               'coupon':available_coupon
+               }
+        
+    return render(request,'dashboard/coupon.html',context)
+

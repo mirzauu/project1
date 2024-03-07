@@ -142,28 +142,30 @@
         
                 // Validate product title
                 if (productTitle.value.trim() === "") {
-                    alert("Please enter a product title.");
+                    showToast('Please enter a product title.', "error");
                     productTitle.focus();
                     return false;
                 }
         
                 // Validate category
                 if (category.value === "") {
-                    alert("Please select a category.");
+                   
+                    showToast('Please select a category', "error");
                     category.focus();
                     return false;
                 }
         
                 // Validate brand
                 if (brand.value === "") {
-                    alert("Please select a brand.");
+                
+                    showToast('Please select a brand', "error");
                     brand.focus();
                     return false;
                 }
         
                 // Validate description
                 if (description.value.trim() === "") {
-                    alert("Please enter a description.");
+                    showToast('Please enter a description.', "error");
                     description.focus();
                     return false;
                 }

@@ -10,17 +10,23 @@
                     <h2 class="content-title card-title">Order List </h2>
                     <p>Lorem ipsum dolor sit amet.</p>
                 </div>
-                <div>
-                    <input type="text" placeholder="Search order ID" class="form-control bg-white">
-                </div>
+                
             </div>
             <div class="card mb-4">
                 <header class="card-header">
                     <div class="row gx-3">
                         <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control">
+                            <div>
+
+                                <form action="{% url 'admin-order-list' %}" class="d-flex " method="post">
+                                    {% csrf_token %}
+                                    <input type="text" id="searchInput" placeholder="Search Order number" class="form-control" name="search">
+                                    <button type="submit" class="btn-borderless" > <i class="fa-solid fa-rotate"></i>   </button>
+                               </form>    
+
+                            </div>
                         </div>
-                        <div class="col-lg-2 col-6 col-md-3">
+                        <!-- <div class="col-lg-2 col-6 col-md-3">
                             <select class="form-select">
                                 <option>Status</option>
                                 <option>Active</option>
@@ -34,7 +40,7 @@
                                 <option>Show 30</option>
                                 <option>Show 40</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">
@@ -46,7 +52,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Total</th>
-                                    <th scope="col">Status</th>
+                                    <!-- <th scope="col">Status</th> -->
                                     <th scope="col">Date</th>
                                     <th scope="col" class="text-end"> Action </th>
                                 </tr>
@@ -57,7 +63,12 @@
                                     <td>{{i}}</td>
                                     <td><b>{{i.user.username}}</b></td>
                                     <td>{{i.user}}</td>
-                                    <td>{{ i.payment.amount_paid }}</td>
+                                    <td>{{i.payment.amount_paid }}</td>
+                               
+                                    {% comment %}
+                                        
+                                
+                                    
                                     {% if i.order_status == 'New' %}
                                     <td><span class="badge rounded-pill alert-warning">New</span></td>
 
@@ -78,6 +89,7 @@
                                     <td><span class="badge rounded-pill alert-warning">Returned_User</span></td>
                               
                                     {% endif %}
+                                    {% endcomment %}
                                     <td>{{i.created_at}}</td>
                                     <td class="text-end">
                                         <a href="{% url 'admin-order-detail' order_id=i.id %}" class="btn btn-md rounded font-sm">Detail</a>

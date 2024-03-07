@@ -1,0 +1,77 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row">
+         <form method="POST" enctype="multipart/form-data" id="form1"> 
+            {% csrf_token %}
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                      
+                        <div class="mb-4">
+                            <label class="form-label">offer name</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="offer_name" value="{{category_offer.offer_name}}" >
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label class="form-label">category</label>
+                                <select class="form-select" name="category">
+                                    {% for i in category %}
+                                        {% if category_offer.category %}
+                                        <option selected value="{{ i.id }}">{{category_offer.category}}</option>   
+                                        {% else %} 
+                                        <option  value="{{ i.id }}">{{i}}</option>
+                                        {% endif %} 
+                                    {% endfor %}
+                                </select>
+                            </div>  
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label" >discount_percentage</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="discount_percentage"  value="{{category_offer.discount_percentage}}" >
+                            </div>
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label">Expire date</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="product_size" name="expire_date"  value="{{category_offer.expire_date}}" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Image</label>
+                                    <input type="file" name="category_offer_image"  >
+                            
+                            </div>
+                        </div>
+                        <!-- <div class="card-body">
+                            <div>
+                                <label class="form-label">Product-Images</label>
+                                {% if old_product.additional_product_images.all %}
+                                    {% for image in old_product.additional_product_images.all %}
+                                        <img src="{{ image.image.url }}" alt="Product Image" >
+                                        <a>{{ image.image.url }}</a>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No product images available</p>
+                                {% endif %}
+                                <input class="form-control" type="file" name="product_image" multiple accept="image/*" onchange="validateImage(this)" required >
+                            </div>
+                        </div> -->
+                        <div>
+                            <button class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD </button>
+                        </div>
+                    </div> card end//
+                </div> <!-- card end// -->
+            </div>
+        </form>   
+       
+        
+    </div>
+</div>
+
+
+{% endblock content %} 

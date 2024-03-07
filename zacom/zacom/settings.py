@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     #custom app
-    'User','Admin','products','customers','orders','cart','wallet',
+    'User','Admin','products','customers','orders','cart','wallet','offer_management',
     # google auth
     'allauth',
     'allauth.account',
@@ -193,6 +193,7 @@ SOCIALACCOUNT_PROVIDERS = {
         
     }
 }
+
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 SOCIALACCOUNT_LOGIN_ON_GET=True

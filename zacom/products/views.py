@@ -1,14 +1,18 @@
 from django.shortcuts import render
 from django.urls import reverse
 from requests import request
-from .models import Product,Product_Variant,Atribute,Category,Brand, Atribute_value,Additional_Product_Image
+from .models import Product,Product_Variant,Atribute,Category,Brand, Atribute_value,Additional_Product_Image,Coupon
 from Admin import urls
+from django.contrib.auth.decorators import login_required
+
 
 from .form import EditProductForm,EditProductVariantForm,CreateProductForm,CreateProductVariantForm,AddProductVariantForm
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib import messages
 
 from django.db import IntegrityError, transaction
+from datetime import datetime
+
 
 # Create your views here.
 
@@ -187,7 +191,6 @@ def create_varient(request):
     return render(request,"admin_templates/add-varient.html",context)
 
 
-
 def create_varient_value(request):
     try:
         if request.method == "POST":
@@ -309,3 +312,38 @@ def delete_variant(request,product_id):
     instance= Atribute_value.objects.get(id=product_id)
     instance.delete()
     return redirect("variant_list")
+
+@login_required(login_url='admin_login')
+def Coupon_list(request):    
+    coupon_all=Coupon.objects.all()
+    return render(request, "admin_templates/coupon.html",{'coupon':coupon_all})
+
+
+def Coupon_create(request): 
+
+    if request.method == "POST":
+            
+           
+            # Convert string values to appropriate data types
+            coupon_code = request.POST['coupon_code']
+            discount = int(request.POST['discount'])
+            amount = int(request.POST['amount'])  # Renamed to lowercase to follow Python naming conventions
+            user_limit = int(request.POST['user_limit'])  # Renamed to lowercase to follow Python naming conventions
+            expire_date = datetime.strptime(request.POST['expire_date'], '%Y-%m-%d').date()  # Convert string to datetime object
+            coupon_count = int(request.POST['coupon_count'])  # Renamed to lowercase to follow Python naming conventions
+
+            # Create and save the Coupon instance
+            Coupon_Create = Coupon(
+                coupon_code=coupon_code,
+                discount=discount,
+                minimum_amount=amount,
+                max_uses=user_limit,
+                expire_date=expire_date,
+                total_coupons=coupon_count,
+            )
+
+            Coupon_Create.save()
+            messages.error(request, 'coupon created.')
+            return render(request, "admin_templates/coupon_create.html")
+    
+    return render(request, "admin_templates/coupon_create.html")

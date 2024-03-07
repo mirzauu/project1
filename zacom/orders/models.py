@@ -14,6 +14,7 @@ class PaymentMethod(models.Model):
 
     def __str__(self):
         return self.method_name
+    
 
 class Payment(models.Model):
 
@@ -22,7 +23,6 @@ class Payment(models.Model):
         ("FAILED", "Failed"),
         ("SUCCESS", "Success"),
         )
-    
     user = models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
     payment_method  = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, null=True, blank=True)
     payment_id = models.CharField(max_length=100,null=True,blank=True)
@@ -34,18 +34,21 @@ class Payment(models.Model):
     
     def __str__(self):
         return self.payment_id
+  
 
-
-
+  
 class Order(models.Model):
+
     ORDER_STATUS_CHOICES =(
         ("New", "New"),
         ("Accepted", "Accepted"),
+        ("Shipped", "Shipped"),
         ("Delivered", "Delivered"),
-        ("Cancelled_Admin", "Cancelled Admin"),
-        ("Cancelled_User", "Cancelled User"),
-        ("Returned_User", "Returned User"),
+        ("Cancelled Admin", "Cancelled Admin"),
+        ("Cancelled User", "Cancelled User"),
+        ("Returned", "Returned"),
         )
+    
     user = models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
     payment = models.OneToOneField(Payment,on_delete=models.SET_NULL,null=True,blank=True)
     order_number = models.CharField(max_length=100,null=True)
@@ -91,21 +94,24 @@ class Order(models.Model):
 
 class OrderProduct(models.Model):
 
-
     ORDER_STATUS_CHOICES =(
         
         ("New", "New"),
         ("Accepted", "Accepted"),
         ("Delivered", "Delivered"),
+        ("Shipped", "Shipped"),
         ("Cancelled_Admin", "Cancelled Admin"),
         ("Cancelled_User", "Cancelled User"),
-        ("Returned_User", "Returned User"),
-        ("Return_pending", "Returned pending"),
-
+        ("Returned", "Returned"),
+        ("Return Status", "Returned Status"),
+        ("Return Approved", "Returned Approved"),
+        ("Return Rejected", "Returned Rejected"),
         )
+    
     order           = models.ForeignKey(Order,on_delete=models.CASCADE)
     user            = models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
     product_variant = models.CharField(max_length=255, null=True)
+    product_id      = models.CharField(max_length=255, null=True)
     quantity        = models.IntegerField()
     product_price   = models.DecimalField(max_digits=12, decimal_places=2)
     grand_totol     = models.DecimalField(max_digits=12, decimal_places=2,null=True)
@@ -113,7 +119,7 @@ class OrderProduct(models.Model):
     ordered         = models.BooleanField(default=False)
     created_at      = models.DateTimeField(auto_now_add=True)
     updated_at      = models.DateTimeField(auto_now=True)
-    order_status= models.CharField(choices = ORDER_STATUS_CHOICES,max_length=20,default='New')
+    order_status    = models.CharField(choices = ORDER_STATUS_CHOICES,max_length=20,default='New')
 
     
     def save(self, *args, **kwargs):
@@ -132,7 +138,7 @@ class ReturnRequest(models.Model):
         ("Approved", "Approved"),
         ("Rejected", "Rejected"),
     )
-    order_product = models.ForeignKey(OrderProduct, on_delete=models.CASCADE)
+    order_product = models.ForeignKey(OrderProduct, on_delete=models.CASCADE, related_name='return_requests')
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     reason = models.TextField()
     status = models.CharField(choices=RETURN_STATUS_CHOICES, max_length=20, default='Pending')

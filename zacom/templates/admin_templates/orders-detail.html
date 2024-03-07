@@ -3,8 +3,15 @@
 {% load static  %}
 
 {% block content %}
-
+<script>
+$('#myModal').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})
+</script> 
         <section class="content-main">
+           <!-- Button trigger modal -->
+ 
+    
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Order detail</h2>
@@ -21,17 +28,6 @@
                             <small class="text-muted">Order ID: {{orders.id}}</small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <select id="status-select" data-order_id="{{orders.id}}" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                {% for status in order_status %}
-                                    {% if status.1 == 'Cancelled User' or status.1 == 'Returned User' %}
-                                    
-                                      
-                                    {% else %}
-                                      <option {% if status.0 == orders.order_status %} selected {% endif %}>{{ status.1 }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                            <a id="save-btn" class=" btn btn-primary">Save</a>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                         </div>
                     </div>
@@ -77,7 +73,7 @@
                                         {% for item in address %}
                                         {{ item }}
                                         
-                                    {% endfor %}
+                                      {% endfor %}
                                     </p>
                                     <a href="#">View profile</a>
                                 </div>
@@ -98,8 +94,9 @@
                                             <th width="20%" class="text-end">Action</th>
                                         </tr>
                                     </thead>
+                                    {% for i in order_product %}
+                                   
                                     <tbody>
-                                        {% for i in order_product %}
                                         <tr>
                                             <td>
                                                 <a class="itemside" href="#">
@@ -112,43 +109,69 @@
                                             <td>${{ i.product_price }}</td>
                                             <td class="quantity-input"> {{ i.quantity }}</td>
                                             <td class="text-end">${{ i.grand_totol }}</td>
-                                            {% if i.order_status == "New" %}
-                                                <td>New</td>
-                                            {% elif i.order_status == "Accepted" %}
-                                                <td>Accepted</td>
-                                            {% elif i.order_status == "Pending" %}
-                                                <td>Pending</td>
-                                            {% elif i.order_status == "Delivered" %}
-                                                <td>Delivered</td>
-                                            {% elif i.order_status == "Shipped" %}
-                                                <td>Shipped</td>
-                                            {% elif i.order_status == "Cancelled Admin" %}
-                                                <td>Cancelled</td>
-                                            {% elif i.order_status == "Returned User" %}
-                                                <td>Returned</td>
-                                            {% endif %}
-
-                                            <td>
-                                                <select id="status2-select_{{i.id}}" data-order_id="{{i.id}}" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                                            {% if i.order_status == "Return Status" %}
+                                               {% for j in return_request %}
+                                                 {% if j.status == 'Pending' %}
+                                                 
+                                                    <td>Return request</td>
+                                                    
+                                                    <td>
+                                                        <a href= {% url "order-return" order_id=i.id %} >Click</a>
+                                                    </td>   
+                                                 {% elif j.status == 'Approved' %}
+                                                    <td>Returned</td>
+                                                 {% elif j.status == 'Rejected' %}
+                                                    <td>Return Rejected</td>
+                                                 {% endif %} 
                                                 
-                                                    <option >----------</option>
-                                                {% for status in order_status %}
-
-                                                        {% if status.1 == 'Cancelled User' or status.1 == 'Returned User' %}
+                                               {% endfor %}   
+                                               
                                             
-                                                        {% else %}
-                                                        <option {% if status.0 == orders.order_status %} selected {% endif %}>{{ status.1 }}</option>
-                                                        {% endif %}
+ 
+                                            {% else %}
 
-                                                {% endfor %}
+                                                    {% if i.order_status == "New" %}
+                                                        <td>New</td>
+                                                    {% elif i.order_status == "Accepted" %}
+                                                        <td>Accepted</td>
+                                                    {% elif i.order_status == "Pending" %}
+                                                        <td>Pending</td>
+                                                    {% elif i.order_status == "Delivered" %}
+                                                        <td>Delivered</td>
+                                                    {% elif i.order_status == "Shipped" %}
+                                                        <td>Shipped</td>
+                                                    {% elif i.order_status == "Cancelled Admin" %}
+                                                        <td>Cancelled</td>
+                                                    {% elif i.order_status == "Cancelled User" %}
+                                                        <td>Customer Cancelled</td>
+                                                    {% elif i.order_status == "Returned" %}
+                                                        <td>Returned</td>
+                                                    {% elif i.order_status == "Returned Rejected" %}
+                                                        <td>Returned Rejected</td>
+                                                    {% endif %}
 
-                                                </select>
-                                            </td>
+
+                                                    {% if  i.order_status != "Delivered" and i.order_status != "Returned" and i.order_status != "Returned Rejected"  %}
+                                                    <td>
+                                                        <select id="status2-select_{{i.id}}" data-order_id="{{i.id}}" class="form-select d-inline-block mb-lg-0 mb-15 mw-200 ">
+                                                        {% for status in order_status %}
+
+                                                                {% if status.1 == 'Cancelled User' or status.1 == 'Returned User' %}
+                                                    
+                                                                {% else %}
+                                                                <option {% if status.0 == orders.order_status %} selected {% endif %}>{{ status.1 }}</option>
+                                                                {% endif %}
+
+                                                        {% endfor %}
+
+                                                        </select>
+                                                    </td>
+                                                    {% endif %}
+                                            {% endif %}
                                         </tr>
+                                       
                                         {% endfor %}
                                         <tr>
-
-
                                             <td colspan="6">
                                                 <article class="float-end">
                                                    
@@ -195,6 +218,9 @@
                     </div>
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
+            <!-- modal -->
+            
+           
         </section> <!-- content-main end// -->
 
 

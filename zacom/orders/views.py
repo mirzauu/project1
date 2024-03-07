@@ -3,7 +3,7 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from customers.models import Account,AdressBook
 import json
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,7 +12,10 @@ from products.models import Product_Variant
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views import View
-from .models import Payment,PaymentMethod,OrderProduct,Order
+from .models import Payment,PaymentMethod,OrderProduct,Order,ReturnRequest
+from wallet.models import Wallet,WalletTransaction
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+import razorpay
 
 @method_decorator(login_required, name='dispatch')
 class Review(View):
@@ -26,12 +29,10 @@ class Review(View):
         if cart_count < 0:
             return redirect('shop')
         
-        for i in cart_items:
-            pass
-        
 
+        
         total_with_orginal_price =0
-        total=0
+        total = 0
         quantity=0
 
         try:
@@ -42,28 +43,36 @@ class Review(View):
                 for cart_item in cart_items:
                     total += cart_item.sub_total()
                     # total += ( cart_item.product.sale_price * cart_item.quantity)
-                    total_with_orginal_price +=( cart_item.product.max_price * cart_item.quantity)
+                    total_with_orginal_price += ( cart_item.product.max_price * cart_item.quantity)
                     quantity += cart_item.quantity
+
+                    if cart_item.quantity > cart_item.product.stock:
+                        messages.error(request, f"Insufficient stock for {cart_item.product}")
+                        return render(request, 'user_templates/order_summary.html', {'cart_items': cart_items})
                     
             
-                
         except ObjectDoesNotExist:
             pass
         
-        discount = total_with_orginal_price - total
-        grand_total = total
-       
+        
+        Discount = request.session.get('discount', Decimal('0')) 
+        total_float = float(total)
+        Discount_float = float(Discount)
+
+        grandtotal = total_float - Discount_float
+    
 
         context = {
             'total':total,
             'quantity':quantity,
             'cart_items':cart_items,
-            'grand_total':grand_total,
-            'discount':discount,
+            'grand_total':grandtotal,
+            'discount':Discount,
             'total_with_orginal_price':total_with_orginal_price
         }
         
         return render (request,'user_templates/order_summary.html',context)
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -71,7 +80,7 @@ class Address(View):
     
     
     def get(self,request):
-            
+
         user = request.user.id
         address = AdressBook.objects.filter(user=user)
         cart_items = CartItem.objects.filter(user=user,is_active=True)
@@ -90,17 +99,21 @@ class Address(View):
                 total_with_orginal_price += ( cart_item.product.max_price * cart_item.quantity)
                 quantity += cart_item.quantity
 
-            discount = total_with_orginal_price - total
-            grand_total = total
-            
+                
+
+            Discount = request.session.get('discount', Decimal('0')) 
+            total_float = float(total)
+            Discount_float = float(Discount)
+
+            grandtotal = total_float - Discount_float
 
 
             context = {'adress': address,
             'total':total,
             'quantity':quantity,
             'cart_items':cart_items,
-            'grand_total':grand_total,
-            'discount':discount,
+            'grand_total':grandtotal,
+            'discount':Discount,
             'total_with_orginal_price':total_with_orginal_price}
 
 
@@ -136,30 +149,44 @@ class Paymentt(View):
    
     def get(self, request):
         user = request.user.id
+        user_detail= Account.objects.get(id=user)
+        wallet, created = Wallet.objects.get_or_create(user=user_detail,defaults={'balance': 0})
         cart_items = CartItem.objects.filter(user=user, is_active=True)
 
-        total_with_original_price = 0
-        total = 0
-        quantity = 0
+    
+        if cart_items.count()>=1:
 
-        for cart_item in cart_items:
-            total += cart_item.sub_total()
-            total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
-            quantity += cart_item.quantity
+            total_with_original_price = 0
+            total = 0
+            quantity = 0
 
-        discount = total_with_original_price - total
-        grand_total = total
+            for cart_item in cart_items:
+                total += cart_item.sub_total()
+                total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+                quantity += cart_item.quantity
 
-        context = {
-            'total': total,
-            'quantity': quantity,
-            'cart_items': cart_items,
-            'grand_total': grand_total,
-            'discount': discount,
-            'total_with_original_price': total_with_original_price
-        }
+            Discount = request.session.get('discount', Decimal('0')) 
+            total_float = float(total)
+            Discount_float = float(Discount)
 
-        return render(request, 'user_templates/payment.html', context)
+            grandtotal = total_float - Discount_float
+    
+
+            context = {
+
+                'total': total,
+                'quantity': quantity,
+                'cart_items': cart_items,
+                'grand_total': grandtotal,
+                'discount': Discount,
+                'total_with_original_price': total_with_original_price,
+                'wallet': wallet.balance
+
+            }
+
+            return render(request, 'user_templates/payment.html', context)
+        
+        return render (request,'user_templates/home.html')
 
     def post(self, request): 
         data = json.loads(request.body)
@@ -167,19 +194,72 @@ class Paymentt(View):
         
         if selected_option == 'option3':
             print('selected')
-            url='/order-place/'
+            url='/order-place-cod/'
+
+        elif selected_option == 'option1':
+            print('OPTION1111')
+            user_id = request.user.id
+
+            # Get necessary instances
+            
+            payment_methods_instance = PaymentMethod.objects.get(method_name="RAZORPAY")
+
+            user_instance = Account.objects.get(id=user_id)
+
+            address = AdressBook.objects.get(is_default=True, user=user_instance)
+
+            cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
+            
+            if cart_items.count()>=1:
+
+                total_with_original_price = 0
+                total = 0
+                quantity = 0
+
+                for cart_item in cart_items:
+                    total += cart_item.sub_total()
+                    total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+                    quantity += cart_item.quantity
+
+                Discount = request.session.get('discount', Decimal('0')) 
+                total_float = float(total)
+                Discount_float = float(Discount)
+
+                grand_total = total_float - Discount_float
+        
+
+                # Create ShippingAddress instance
+                
+                print('=========================')
+
+                client = razorpay.Client(auth=("rzp_test_vAeyohaspEahRA", "076FQiZmu52B1ODs1UWKe2HF"))
+                data = { "amount":(int(grand_total)*100), "currency": "INR" }
+                payment1 = client.order.create(data=data)
+                print(payment1)
+                payment_order_id = payment1['id']
+                print(payment_order_id)
+
+                payment = Payment.objects.create(user=user_instance,
+                                            payment_method=payment_methods_instance,
+                                            amount_paid=grand_total,
+                                            payment_status='PENDING',
+                                            payment_order_id=payment_order_id
+                                            )   
+
+                return JsonResponse({'message': 'Success', 'context': payment1})
+                
         else:
-            print('review')
-            url='/order-review/'
+            print('selected')
+            url='/order-place-wallet/'
+
         return JsonResponse({'success': False, 'message': 'Error processing request','url':url})
 
 
-def order_place(request):
+
+def order_place_cod(request):
 
     user_id = request.user.id
 
-    # Get necessary instances
-    
     payment_methods_instance = PaymentMethod.objects.get(method_name="CASH ON DELIVERY")
 
     user_instance = Account.objects.get(id=user_id)
@@ -190,8 +270,6 @@ def order_place(request):
     
     if cart_items.count()>=1:
 
-
-
         total_with_original_price = 0
         total = 0
         quantity = 0
@@ -200,23 +278,25 @@ def order_place(request):
             total += cart_item.sub_total()
             total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
             quantity += cart_item.quantity
-        grand_total = total
+        Discount = request.session.get('discount', Decimal('0')) 
+        total_float = float(total)
+        Discount_float = float(Discount)
 
+        grand_total = total_float - Discount_float
+        
         # Create ShippingAddress instance
         address1 =[address.name,address.address_line_1,address.locality,address.city,address.state,address.country,address.pincode,address.phone]
-        
-        
 
-        # Create Payment instance
-        payment = Payment.objects.create(user=user_instance,payment_method=payment_methods_instance,amount_paid=0,payment_status='PENDING')
+        payment = Payment.objects.create(user=user_instance,payment_method=payment_methods_instance,amount_paid=0,payment_status='SUCCESS')
         
         
         draft_order= Order.objects.create(
-                user=user_instance,
-                shipping_address=address1,
-                order_total=grand_total,
-                is_ordered  = True,
-            )
+                        user=user_instance,
+                        shipping_address=address1,
+                        order_total=grand_total,
+                        is_ordered  = True,
+                        payment = payment,
+                    )
         for cart_item in cart_items:
             product= cart_item.product
             product.stock -= cart_item.quantity
@@ -227,15 +307,22 @@ def order_place(request):
                     order           = draft_order,
                     user            = user_instance,
                     product_variant = cart_item.product.get_product_name(),
+                    product_id      = cart_item.product.id,
                     quantity        = cart_item.quantity,
                     product_price   = float(cart_item.product.sale_price),
                     images          = cart_item.product.thumbnail_image,
                     ordered         = True,
                 )
+                cart_id=Cart.objects.get(id=cart_item.cart.id)
+                print(cart_id)
+        cart_id.delete() 
 
         cart_items.delete()    
        
-        order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order)
+        order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
+
+
+
         for i in order_dtails:
             address=i.order.shipping_address
         
@@ -256,40 +343,296 @@ def order_place(request):
     
     context = {
                 'order_dtails' : draft_order,
-                'address' : cleaned_data,
-                'order_product' : order_dtails
+                'order_product' : order_dtails,
                 }
 
-   
+    return render (request,'user_templates/order_sucess.html',context)
+
+def order_place_Wallet(request):
+
+    user = request.user.id
+    user_instance = Account.objects.get(id=user)
+    wallet=Wallet.objects.get(user=user_instance)
+
+    payment_methods_instance = PaymentMethod.objects.get(method_name="WALLET")
+
+    address = AdressBook.objects.get(is_default=True, user=user_instance)
+
+    cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
+  
+    total_with_original_price = 0
+    total = 0
+    quantity = 0
+
+
+    for cart_item in cart_items:
+        total += cart_item.sub_total()
+        total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+        quantity += cart_item.quantity
+    Discount = request.session.get('discount', Decimal('0')) 
+    total_float = float(total)
+    Discount_float = float(Discount)
+
+    grand_total = total_float - Discount_float
+
+    if wallet.balance >=grand_total:
+    
+        wallet.balance -= grand_total
+        wallet.save()
+        WalletTransaction.objects.create(wallet=wallet, amount=grand_total, transaction_type='DEBIT')
+
+
+        # Create ShippingAddress instance
+        
+        print('==================....=======')
+
+        payment = Payment.objects.create(user=user_instance,
+                                    payment_method=payment_methods_instance,
+                                    amount_paid=grand_total,
+                                    payment_status='PENDING',
+                                    
+                                    )   
+
+
+        # Create ShippingAddress instance
+        address1 =[address.name,address.address_line_1,address.locality,address.city,address.state,address.country,address.pincode,address.phone]
+          
+        draft_order= Order.objects.create(
+                        user=user_instance,
+                        shipping_address=address1,
+                        order_total=grand_total,
+                        is_ordered  = True,
+                        payment = payment,
+                    )
+        
+        for cart_item in cart_items:
+            product= cart_item.product
+            product.stock -= cart_item.quantity
+            product.save()
+            
+        for cart_item in cart_items:
+                OrderProduct.objects.create(
+                    order           = draft_order,
+                    user            = user_instance,
+                    product_variant = cart_item.product.get_product_name(),
+                    product_id      = cart_item.product.id,
+                    quantity        = cart_item.quantity,
+                    product_price   = float(cart_item.product.sale_price),
+                    images          = cart_item.product.thumbnail_image,
+                    ordered         = True,
+                )
+
+                cart_id=Cart.objects.get(id=cart_item.cart.id)
+                print(cart_id)
+        cart_id.delete() 
+
+        cart_items.delete()    
+       
+        order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
+
+
+
+        for i in order_dtails:
+            address=i.order.shipping_address
+        
+    else:
+       
+        messages.error(request, 'NO ENOUGH BALANCE ,choose another option')
+        return redirect('order-payment')
+        
+
+    cleaned_string = address.replace('[', '').replace(']', '')
+
+    # Split the string by comma and remove empty strings and 'None' values
+    split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+    # Remove single quotes from each item
+    cleaned_data = [item.replace("'", "") for item in split_data]
+    
+
+    context = {
+                'order_dtails' : draft_order,
+                'address' : cleaned_data,
+                'order_product' : order_dtails,
+                }
 
     return render (request,'user_templates/order_sucess.html',context)
+
+
+@csrf_exempt
+def paymenthandler(request):
+    
+   
+    # only accept POST request.
+    if request.method == "POST":
+
+        try:
+            # Extract payment details from the POST request
+            payment_id        = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature         = request.POST.get('razorpay_signature', '')
+            print(f'1:{payment_id},2:{razorpay_order_id},3:{signature}')
+            # Create a dictionary of payment parameters
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature,
+            }
+
+            # Verify the payment signature
+            client = razorpay.Client(auth=('rzp_test_vAeyohaspEahRA', '076FQiZmu52B1ODs1UWKe2HF'))
+            result = client.utility.verify_payment_signature(params_dict)
+
+            if not result :
+                return JsonResponse({'message': 'Payment signature verification failed'})
+
+            else:
+              
+                payment = Payment.objects.get(payment_order_id=razorpay_order_id)
+                payment.payment_status = 'SUCCESS'
+                payment.payment_id = payment_id
+                payment.save()
+
+                
+                user_instance = payment.user
+
+                total_with_original_price = 0
+                total = 0
+                quantity = 0
+
+                cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
+
+
+                for cart_item in cart_items:
+                    total += cart_item.sub_total()
+                    total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+                    quantity += cart_item.quantity
+                Discount = request.session.get('discount', Decimal('0')) 
+                total_float = float(total)
+                Discount_float = float(Discount)
+
+                grand_total = total_float - Discount_float
+        
+            
+                address = AdressBook.objects.get(is_default=True, user=user_instance)
+
+                
+                address1 =[address.name,
+                        address.address_line_1,
+                        address.locality,
+                        address.city,
+                        address.state,
+                        address.country,
+                        address.pincode,
+                        address.phone
+                        ]
+
+                draft_order= Order.objects.create(
+                        user=user_instance,
+                        shipping_address=address1,
+                        order_total=grand_total,
+                        is_ordered  = True,
+                        payment = payment,
+                    )
+                
+                
+                for cart_item in cart_items:
+                    product = cart_item.product
+                    product.stock -= cart_item.quantity
+                    product.save()
+                    
+                for cart_item in cart_items:
+                        
+                        OrderProduct.objects.create(
+                            order           = draft_order,
+                            user            = user_instance,
+                            product_variant = cart_item.product.get_product_name(),
+                            product_id      = cart_item.product.id,
+                            quantity        = cart_item.quantity,
+                            product_price   = float(cart_item.product.sale_price),
+                            images          = cart_item.product.thumbnail_image,
+                            ordered         = True,
+                        )
+                        cart_id=Cart.objects.get(id=cart_item.cart.id)
+                        print(cart_id)
+                cart_id.delete()       
+                cart_items.delete() 
+                if 'discount' in request.session:
+                   del request.session['discount']
+
+                order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
+
+
+                for i in order_dtails:
+                    address=i.order.shipping_address
+
+                cleaned_string = address.replace('[', '').replace(']', '')
+
+                    # Split the string by comma and remove empty strings and 'None' values
+                split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+                # Remove single quotes from each item
+                cleaned_data = [item.replace("'", "") for item in split_data]
+                
+
+                context = {
+                            'order_dtails' : draft_order,
+                            'address' : cleaned_data,
+                            'order_product' : order_dtails,
+                            }
+
+                return render (request,'user_templates/order_sucess.html',context)
+               
+        except Exception as e:
+            # Exception occurred during payment handling
+            print('Exception:', str(e))
+            return HttpResponseBadRequest()
+    else:
+        return redirect('payment')
+
 
 def get_current_step(request):
 
     d_id = request.GET.get('d_id')
-    order_dtails=Order.objects.get(id=d_id)
- 
+    order_dtails=OrderProduct.objects.get(id=d_id)
+    print('getttt',order_dtails.order_status)
     if order_dtails.order_status=='New':
         current_step = 1
     elif order_dtails.order_status=='Accepted':
         current_step = 2  # Example: You can fetch this from the database or any other source
+    elif order_dtails.order_status=='Shipped':
+        current_step = 3  # Example: You can fetch this from the database or any other source
     elif order_dtails.order_status=='Delivered':
         current_step = 4  # Example: You can fetch this from the database or any other source
-    else :
-        current_step = 2  # Example: You can fetch this from the database or any other source
-  
+      # Example: You can fetch this from the database or any other source
+    print(current_step)
     # Return the current step as JSON response
     return JsonResponse({'currentStep': current_step})
 
 
 def orders_return(request):
+
+    user_id = request.user.id
+
+    user_instance = Account.objects.get(id=user_id)
+
     if request.method == 'POST':
         data = json.loads(request.body)
         orderId = data.get('orderId')
         returnReason = data.get('returnReason')
 
-        print(orderId,returnReason)
-        # Process orderId and returnReason as needed
+        order_dtails=OrderProduct.objects.get(id=orderId,user=user_instance)
+        order_dtails.order_status='Return Status'
+        order_dtails.save()
+        
+        return_request=ReturnRequest(
+            order_product=order_dtails,
+            user=user_instance,
+            reason=returnReason,
+        )
+        return_request.save()
+
+
         return JsonResponse({'status': 'success', 'orderId': orderId, 'returnReason': returnReason})
     else:
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)

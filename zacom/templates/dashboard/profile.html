@@ -36,6 +36,12 @@
                 <li class="d-flex nav-item justify-content-center" role="presentation">
                     <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
                 </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'wallet' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Wallet</button> </a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'coupon-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button> </a>
+                </li>
               
         
             </div>
@@ -197,11 +203,6 @@
         if (!firstName.match(/^[a-zA-Z\s]+$/)) {
             firstNameError.innerHTML = 'First name can only contain letters and spaces';
             return false;
-        }
-
-        if (firstName.length !== 5) {
-        firstNameError.innerHTML = 'First name must be exactly 5 letters';
-        return false;
         }
         firstNameError.innerHTML = null;
         return true;
@@ -390,11 +391,19 @@
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
-            if (result.isConfirmed) {
+            console.log(result);
+            if (result.message === 'Not Verified') {
                 Swal.fire({
-                    title: `email verified `,
+                    title: `Not Verified`,
                     imageUrl: result.value.avatar_url
                 });
+               
+            } else {
+                Swal.fire({
+                    title: `Email verified`,
+                    imageUrl: result.value.avatar_url
+                });
+                
             }
         });
 

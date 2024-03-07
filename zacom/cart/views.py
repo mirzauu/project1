@@ -1,10 +1,17 @@
 from django.shortcuts import render,redirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from .models import CartItem,Cart
 from products.models import Product_Variant
 from django.http import JsonResponse
 from orders.models import Payment
 from django.contrib import messages
+from django.core.cache import cache
+from django.http import JsonResponse
+from products.models import Coupon,UserCoupon
+import json
+from django.utils import timezone
+from decimal import Decimal
 
 # Create your views here.
 #to get the cart id if present
@@ -17,56 +24,96 @@ def _cart_id(request):
 
 
 def cart(request,total=0,quantity=0,cart_items=None):
+    
     total_with_orginal_price =0
+     
+    discount = total_with_orginal_price - total
+    grand_total = total
+    request.session['grandtotal'] = str(grand_total)
+
+    limit=0
+   
+    coupon_detail=None
 
     try:
 
         if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(user=request.user,is_active=True)
-          
-
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            cart = None  # Initialize cart outside of the try block
+            for i in cart_items:
+                cart = i.cart
 
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = CartItem.objects.filter(cart=cart,is_active=True)
-           
-        print(cart_items)
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            
+        coupon_detail = None  # Initialize coupon_detail outside of the try block
+        if cart and cart.coupon and cart.coupon.coupon:
+            # Retrieve the coupon instance based on the coupon code
+            coupo = Coupon.objects.get(coupon_code=cart.coupon.coupon)
+            if not coupo.is_expired and coupo.total_coupons > 0:
+                # Check if the coupon is valid and has remaining uses
+                coupon_detail = coupo
+            else:
+                # Handle cases where the coupon is expired or has no remaining uses
+                messages.error(request, "Coupon is expired or not valid")
+        else:
+            pass
 
         for cart_item in cart_items:
             total += cart_item.sub_total()
-            # total += ( cart_item.product.sale_price * cart_item.quantity)
+            offer=cart_item.product.apply_category_offer_discount()
             total_with_orginal_price +=( cart_item.product.max_price * cart_item.quantity)
             quantity += cart_item.quantity
-            
+            print('ss',offer)
+            if cart_item.quantity > cart_item.product.stock:
+                    limit=1
+                    messages.error(request, f"Insufficient stock for {cart_item.product}")
 
-
+                    return render(request, 'user_templates/shop-cart.html', {
+                    'total': total,
+                    'quantity': quantity,
+                    'cart_items': cart_items,
+                    'grand_total': grand_total,
+                    'discount': discount,
+                    'total_with_orginal_price': total_with_orginal_price,
+                    'limit' : limit,
+                    'cart':cart.id,
+                    'coupon_detail':coupon_detail,
+                })
+           
+        
+  
     except ObjectDoesNotExist:
         pass
-    
-    discount = total_with_orginal_price - total
-    grand_total = total
-    
-    context = {
-        'total':total,
-        'quantity':quantity,
-        'cart_items':cart_items,
-        'grand_total':grand_total,
-        'discount':discount,
-        'total_with_orginal_price':total_with_orginal_price,
-    }
-
-    if total==0:
-      return render(request, 'user_templates/shop_cart_empty.html',context)
-
-    else:
+   
+     
+    if total_with_orginal_price == 0:
       
-      return render(request, 'user_templates/shop-cart.html',context)
+        if 'discount' in request.session:
+            del request.session['discount']
+        return render(request, 'user_templates/shop_cart_empty.html')
+    
+    else:
+
+        return render(request, 'user_templates/shop-cart.html', {
+                    'total': total,
+                    'quantity': quantity,
+                    'cart_items': cart_items,
+                    'grand_total': grand_total,
+                    'discount': discount,
+                    'total_with_orginal_price' : total_with_orginal_price,
+                    'limit' : limit,
+                    'coupon_detail': coupon_detail,
+                    'cart':cart.id,
+                })
 
  
 
 def add_cart(request,product_id):
     current_user = request.user
     product = Product_Variant.objects.get(id=product_id)    #get the product
+    
     
     if request.GET.get('quantity'):
         quantity1 = int(request.GET.get('quantity'))
@@ -84,38 +131,39 @@ def add_cart(request,product_id):
                 cart_id=_cart_id(request)
             )
         cart.save()
-        
-
-
+ 
         try:
-            cart_item = CartItem.objects.get(product=product , user=current_user)
+            cart_item = CartItem.objects.get(product=product,user=current_user)
             print('1stttttttttttttttttttttt')
             maxstock=cart_item.quantity + quantity1
             if maxstock <= product.stock:
                 cart_item.quantity += quantity1
                 cart_item.save()
+                messages.error(request, 'Product Added')
             else:
                 messages.error(request, 'Stock limit exceed')
     
 
         except CartItem.DoesNotExist:
             print('12stttttttttttttttttttttt')
+            if quantity1 <= product.stock:
+                cart_item = CartItem.objects.create(
+                    product=product,
+                    user=current_user,
+                    cart=cart,
+                    quantity = quantity1,
+                )
+                cart_item.save()
+                messages.error(request, 'Product Added')
+            else:
+                messages.error(request, 'Stock limit exceed')
 
-            cart_item = CartItem.objects.create(
-                product=product,
-                user=current_user,
-                cart=cart,
-                quantity = quantity1,
-            )
-            cart_item.save()
-        return redirect('cart')
-        
     else:
         
         # ===CART CREATED ===
         try:
             print('3stttttttttttttttttttttt')
-
+ 
             cart = Cart.objects.get(cart_id=_cart_id(request)) # to get the cartid present in the session
         except Cart.DoesNotExist:
             print('13stttttttttttttttttttttt')
@@ -123,30 +171,39 @@ def add_cart(request,product_id):
             cart = Cart.objects.create(
                 cart_id=_cart_id(request)
             )
-        cart.save()
-        
+            cart.save()
+            print(cart)
+            
         # ===Product saved to cart item
         try:
             print('assstttttttttttttttttttttt')
 
-            cart_item = CartItem.objects.get(product=product , cart=cart)
+            cart_item = CartItem.objects.get(product=product,cart=cart)
             maxstock=cart_item.quantity + quantity1
             if maxstock <= product.stock:
                 cart_item.quantity += quantity1
                 cart_item.save()
+                messages.error(request, 'Product Added')
+
             else:
                 messages.error(request, 'Stock limit exceed')
 
         except CartItem.DoesNotExist:
-            cart_item = CartItem.objects.create(
-                product=product,
-                cart=cart,
-                quantity = quantity1,
-            )
-            cart_item.save()
-        return redirect('cart')
+            if quantity1 <= product.stock:
+                cart_item = CartItem.objects.create(
+                    product=product,
+                    cart=cart,
+                    quantity = quantity1,
+                )
+                cart_item.save()
+                messages.error(request, 'Product Added')
+            else:
+                messages.error(request, 'Stock limit exceed')
+    return redirect(reverse('product_detail', kwargs={'product_variant_slug': product.product_variant_slug}))
+
 
 def update_cart(request, cart_item_id, new_quantity):
+
     try:
         cart_item = CartItem.objects.get(id=cart_item_id)
         cart_item.quantity = int(new_quantity)
@@ -187,19 +244,14 @@ def delete_cart_item(request, cart_item_id):
         'message': 'Item deleted successfully',
     }
 
-   
-      
-
     return JsonResponse(response_data)
-
-
 
 
 def order_summary(request):
     # Your existing code to calculate order summary
-    total = 0
-    quantity = 0
-    shipping = 100
+    total = Decimal(0) 
+    quantity = Decimal(0) 
+    shipping = Decimal(100) 
 
     if request.user.is_authenticated:
         cart_items = CartItem.objects.filter(user=request.user,is_active=True)
@@ -212,19 +264,144 @@ def order_summary(request):
     for cart_item in cart_items :
         total += round(cart_item.sub_total(), 2)
         quantity += cart_item.quantity
+        cart_id = cart_item.cart.id
 
     tax = round(total / 100 * 5, 2)
-    grandtotal = round(tax + total + shipping, 2)
-    Discount =grandtotal-total
-    # Return JSON response
+    grandtotal = round( total , 2)
+    request.session['grandtotal'] = float(grandtotal)
+    grand_total_session = request.session['grandtotal'] 
+
+    Discount = request.session.get('discount')
+    if Discount is None:
+        Discount = 0  
+        request.session['discount'] = Discount
+
+    grandtotal = grand_total_session - Discount    
+
     return JsonResponse({
         'total': total,
         'quantity': quantity,
         'shipping': shipping,
         'tax': tax,
         'grandtotal': grandtotal,
-        'Discount':Discount
+        'Discount':Discount,
+        'cart_id': cart_id,
     })
 
 
+def apply_coupon(request):
 
+    if request.method == 'POST':
+        discount_amount = 0 
+        if 'discount' in request.session:
+            del request.session['discount']
+            print(discount_amount,'ddiscount')
+
+        if discount_amount == 0 :
+            data = json.loads(request.body)
+            coupon_code = data.get('coupon')
+            coupn_dict = {'coupon':coupon_code,}
+            cache.set('coupon_code',coupn_dict )
+            print(coupon_code)
+            grand_total = float(request.session.get('grandtotal'))
+            print('grandd',grand_total)
+        
+            try:
+                # Attempt to get the Coupon object based on the provided coupon code
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                print(coupon,'1')
+            except Coupon.DoesNotExist:
+                # Handle the case where the coupon does not exist
+                data = {'error': 'Coupon does not exist'}
+                return JsonResponse(data, status=200)
+            
+            try:
+                # Attempt to get the UserCoupon object for the current user and coupon
+                cart_item_instance= CartItem.objects.filter(user=request.user)
+                for i in cart_item_instance:
+                    i.cart.id
+                cart_instance = Cart.objects.get(id=i.cart.id)   
+                coupon_usage, created = UserCoupon.objects.get_or_create(
+                coupon=coupon,
+                user=request.user,
+                defaults={'usage_count': 0}  # Set default values for newly created instance
+                ) 
+
+                cart_instance.coupon = coupon_usage
+                cart_instance.save()
+                print('sucess',cart_instance)
+                print(coupon_usage.id, '2')
+            except UserCoupon.DoesNotExist:
+                # Handle the case where the UserCoupon does not exist
+                data = {'error': 'UserCoupon does not exist'}
+                return JsonResponse(data, status=200)
+            
+            discount=coupon.discount
+            if coupon_usage.apply_coupon() and grand_total >= float(coupon.minimum_amount):
+                discount_amount = grand_total-discount
+                coupon.total_coupons -= 1
+                coupon.save()
+                print(discount_amount, 'Success')
+                request.session['discount'] = round(discount,2) 
+                print('grandd',grand_total)
+                data={'discount_amount':discount_amount,'discount':discount}
+                print(data,'3')
+                return JsonResponse({'success':'Coupon Applied'})
+                
+            else:
+
+                if coupon.expire_date < timezone.now().date():
+                    data={'error':'Coupon expired'}
+                    print('Failed')
+                    return JsonResponse(data)
+                elif grand_total < float(coupon.minimum_amount):
+                    data={'error':'Minimum amount required'}
+                    print('Failed')
+                    return JsonResponse(data)
+                elif coupon.total_coupons == 0:
+                    data={'error':'Coupon not available'}
+                    print('Failed')
+                    return JsonResponse(data)
+                data={'error':'Maximum uses of the coupon reached'}
+                print('Failed')
+                return JsonResponse(data)
+            
+        else:
+            return JsonResponse({'error': 'Coupon already applied'})
+        
+
+def delete_applied_coupon(request,cart_item_id):
+    print('xx1',cart_item_id)
+    if 'discount' in request.session:
+        del request.session['discount']
+        
+    if request.user.is_authenticated:
+        cart = Cart.objects.get(id=cart_item_id)
+    else:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True,id=cart_item_id)
+   
+    try:
+        if cart.coupon:  # Check if cart has a coupon applied
+            coupon_detail = UserCoupon.objects.get(id=cart.coupon.id)
+            coupon_detail.usage_count -= 1
+            coupon_detail.save()
+
+            cart.coupon=None
+            cart.save()
+
+
+    except UserCoupon.DoesNotExist:
+        pass
+
+    if 'discount' in request.session:
+        del request.session['discount']
+        print('del  discount')
+    print('aaaaapd')
+
+    response_data = {
+        'success': True,
+        'message': 'coupon deleted successfully',
+    }
+
+    return JsonResponse(response_data)

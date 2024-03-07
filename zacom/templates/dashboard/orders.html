@@ -26,15 +26,22 @@
         <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
             <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
                 
+                 
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'profile' %}"> <button class="nav-link  rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                    <a href="{% url 'profile' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
                 </li>
                 <li class="d-flex nav-item justify-content-center" role="presentation">
                    <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
                 </li>
                
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <button class="nav-link active rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button>
+                    <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'wallet' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Wallet</button> </a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'coupon-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button> </a>
                 </li>
               
         
@@ -116,9 +123,13 @@
                                         {% elif order.order_status == "Cancelled Admin" %}
                                             <td>Seller Cancelled</td>
                                         {% elif order.order_status == "Cancelled User" %}
-                                        <td>Cancelled</td>
-                                        {% elif order.order_status == "Returned User" %}
+                                           <td>Cancelled</td>
+                                        {% elif order.order_status == "Returned" %}
                                             <td>Returned</td>
+                                        {% elif order.order_status == "Return Status" %}
+                                            <td>Return Pending</td>
+                                        {% elif order.order_status == "Returned Rejected" %}
+                                            <td>Returned Rejected</td>
                                         {% endif %}
                                         <td><a href="{% url 'order-detail' product_id=order.id %}" class="view">{{order.order.order_number}}</a></td>
                                         <td>
@@ -128,8 +139,11 @@
                                             <a  class="view">Cancelled</a>
                                             {% elif order.order_status == 'Returned' %}
                                             <a href="" class="view">Returned</a>
-                                            {% else %}
+                                            {% elif order.order_status == "New" or order.order_status == "Accepted" or order.order_status == "Shipped" %}
+
                                             <a href="#" class="view" onclick="cancelOrderConfirmation('{{ order.id }}')">Cancel</a>
+                                            {% else %}
+                                            
                                             {% endif %}
                                         </td>
                                     </tr>

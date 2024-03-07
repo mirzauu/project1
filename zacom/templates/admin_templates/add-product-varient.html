@@ -106,23 +106,30 @@
         
         // Perform validation checks
         if (product.value === "") {
-            alert("Please select a product");
+        
+            showToast('Please select a product', "error");
             return false;
         }
         if (skuId.value.trim() === "") {
-            alert("Please enter SKU ID");
+          
+            showToast('Please enter SKU ID', "error");
             return false;
         }
         if (maxPrice.value.trim() === "" || isNaN(maxPrice.value.trim()) || parseFloat(maxPrice.value.trim()) <= 0 || !/^\d{1,6}(\.\d{0,2})?$/.test(maxPrice.value.trim())) {
-            alert("Please enter a valid max price ");
+   
+            showToast('Please enter a valid max price', "error");
+            
             return false;
         }
        if (salePrice.value.trim() === "" || isNaN(salePrice.value.trim()) || parseFloat(salePrice.value.trim()) <= 0 || salePrice.value.trim().length > 8 || !/^\d{1,6}(\.\d{0,2})?$/.test(salePrice.value.trim())) {
-           alert("Please enter a valid sale price ");
+          
+           showToast('Please enter a valid sale price ', "error");
            return false;
        }
         if (stock.value.trim() === "" || isNaN(stock.value.trim()) || parseFloat(stock.value.trim()) <= 0) {
-            alert("Please enter a valid stock greater than zero");
+           
+            showToast('Please enter a valid stock greater than zero', "error");
+
             return false;
         }
 
@@ -148,7 +155,7 @@
 
     if (file) {
         if (!allowedTypes.includes(file.type)) {
-            alert("Please select a valid image file (JPEG, PNG, or GIF).");
+            showToast('Please select a valid image file (JPEG, PNG, or GIF)', "error");
             fileInput.value = ''; // Clear the file input
             return false;
         }

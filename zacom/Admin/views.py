@@ -8,7 +8,7 @@ from requests import request
 from django.urls import reverse
 
 from products.models import Product,Product_Variant,Brand,Category
-from orders.models import Order,OrderProduct
+from orders.models import Order,OrderProduct,ReturnRequest
 
 from django.http import JsonResponse
 
@@ -19,7 +19,9 @@ from django.db import IntegrityError, transaction
 
 from django.http import HttpResponseBadRequest
 
-
+from customers.models import Account,AdressBook
+from wallet.models import Wallet,WalletTransaction
+from orders.models import Payment,PaymentMethod
 from PIL import Image
 
 
@@ -61,24 +63,40 @@ def adminlogout(request):
     return redirect('admin_login')
 
 
+@login_required(login_url='admin_login')
 def productdetail(request):
-
+ 
     if request.method == 'POST':
         selected_option = request.POST.get('selectedOption')
+        print(selected_option)
         if selected_option =="All category":
              products = Product.objects.all().order_by('-id')
              product_count = products.count()
+             return redirect('productdetail')
         else:
             products = Product.objects.filter(product_catg__cat_name  = selected_option)
+            print(products)
             product_count = products.count()
-        
+            context= {
+                'products': products,
+                'products_count':product_count,
+                'selectedOption':selected_option
+            }
+            return render(request, "admin_templates/products-list.html", context)
+
     else:
         products = Product.objects.all().order_by('-id')
         product_count = products.count()
+        
+
+   
+
     context= {
         'products': products,
         'products_count':product_count,
     }
+
+    # return JsonResponse(context)
     return render(request, "admin_templates/products-list.html", context)
         # products_data = [{'name': product.product_name, 'price': product.price} for product in products]
         # return render(request,"admin_templates/products-list.html", context)
@@ -113,7 +131,7 @@ def activate_varient(request,product_id):
     return redirect(reverse('product_varient_detail', kwargs={'product_id': product}))
 
 
-
+@login_required(login_url='admin_login')
 def product_varient_detail(request,product_id):
     product         = Product.objects.get(id=product_id)
     product_variant = Product_Variant.objects.filter(product=product)
@@ -125,6 +143,7 @@ def product_varient_detail(request,product_id):
     return render(request, "admin_templates/products-variation-list.html",context)
      
 
+@login_required(login_url='admin_login')
 def Brand_detail(request):
 
     all_brand=Brand.objects.all()
@@ -143,7 +162,9 @@ def Brand_detail(request):
         'all_brand': all_brand_product,
     }
     return render(request, "admin_templates/brands.html",context)
-     
+
+
+@login_required(login_url='admin_login')  
 def Brand_create(request):
 
     if request.method == 'POST':
@@ -162,76 +183,55 @@ def Brand_create(request):
 
    
      
+
+
+@login_required(login_url='admin_login')   
 def category_detail(request):
 
-    all_brand=Category.objects.all()
-    all_brand_product={}
-    for i in all_brand:
-       product=Product.objects.filter(product_catg=i.id)
-       all_brand_product[i]=product
-    #    all_brand_product.append(product)
-
-    count1=len(all_brand_product)   
-    print(all_brand_product)
-    print(count1)
-
-
-    context={
-        'all_brand': all_brand_product,
-    }
-    return render(request, "admin_templates/category.html",context)
-
-# def category_create(request):
-#     try:
-#         if request.method == 'POST':
-#             cat_name=request.POST['brand_title']   
-#             cat_image = request.FILES.get('brand_imagee')  
-        
-#             brand_new=Category(cat_name=cat_name,cat_image=cat_image)
-#             brand_new.save()
-#             messages.success(request, 'New category Added.')
-#             return redirect('admin-category')
-#         else:
-#             return render(request, "admin_templates/category_create.html")
-#     except IntegrityError:           
-#         messages.error(request, 'Sorry , it already exist')
-    
-def category_create(request):
     if request.method == 'POST':
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            cat_name = request.POST.get('brand_title')
-            cat_image = request.FILES.get('brand_imagee')
-            
-            if not cat_name:
-                return HttpResponseBadRequest("Category name is required")
-            
-            image = Image.open(cat_image)
+        selected_option = request.POST.get('search')
+        print(selected_option)
+        all_categories = Category.objects.filter(cat_name__icontains=selected_option)
+    
 
-
-            # Save the image
-            image_path = f"{settings.MEDIA_ROOT}/photos/cat_image/{cat_image.name}"
-            image.save(image_path)
-
-            try:
-                category = Category(cat_name=cat_name, cat_image=f"photos/cat_image/{cat_image.name}")
-                category.save()
-                messages.success(request, 'New category added.')
-                return redirect('admin-category')
-            except IntegrityError:
-                messages.error(request, 'Category already exists.')
-                return redirect('admin-category-create')
     else:
+       all_categories = Category.objects.all()
 
-        form = ImageUploadForm()
 
-    return render(request, "admin_templates/category_create.html" ,{'form': form})    
+    all_categories_with_products = {}
+
+    for category in all_categories:
+        products = Product.objects.filter(product_catg=category.id)
+        all_categories_with_products[category] = products
+
+    context = {
+        'all_categories': all_categories_with_products,
+    }
+    print(all_categories_with_products)
+    return render(request, "admin_templates/category.html", context)
+
+
+def category_create(request):
+    try:
+        if request.method == 'POST':
+            cat_name=request.POST['brand_title']   
+            cat_image = request.FILES.get('brand_imagee')
+
+            print(cat_name,cat_image)  
+        
+            brand_new=Category(cat_name=cat_name,cat_image=cat_image)
+            brand_new.save()
+            messages.success(request, 'New category Added.')
+            return redirect('admin-category')
+        else:
+            return render(request, "admin_templates/category_create.html")
+    except IntegrityError:           
+        messages.error(request, 'Sorry , it already exist')
+        return redirect('admin-category-create')
 
 
 def category_edit(request,cat_id):
     instance = Category.objects.get(id=cat_id)
-
-
     if request.method == 'POST':
         cat_name = request.POST.get('brand_title')
         cat_image = request.FILES.get('brand_imagee')
@@ -256,8 +256,13 @@ def category_edit(request,cat_id):
 
 
 def orderlist(request):
-    
-    orders=Order.objects.all().order_by('-created_at')
+    if request.method == 'POST':
+        selected_option = request.POST.get('search')
+        print(selected_option)
+      
+        orders=Order.objects.filter(order_number__icontains=selected_option).order_by('-created_at')
+    else:
+        orders=Order.objects.all().order_by('-created_at')
 
    
     return render(request, "admin_templates/order_list.html",{'orders':orders})
@@ -268,14 +273,19 @@ def orderdetail(request,order_id):
     order = Order.objects.get(id=order_id)
     
     order_products = OrderProduct.objects.filter(order=order)
-    
+
+    return_requests = []
+    for order_product in order_products:
+        # Step 2a: Use the related name to access the related ReturnRequest instances
+        related_return_requests = order_product.return_requests.all()
+        # Step 2b: Collect the related ReturnRequest instances
+        return_requests.extend(related_return_requests)
+
     grand_total=0
 
     for i in order_products:
-        if i.order_status not in ('Cancelled Admin', 'Cancelled User'):        
+        if i.order_status not in ('Cancelled Admin', 'Cancelled User','Returned'):        
             grand_total += i.grand_totol
-    
-      
         user=i.user
         address=i.order.shipping_address
     cleaned_string = address.replace('[', '').replace(']', '')
@@ -287,9 +297,10 @@ def orderdetail(request,order_id):
     cleaned_data = [item.replace("'", "") for item in split_data]
 
 
-    print(cleaned_data)
+    print(return_requests)
 
     order_status = Order.ORDER_STATUS_CHOICES
+ 
    
     context={
 
@@ -299,6 +310,7 @@ def orderdetail(request,order_id):
         'user': user,
         'address': cleaned_data,
         'order_status': order_status,
+        'return_request' : return_requests,
 
     }     
 
@@ -322,10 +334,6 @@ def update_order_status(request):
             for i in order_item:
                 i.order_status=new_status
                 i.save()
-                # if (new_status=='Cancelled Admin' or new_status=='Cancelled User' or new_status=='Returned User' ):
-                #     product=Product_Variant.objects.filter(name__icontains=i.product_variant)
-                #     print(product)
-
 
             return JsonResponse({'message': 'Order status updated successfully'}, status=200)
         except ObjectDoesNotExist:
@@ -335,6 +343,7 @@ def update_order_status(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
+
 
 def update_orderitem_status(request):
     if request.method == 'POST':
@@ -342,12 +351,54 @@ def update_orderitem_status(request):
             data = json.loads(request.body)
             order_id = data.get('order_id')
             new_status = data.get('new_status')
-            print(order_id, new_status)
-
+            print('xxxx',order_id, new_status)
+            print('---------------------------')
+            
             # Update the order status
             order = OrderProduct.objects.get(id=order_id)
+            print('1')
+
+            user_id = request.user.id
+
+            user_instance = Account.objects.get(id=user_id)
+            print('2')
+
+            wallet= Wallet.objects.get(user=user_instance)
+            print('3')
+
+            payment_order=order.order.payment
+            print('4')
+
+            method1=payment_order.payment_method
+         
+            print(method1)
+
+            if new_status in ('Cancelled User', 'Cancelled Admin','Returned'):
+                print('=======')
+                order.order_status = new_status
+                order.save()
+                print('inside',method1)
+                product=order.product_id
+                product_instance=Product_Variant.objects.get(id=product)
+                product_instance.stock += order.quantity
+                product_instance.save()
+                wallet.balance += order.grand_totol
+                wallet.save()
+                WalletTransaction.objects.create(wallet=wallet, amount=order.grand_totol, transaction_type='CREDIT')
+
+                print('5')
+
+                if method1=='RAZORPAY':
+                    print('razropay')
+                    
+                else:
+                    print('nop')    
+
+            print('++++++++++++++')
             order.order_status = new_status
             order.save()
+                
+
 
             return JsonResponse({'message': 'Order status updated successfully'}, status=200)
         except ObjectDoesNotExist:
@@ -358,24 +409,58 @@ def update_orderitem_status(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
 
-        
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
 
-from image_cropping.utils import get_backend
+@never_cache
+def order_return(request,order_id):
 
-from products.form import ImageForm
-from products.models import Image, ImageFK
+    instance=ReturnRequest.objects.get(order_product=order_id)
+    
+    context={
+        'return_instance' : instance
+    }
+    return render(request,'admin_templates/order_return.html',context)
 
-def add(request, image_id=None):
-    image = get_object_or_404(Image, pk=image_id) if image_id else None
-    form = ImageForm(instance=image)
-    if request.method == "POST":
-        form = ImageForm(request.POST, request.FILES, instance=image)
-        if form.is_valid():
-            image = form.save()
-            return HttpResponseRedirect(reverse('image_add', args=(str(image.pk),)))
+@never_cache
+def order_return_approve(request,return_id):
+    print(return_id)
+    instance=ReturnRequest.objects.get(id=return_id)
+    instance.status='Approved'
+    instance.save()
 
-    return render(request, 'includes/cropper.html', {'form': form, 'image': image})
+    product_id=instance.order_product.id
+    order = OrderProduct.objects.get(id=product_id)
+    order.order_status = 'Returned'
+    order.save()
+
+    product=order.product_id
+    product_instance=Product_Variant.objects.get(id=product)
+    product_instance.stock += order.quantity
+    product_instance.save()
+
+
+
+
+    order_id=instance.order_product.order.id
+    print(order_id)
+
+   
+    return redirect(reverse('admin-order-detail', kwargs={'order_id': order_id}))
+
+
+@never_cache
+def order_return_reject(request,return_id):
+    instance=ReturnRequest.objects.get(id=return_id)
+    instance.status='Rejected'
+    instance.save()
+
+    product_id=instance.order_product.id
+    order = OrderProduct.objects.get(id=product_id)
+    order.order_status = 'Returned Rejected'
+    order.save()
+
+    order_id=instance.order_product.order.id
+    print(order_id)
+
+   
+    return redirect(reverse('admin-order-detail', kwargs={'order_id': order_id}))
 

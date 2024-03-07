@@ -39,11 +39,15 @@
                             <i class="fa fa-star"></i>
                             <span>( 138 reviews )</span>
                         </div>
+                        {% if offer %}
+                        <div class="product__details__price">{{offer_discount}}<span>{{i.offer}} </span></div>
+                        <h4>{{offer.discount_percentage}}% off </h4>
+                        {% else %}
                         <div class="product__details__price">{{i.sale_price}} <span>{{i.max_price}}</span></div>
-                      
+                        {% endif %}
                         <div class="product__details__button">
                             <div class="">
-                            {% if i.stock == 0 %}
+                            {% if i.stock <= 0 %}
                             <h6>out of stock</h6>
                             {% else %}
                           
@@ -425,6 +429,7 @@ function updateQuantity(cartItemId, change) {
         newQuantity = 1; // Prevent decreasing quantity below 1
     } else if (newQuantity > maxStock) {
         newQuantity = maxStock; // Prevent increasing quantity above maximum stock
+        showToast('Stock limit Reached', "error");
     }
 
     // Update the quantity input field value

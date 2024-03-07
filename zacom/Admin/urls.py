@@ -4,7 +4,8 @@ from django.urls import path
 
 from . import views
 from products import  views as productView
-from customers import  views as customView
+from customers import  views as customView   
+from offer_management import  views as offerView   
 
 
 urlpatterns = [
@@ -58,8 +59,21 @@ urlpatterns = [
     path("order/detail/<int:order_id>/", views.orderdetail, name="admin-order-detail"),
     path('update-order-status/', views.update_order_status, name='update_order_status'),
     path('update-orderitem-status/', views.update_orderitem_status, name='update_orderitem_status'),
-    path('up/', views.add, name='rderitem_status'),
+ 
+    path('order/return/<int:order_id>/', views.order_return, name='order-return'),
+    path('return/approve/<int:return_id>/', views.order_return_approve, name='order-return-approve'),
+    path('return/reject/<int:return_id>/', views.order_return_reject, name='order-return-reject'),
 
+# coupon 
+    path('Coupon/', productView.Coupon_list, name='admin-coupon'),
+    path('Coupon/create', productView.Coupon_create, name='admin-create'),
+
+# offer   
+    path('categoryoffer/', offerView .category_offer, name='admin-category-offer'),
+    path('categoryoffer/create', offerView .create_category_offer, name='admin-create-category-offer'),
+    path('categoryoffer/edit/<int:offer_id>/', offerView .edit_category_offer, name='admin-edit-category-offer'),
+    path('categoryoffer/activate/<int:offer_id>/', offerView .activate_category_offer, name='activateCatOffer'),
+    path('categoryoffer/deactivate/<int:offer_id>/', offerView .deactivate_category_offer, name='deactivateCatOffer'),
 
 ]
 

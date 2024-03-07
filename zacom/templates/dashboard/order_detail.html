@@ -162,65 +162,90 @@
     <div class="container-wrapper , body">
         <div class="container-left">
             
-        {% for order in order_product %}
+  
+
             {% if order.order_status == "New" %}
             <h1 style="color: #ffffff;">YOUR ORDER IS PROCESSING</h1>
             {% elif order.order_status == "Accepted" %}
             <h1 style="color: #ffffff;">YOUR ORDER IS CONFIRMED</h1>
+            {% elif order.order_status == "Shipped" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS SHIPPED</h1>
             {% elif order.order_status == "Delivered" %}
             <h1 style="color: #ffffff;">YOUR ORDER IS DELIVERED</h1>
             {% elif order.order_status == "Cancelled Admin" %}
-            <h1 style="color: #a50a0a;">YOUR ORDER IS CANCELLED BY SELLER</h1>
+            <h1 style="color: #ffffff;">YOUR ORDER IS CANCELLED BY SELLER</h1>
             {% elif order.order_status == "Cancelled User" %}
-            <h1 style="color: #911111;">YOUR ORDER IS CANCELLED</h1>
-            {% elif order.order_status == "Returned User" %}
+            <h1 style="color: #ffffff;">YOUR ORDER IS CANCELLED</h1>
+            {% elif order.order_status == "Returned" %}
             <h1 style="color: #ffffff;">YOUR ORDER IS Returned</h1>
+            {% elif order.order_status == "Return Status" %}
+            <h1 style="color: #ffffff;">RETURN PENDING</h1>
+            {% elif order.order_status == "Returned Rejected" %}
+            <h1 style="color: #ffffff;">RETURN REJECTED</h1>
             {% endif %}
 
          
 
-            
-            <!-- Your box -->
-            <div class="steps-container" >
-                <div class="steps">
-                    <span class="circle active"><i class="fa-solid fa-check"></i></span>
-                    <span class="circle"><i class="fa-solid fa-check"></i></span>
-                    <span class="circle"><i class="fa-solid fa-check"></i></span>
-                    <span class="circle"><i class="fa-solid fa-check"></i></span>
-                    <div class="progress-bar">
-                        <span class="indicator"></span>
+            {% if order.order_status == "New" or order.order_status == "Accepted" or order.order_status == "Shipped" or  order.order_status == "Delivered"%}
+            <!-- Your box --> 
+                <div class="steps-container"  >
+                    <div class="steps">
+                        <span class="circle active"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <div class="progress-bar">
+                            <span class="indicator"></span>
+                        </div>
                     </div>
-                </div>
-                <div class="steps">
-                    <span >PROCESSING</span>
-                    <span >ORDER <br> CONFIRMED</span>
-                    <span >SHIPPING</span>
-                    <span >DELIVERED</span>
+                    <div class="steps">
+                        <span >PROCESSING</span>
+                        <span >ORDER <br> CONFIRMED</span>
+                        <span >SHIPPING</span>
+                        <span >DELIVERED</span>
+                        
                     
-                   
-                </div>
+                    </div>
+                    
+                </div>  
                
-         
-            </div>  
+            {% else %}
+                <div class="steps-container" style="opacity: 0.5; " >
+                    <div class="steps">
+                        <span class="circle active"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <span class="circle"><i class="fa-solid fa-check"></i></span>
+                        <div class="progress-bar">
+                            <span class="indicator"></span>
+                        </div>
+                    </div>
+                    <div class="steps">
+                        <span >PROCESSING</span>
+                        <span >ORDER <br> CONFIRMED</span>
+                        <span >SHIPPING</span>
+                        <span >DELIVERED</span>
+                        
+                    
+                    </div>
+                    
+                </div>  
+
+            {% endif %}
 
             <div class="container " style="background-color: #f8fafd;  margin-top: 10px; border: #999 2px solid;">
                 <h4>ORDERED ITEM</h4>
 
-                {% for i in order_product %}
                 <div class="d-flex align-items-top gap-4 mt-3 mb-3">
                     
-                <img class="avatar border-white" src="{{i.images.url}}" style="width: 200px;"/><br>
+                <img class="avatar border-white" src="{{order.images.url}}" style="width: 200px;"/><br>
                 <div>
-                <p class="fs-5 fw-bold">product  {{i.product_variant}}</p>          
-                <p>quantity :  {{i.quantity}}</p>          
-                <p>price : {{i.product_price }}</p>
+                <p class="fs-5 fw-bold">product  {{order.product_variant}}</p>          
+                <p> Quantity :  {{order.quantity}}</p>          
+                <p> Price : {{order.product_price }}</p>
+                <p> Total price : {{order.grand_totol}}</p>
                 </div> 
                 </div>        
-                
-                {% endfor %}
-                <ul>
-                    <li>JJJJ</li>
-                </ul>
             </div>
 
 
@@ -230,7 +255,7 @@
         <div class="container-right " style="padding: 20px;">
             <div class="content-box">
                 <span>ORDER DETAIL</span>
-                <h3>#{{order_dtails}}</h3>
+                <h3>#{{order}}</h3>
             </div>
 
             <div class="container " style="background-color: #f8fafd; max-width: 100%; padding-left: 10px; border: #999 2px solid; height: 200px;">
@@ -239,27 +264,24 @@
                 <h4>DELIVERY ADDRESS</h4>
                 </div>
                 <i class="fa-regular fa-truck" style="color: #2862b9;"></i>
-                <span style="font-size: medium;">{{order_dtails.shipping_address }}</span>
+                {% for i in address %}
+                <span style="font-size: medium;">{{i}}</span>
+                {% endfor %}
+           
+            </div>
+            <div class="container " style="background-color: #f8fafd; max-width: 100%; padding-left: 10px; border: #999 2px solid; height: 200px;">
+                <div  class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-truck" style="color: #e0e2e5;"></i>
+                <h4>Payment mode</h4>
+                </div>
+                <h5>{{payment}}</h5>
+                
            
             </div>
             <div class="container " style="background-color: #f8fafd;  margin-top: 10px; border: #999 2px solid;">
               
                 <tbody>
                     <tr>
-                      
-                        {% if order.order_status == "New" %}
-                            <td>New</td>
-                        {% elif order.order_status == "Accepted" %}
-                            <td>Accepted</td>
-                        {% elif order.order_status == "Delivered" %}
-                            <td>Delivered</td>
-                        {% elif order.order_status == "Cancelled Admin" %}
-                            <td>Seller Cancelled</td>
-                        {% elif order.order_status == "Cancelled User" %}
-                        <td>Cancelled</td>
-                        {% elif order.order_status == "Returned User" %}
-                            <td>Returned</td>
-                        {% endif %}
                         <td>
                             {% if order.order_status == 'Delivered' %}
                             <a href="#" class="return-order" onclick="ReturnOrderConfirmation('{{ order.id }}')" data-order-id="{{ order.order.id }}" data-order-created-at='{{ order.created_at|date:"Y-m-d\TH:i:s" }}'>Return</a>
@@ -267,12 +289,12 @@
                             <a  class="view">Cancelled</a>
                             {% elif order.order_status == 'Returned' %}
                             <a href="" class="view">Returned</a>
-                            {% else %}
+                            {% elif order.order_status == "New" or order.order_status == "Accepted" or order.order_status == "Shipped" %}
                             <a href="#" class="view" onclick="cancelOrderConfirmation('{{ order.id }}')">Cancel</a>
                             {% endif %}
                         </td>
                     </tr>
-        {% endfor %}
+   
                 </tbody>
             </div>
           
@@ -342,11 +364,10 @@
 
 
 <script>
-    
-async function fetchDataFromBackend() {
+  async function fetchDataFromBackend() {
   try {
     // Make a GET request to your backend endpoint
-    const response = await fetch('/order-status/?d_id={{order_dtails.id}}');
+    const response = await fetch('/order-status/?d_id={{order.id}}');
     
     // Check if the response is successful (status code 200)
     if (!response.ok) {
@@ -368,19 +389,17 @@ async function fetchDataFromBackend() {
   }
 }
 
-
-     //DOM Elements
+//DOM Elements
 const circles = document.querySelectorAll(".circle"),
   progressBar = document.querySelector(".indicator"),
   buttons = document.querySelectorAll("button");
 
-let currentStep =1 ;
+let currentStep = 1;
 
 // function that updates the current step and updates the DOM
 const updateSteps = async () => {
-    // Fetch data from the backend
+  // Fetch data from the backend
   const currentStep = await fetchDataFromBackend();
-//   currentStep = e.target.id === "next" ? ++currentStep : --currentStep;
 
   // loop through all circles and add/remove "active" class based on their index and current step
   circles.forEach((circle, index) => {
@@ -399,7 +418,8 @@ const updateSteps = async () => {
     buttons.forEach((button) => (button.disabled = false));
   }
 };
-updateSteps()
+updateSteps();
+
 
 // add click event listeners to all buttons
 // buttons.forEach((button) => {
@@ -439,8 +459,8 @@ updateSteps()
             preConfirm: async () => {
             const returnReason = document.getElementById('customTextArea').value.trim();
             if (!returnReason) {
-                Swal.showValidationMessage('Please enter a return reason');
-                return;
+                Swal.showValidationMessage('Please enter  return reason');
+                return
             }
 
             try {
@@ -469,12 +489,16 @@ updateSteps()
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
-                    title: `return processing`,
+                    title: `Return request proceed`,
                     imageUrl: result.value.avatar_url
                 });
             }
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
         });
         customTextAreaWrapper.style.display = 'block';
+
     }
 </script>
 <style>

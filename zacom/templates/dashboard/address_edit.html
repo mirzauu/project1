@@ -1,0 +1,355 @@
+{% extends 'user_templates/base.html' %}
+
+
+
+{% block content %}
+{% load static %}
+
+    <!-- Bootstrap core CSS     -->
+
+  
+
+    <!--  Paper Dashboard core CSS    -->
+    <link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
+
+    <!--  CSS for Demo Purpose, don't include it in your project     -->
+    <link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
+
+    <!--  Fonts and icons     -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+    <link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
+
+    
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
+            <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
+                
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'profile' %}"> <button class="nav-link  rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                   <a href="{% url 'address-detail' %}"> <button class="nav-link active rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
+                </li>
+               
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
+                </li>
+              
+        
+            </div>
+        </div>
+      
+    <div class="col-md-10" style="margin-top: 50px;margin-left: 60px; ">
+        
+       
+
+        <div class="content mt-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-4 col-md-5">
+                        {% for i in user %}
+                        <div class="card card-user">
+                            <div class="image">
+                                <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="..."/>
+                            </div>
+                         
+                            <div class="content">
+                                <div class="author">
+                                  <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="..."/>
+                                 
+                                  <h4 class="title">{{i.first_name}}{{i.last_name}}<br />
+                                     <a href="#"><small>@{{i.username}}</small></a>
+                                  </h4>
+                                </div>
+                                <p class="description text-center">
+                                    {{i.email}} <br>
+                                    {{i.phone_number}} <br>
+                                   
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-offset-1">
+                                        <h5>{{order_dtails}}<br /><small>Orders</small></h5>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>2GB<br /><small>Used</small></h5>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>24,6$<br /><small>Spent</small></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                       
+                    </div>
+                    <div class="col-lg-6 col-md-7">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Address</h4>
+                            </div>
+                            <div class="content" id="address-form" >                                  
+                                        <form id="new-address-form" method="post" onsubmit="return validateForm()" >
+                                            {% csrf_token %}
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <div class="form-group">
+                                                        <label>Name</label>
+                                                        <input type="text" id="nameInput" class="form-control border-input" placeholder="Name" name="name" value="{{address.name}}" >
+                                                        <span id="nameError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <div class="form-group">
+                                                        <label for="exampleInputEmail1">Phone Number</label>
+                                                        <input type="number" class="form-control border-input" placeholder="Phone" name="phone" id="Phone" value="{{address.phone}}">
+                                                        <span id="phoneError" class="error"></span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Pincode</label>
+                                                        <input type="number" class="form-control border-input" placeholder="Pincode" name="pincode" id="pincode" value="{{address.pincode}}">
+                                                        <span id="pincodeError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Locality</label>
+                                                        <input type="text" class="form-control border-input" placeholder="Locality" name="locality" id="locality" value="{{address.locality}}">
+                                                        <span id="localityError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-11">
+                                                    <div class="form-group">
+                                                        <label>Address</label>
+                                                        <textarea  class="form-control border-input" placeholder="Address" name="address" id="address">{{address.address_line_1}}</textarea>
+                                                        <span id="addressError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>City</label>
+                                                        <input type="text" class="form-control border-input" placeholder="City" id="city" name="city" value="{{address.city}}">
+                                                        <span id="cityError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>State</label>
+                                                        <input type="text" class="form-control border-input" placeholder="State" id="state" name="state" value="{{address.state}}">
+                                                        <span id="stateError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Country</label>
+                                                        <input type="text" class="form-control border-input" placeholder="Country" id="country"  name="country" value="{{address.country}}">
+                                                        <span id="countryError" class="error"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <button type="submit" class="btn custom-btn">Edit Address</button>
+                          
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </form>
+                                    </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                
+
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+  
+  
+<style>
+    .custom-btn {
+  background-color: #ee7c7c; /* Change background color */
+  color: #fff; /* Change text color */
+  border-radius: 5px; /* Add rounded corners */
+  padding: 10px 20px; /* Add padding */
+  border: none; /* Remove border */
+  cursor: pointer; /* Add pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Add smooth transition for background color */
+}
+
+.custom-btn:hover {
+  background-color: #ca1515; /* Change background color on hover */
+}
+
+    /* Override Bootstrap classes */
+    .bg-danger {
+      background-color: #ca1515 !important; /* Change background color to grey */
+    }
+  
+    .nav-link {
+      color: rgb(24, 24, 43) !important; /* Change text color to blue */
+    }
+  
+    .nav-link.active {
+      background-color: #ca1515 !important; /* Change background color of active link to grey */
+      color: rgb(255, 255, 255) !important; /* Change text color of active link to blue */
+    }
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+<script>
+
+function validateusername() {
+ 
+    const lastName = document.getElementById('nameInput').value.trim();
+    const lastNameError = document.getElementById('nameError');
+
+    if (lastName === "") {
+        lastNameError.innerHTML = 'Enter your name';
+        return false;
+    }
+    // Check if last name contains only letters and spaces
+    if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+        lastNameError.innerHTML = 'User name can only contain letters and spaces';
+        return false;
+    }
+    lastNameError.innerHTML = null;
+    return true;
+}
+
+
+function validatePhone() {
+    const phone = document.getElementById('Phone').value.trim();
+    const phoneError = document.getElementById('phoneError');
+
+    if (phone === "") {
+        phoneError.innerHTML = 'Enter your phone number';
+        return false;
+    }
+    // Check if phone number consists of the same digit repeated 10 times
+    if (/^(\d)\1{9}$/.test(phone)) {
+        phoneError.innerHTML = 'Enter a valid number';
+        return false;
+    }
+    // Check if phone number contains exactly 10 digits
+    if (!phone.match(/^\d{10}$/)) {
+        phoneError.innerHTML = 'Phone number must be 10 digits';
+        return false;
+    }
+    phoneError.innerHTML = null;
+    return true;
+}
+
+
+function validatePincode() {
+    const phone = document.getElementById('pincode').value.trim();
+    const phoneError = document.getElementById('pincodeError');
+
+    if (phone === "") {
+        phoneError.innerHTML = 'Enter your pincode';
+        return false;
+    }
+    // Check if phone number consists of the same digit repeated 10 times
+    if (/^(\d)\1{9}$/.test(phone)) {
+        phoneError.innerHTML = 'Enter a valid number';
+        return false;
+    }
+    // Check if phone number contains exactly 10 digits
+    if (!phone.match(/^\d{6}$/)) {
+        phoneError.innerHTML = 'must be 6 digits';
+        return false;
+    }
+    phoneError.innerHTML = null;
+    return true;
+}
+
+
+
+function validatecity() {
+ 
+ const lastName = document.getElementById('city').value.trim();
+ const lastNameError = document.getElementById('cityError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your city';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+function validatestate() {
+ 
+ const lastName = document.getElementById('state').value.trim();
+ const lastNameError = document.getElementById('stateError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your state';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+function validatecountry() {
+ 
+ const lastName = document.getElementById('country').value.trim();
+ const lastNameError = document.getElementById('countryError');
+
+ if (lastName ==="") {
+     lastNameError.innerHTML = 'Enter your country';
+     return false;
+ }
+ // Check if last name contains only letters and spaces
+ if (!lastName.match(/^[a-zA-Z\s]+$/)) {
+     lastNameError.innerHTML = 'invalid';
+     return false;
+ }
+ lastNameError.innerHTML = null;
+ return true;
+}
+
+
+
+function validateForm() {
+    const isValidUserName = validateusername();
+    const isValidphone = validatePhone();
+    const isValidpincode = validatePincode();
+    const isValidcity = validatecity();
+    const isValidstate = validatestate();
+    const isValidcountry = validatecountry();
+    return isValidUserName && isValidphone && isValidpincode && isValidcity && isValidstate && isValidcountry /* && other validation checks */;
+}
+
+</script>
+
+{% endblock content %}
+
+
+

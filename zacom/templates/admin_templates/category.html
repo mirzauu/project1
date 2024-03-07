@@ -16,29 +16,22 @@
                 <header class="card-header">
                     <div class="row gx-3">
                         <div class="col-lg-4 mb-lg-0 mb-15 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control">
+                            <form action="{% url 'admin-category' %}" class="d-flex " method="post">
+                                     {% csrf_token %}
+                                <input type="text" id="searchInput" placeholder="Search..." class="form-control" name="search">
+                                <button type="submit" class="btn-borderless" > <i class="fa-solid fa-rotate"></i>   </button>
+                            </form>
                         </div>
-                        <div class="col-lg-2 col-6">
-                            <div class="custom_select">
-                                <select class="form-select select-nice">
-                                    <option selected>Categories</option>
-                                    <option>Technology</option>
-                                    <option>Fashion</option>
-                                    <option>Home Decor</option>
-                                    <option>Healthy</option>
-                                    <option>Travel</option>
-                                    <option>Auto-car</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-6">
+                        
+                        <!-- <div class="col-lg-2 col-6">
                             <input type="date" class="form-control" name="">
-                        </div>
+                        </div> -->
                     </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">
                     <div class="row gx-3">
-                        {% for i,j in all_brand.items %}
+                       
+                        {% for i,j in all_categories.items %}
                         <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                             <figure class="card border-1">
                                 <div class="card-header bg-white text-center">
@@ -58,5 +51,40 @@
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
         </section> <!-- content-main end// -->
+
+    <script>
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     document.getElementById('category_select').addEventListener('change', function (e) {
+        //         console.log(e.target.value);
+    
+        //         const selectedOption = e.target.value;
+        //         const formData = new FormData();
+        //         formData.append('selectedOption', selectedOption);
+        //         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+        //         fetch('/admin/product/', {
+        //             method: 'POST',
+        //             body: formData
+        //         })
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error('Network response was not ok');
+        //             }
+        //             // $('#product_container').html(response); 
+        //             return response.json(); 
+        //         })
+        //         .then(data => {
+        //             console.log('Option sent successfully');
+                  
+        //               console.log(data,'ssssssssssssss');
+        //         })
+        //         .catch(error => {
+        //             console.error('Error sending option: ', error);
+        //         });
+        //     });
+        // });
+    </script>
+
+    
       
 {% endblock content %}
