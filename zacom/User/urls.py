@@ -5,6 +5,7 @@ from django.conf import settings
 from . import views
 from customers import views as custview
 from cart import views as cartview
+from chatbot import views as chatbot
 from wallet import views as walletview
 from orders import views as orderview
 from django.contrib.auth import views as auth_views
@@ -54,6 +55,10 @@ urlpatterns = [
     path('order-status/',orderview.get_current_step,name='order_status'),
     path('order-return/',orderview.orders_return,name='order_return'),
     path('paymenthander/',orderview.paymenthandler,name='paymenthander'),
+
+
+    path('webhook/', chatbot.webhook_view, name='webhook'),
+
 
 
 ]

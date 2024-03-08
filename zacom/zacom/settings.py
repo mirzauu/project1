@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     # image copper
      'easy_thumbnails',
      'image_cropping',
+
+     'chatbot',
  
 ]
 
@@ -89,6 +91,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                    # `allauth` needs this from django
                 'django.template.context_processors.request',
+                'chatbot.context_processors.chat_history'
             ],
         },
     },

@@ -20,7 +20,7 @@ def product_detail(request, product_variant_slug):
         Product_Variant.objects.select_related("product")
         .prefetch_related("atributes")
         .filter(product_variant_slug= product_variant_slug,is_active=True))
-
+    print(single_product_variant)
 
     for i in single_product_variant:
       variants = Product_Variant.objects.select_related('product').filter(product=i.product)
