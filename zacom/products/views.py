@@ -323,7 +323,6 @@ def Coupon_create(request):
 
     if request.method == "POST":
             
-           
             # Convert string values to appropriate data types
             coupon_code = request.POST['coupon_code']
             discount = int(request.POST['discount'])

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Example</title>
+</head>
+<body>
+    <h1>Chatbot Example</h1>
+
+    <div id="chat-container">
+        {% for message in chat_history %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+
+    <form id="chat-form" method="post" action="{% url 'webhook' %}">
+        {% csrf_token %}
+        <input type="text" id="message" name="message" placeholder="Type your message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        // Function to handle form submission
+        document.getElementById("chat-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            var message = document.getElementById("message").value; // Get the user's message
+            sendMessage(message); // Send the message to the server
+        });
+
+        // Function to send message to the server
+        function sendMessage(message) {
+            var xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
+
+            // Configure the request
+            xhr.open("POST", "{% url 'webhook' %}", true); // Specify the method and URL
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); // Set the request header
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"); // Set the CSRF token header
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) { // Check if the request is complete
+                    if (xhr.status === 200) { // Check if the request was successful
+                        var response = JSON.parse(xhr.responseText); // Parse the JSON response
+                        updateChat(response.message); // Update the chat with the bot's response
+                    } else {
+                        console.error("Error:", xhr.statusText); // Log any errors
+                    }
+                }
+            };
+
+            // Send the request with the user's message as the payload
+            xhr.send("message=" + encodeURIComponent(message));
+        }
+
+        // Function to update the chat with the bot's response
+        function updateChat(message) {
+            var chatContainer = document.getElementById("chat-container"); // Get the chat container element
+            var newMessage = document.createElement("p"); // Create a new paragraph element
+            newMessage.textContent = "Bot: " + message; // Set the text content of the new message
+            chatContainer.appendChild(newMessage); // Append the new message to the chat container
+        }
+    </script>
+</body>
+</html>
