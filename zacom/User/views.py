@@ -3,52 +3,73 @@ from django.shortcuts import get_object_or_404, render
 from products.models import Category, Product,Product_Variant,Brand,Additional_Product_Image
 from django.views.decorators.cache import never_cache
 from django.db.models import Q
-from offer_management.models import CategoryOffer
+from offer_management.models import CategoryOffer,ProductOffer
 from decimal import Decimal
+from additional_management.models import Banner,PromotionBanner
 # Create your views here.
-@never_cache
+
 def home(request):
-    return render(request,'user_templates/home.html')
+    cate=Category.objects.all()
+    pro=Product.objects.all()
+    banner=Banner.objects.first()
+    banner2=PromotionBanner.objects.first()
+   
+    dic={}
+    for i in pro:
+        single_product_variant = list(Product_Variant.objects.filter(product=i))
+        dic[i.product_brand] = single_product_variant
+
+    print(dic)
+
+    context = {
+        "detail": dic,
+        "banner":banner,
+        "banner2":banner2,
+    }
+    return render(request,'user_templates/home.html',context)
  
- 
+
 def product_detail(request, product_variant_slug):
 
+    single_product_variant = Product_Variant.objects.select_related("product").prefetch_related("atributes").filter(product_variant_slug=product_variant_slug, is_active=True).first()
+    variants = Product_Variant.objects.select_related('product').filter(product=single_product_variant.product)
+    images = Additional_Product_Image.objects.filter(product_variant=single_product_variant.id).order_by('-id')
+    print(images)
     
+    offer = None
+    offer_discount = 0
 
+    # Retrieve category offers and product offers
+    category_offers = CategoryOffer.objects.filter(is_active=True, category=single_product_variant.product.product_catg)
+    product_offers = ProductOffer.objects.filter(products=single_product_variant.product, is_active=True)
 
-    single_product_variant = (
-        Product_Variant.objects.select_related("product")
-        .prefetch_related("atributes")
-        .filter(product_variant_slug= product_variant_slug,is_active=True))
-    print(single_product_variant)
+    # Find the highest discount offer
+    max_discount_offer = max(product_offers, key=lambda offer: offer.discount_percentage, default=None)
+    if max_discount_offer and max_discount_offer.discount_percentage > (category_offers.first().discount_percentage if category_offers else 0):
+        offer = max_discount_offer
+    elif category_offers:
+        offer = category_offers.first()
 
-    for i in single_product_variant:
-      variants = Product_Variant.objects.select_related('product').filter(product=i.product)
-      images = Additional_Product_Image.objects.filter(product_variant=i.id)
-    category_offer = None
-    offer_discount=0
-    category_offers = CategoryOffer.objects.filter(is_active=True,category=i.product.product_catg)
-    if category_offers:
-        # Iterate over the category offers
-         for offer in category_offers:
-            # Calculate the discount
-            discount = (offer.discount_percentage / Decimal(100)) * (i.offer)
-            # Calculate the discounted price
-            offer_discount = i.offer - discount
-            # Update category_offer to the current offer
-            category_offer = offer
-    
+    # Calculate offer discount if an offer is available
+    if offer:
+        discount = (offer.discount_percentage / Decimal(100)) * single_product_variant.offer
+        offer_discount = single_product_variant.offer - discount
 
+    # Related product 
+    print(single_product_variant.product.product_catg)
+    related_product=Product_Variant.objects.filter(product__product_catg=single_product_variant.product.product_catg)
+    print(related_product)
     context = {
         "variants": variants,
         "detail": single_product_variant,
-        'image':images,
-        'offer':category_offer,
-        'offer_discount':offer_discount
+        'image': images,
+        'offer': offer,
+        'offer_discount': offer_discount,
+        "related_product":related_product
     }
-    # return render(request, f"{user_page}product_detail.html", context)
 
-    return render(request,'user_templates/product-details.html',context)
+    return render(request, 'user_templates/product-details.html', context)
+
 
 def shop(request,product_slug=None):
     categories = None
@@ -102,53 +123,3 @@ def shop(request,product_slug=None):
      
     }
     return render(request, 'user_templates/shop.html', context)
-
-# def shop(request,category_slug=None):
-#     categories = None
-#     products  = None
-
-#     if category_slug != None:
-#         # categories =get_object_or_404(Category, slug=category_slug )
-#         p=Product.objects.filter(product_catg__cat_slug =category_slug)
-        
-#         products_ls=[]
-#         for i in p:
-
-#            products = Product_Variant.objects.prefetch_related('atributes').filter(is_active=True,product=i.id).first()
-
-#            products_ls.append(products)
-#         product_count = len(products_ls)
-
-#         print('=====================',products_ls)
-
-#     else:
-#         p=Product.objects.filter(is_available=True)
-#         products_ls=[]
-#         for i in p:
-#             products = Product_Variant.objects.prefetch_related('atributes').filter(is_active=True,product=i.id).first()
-#             products_ls.append(products)
-#         product_count = len(products_ls)
-     
-
-#     # <--category-->
-#     cat=Category.objects.all()
-#     category_pr=[]
-#     product_detail={}
-#     for i in cat:
-#         cate=Product.objects.filter(product_catg=i.id,is_available=True).all()
-#         product_detail[i]=cate
-    
-            
-           
-            
-#     context = { 
-#         'products': products_ls,
-#         'product_count': product_count,
-#         'category': product_detail,
-      
-#     }
-#     return render(request,'user_templates/shop.html',context)
-
-# def cart(request):
-#     return render(request,'user_templates/shop-cart.html')
-

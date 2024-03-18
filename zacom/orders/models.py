@@ -55,7 +55,7 @@ class Order(models.Model):
     shipping_address = models.TextField()
     # coupon_code = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)
     additional_discount = models.IntegerField(default=0,null=True)
-    wallet_discount = models.IntegerField(default=0,null=True)
+    grand_total = models.IntegerField(default=0,null=True)
     order_note = models.CharField(max_length=100,blank=True,null=True)
     order_total = models.DecimalField(max_digits=12, decimal_places=2)
     order_status= models.CharField(choices = ORDER_STATUS_CHOICES,max_length=20,default='New')
@@ -108,7 +108,7 @@ class OrderProduct(models.Model):
         ("Return Rejected", "Returned Rejected"),
         )
     
-    order           = models.ForeignKey(Order,on_delete=models.CASCADE)
+    order           = models.ForeignKey(Order,on_delete=models.CASCADE, related_name='order')
     user            = models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
     product_variant = models.CharField(max_length=255, null=True)
     product_id      = models.CharField(max_length=255, null=True)

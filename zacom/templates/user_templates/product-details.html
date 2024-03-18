@@ -1,313 +1,172 @@
-
 {% extends 'user_templates/base.html' %}
-
 {% load static %}
 
 {% block content %}
-
-    <!-- Product Details Section Begin -->
-    <section class="product-details spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="product__details__pic">
-                        <div class="product__details__pic__left product__thumb nice-scroll">
+<!-- Product Details Section Begin -->
+<section class="product-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="product__details__pic">
+                    <div class="product__details__pic__left product__thumb nice-scroll">
+                        {% for url in image %}
+                        <a class="pt {% if forloop.first %}active{% endif %}" href="#product-{{ forloop.counter }}">
+                            <img src="{{ url }}" alt="">
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <div class="product__details__slider__content">
+                        <div class="product__details__pic__slider owl-carousel">
                             {% for url in image %}
-                            <a class="pt {% if forloop.first %}active{% endif %}" href="#product-{{ forloop.counter }}">
-                                <img src="{{ url }}" alt="">
-                            </a>
+                            <img data-hash="product-{{ forloop.counter }}" class="product__big__img {% if forloop.first %}active{% endif %}" src="{{ url }}" alt="">
                             {% endfor %}
-                        </div>
-                        <div class="product__details__slider__content">
-                            <div class="product__details__pic__slider owl-carousel">
-                                {% for url in image %}
-                                <img data-hash="product-{{ forloop.counter }}" class="product__big__img {% if forloop.first %}active{% endif %}" src="{{ url }}" alt="">
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-            
-            
-            {% for i in detail %}
-                <div class="col-lg-6">
-                    <div class="product__details__text">
-                        <h3>{{i.product.product_name}} <span>{{ i.variant_name}}</span></h3>
-                        <div class="rating">
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <span>( 138 reviews )</span>
-                        </div>
-                        {% if offer %}
-                        <div class="product__details__price">{{offer_discount}}<span>{{i.offer}} </span></div>
-                        <h4>{{offer.discount_percentage}}% off </h4>
-                        {% else %}
-                        <div class="product__details__price">{{i.sale_price}} <span>{{i.max_price}}</span></div>
-                        {% endif %}
-                        <div class="product__details__button">
-                            <div class="">
-                            {% if i.stock <= 0 %}
-                            <h6>out of stock</h6>
-                            {% else %}
-                          
-                                <div class="quantity">
-                                    <span>Quantity:</span>
-                             
-                                    
-                                    <div id='myform' method='POST' class='quantity d-flex' action='#'>
-                                        <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', -1)"  />
-                                        <input type='text' name='quantity' value="1" class='qty' id="quantityInput{{ cart_item.id }}" max='{{i.stock}}'/>
-                                        <input type='button' value='+' class='qtyplus plus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', 1)"  />
-                                    </div>
-                                </div>
-
-                                <div class="add-to-cart-btn">
-                                    <a href="{% url 'cart-add' product_id=i.id %}" id="addToCartBtn" class="cart-btn">Add to cart</a>
-                                </div> 
-                                  
-                                <div class="other-actions">
-                                    <ul>
-                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                        <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
-                                    </ul>
-                                </div>
-                            {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="product__details__widget">
-                            <ul>
-                                <li>
-                                    <span>Availability:</span>
-                                        <div class="stock__checkbox">
-                                            <label for="stockin">
-                                            <h4>{{i.stock}}</h4> 
-                                            </label>
-                                        </div>
-                                </li>
-                                <span>Available option:</span>
-                                
-                                <div class="col-md-4  mb-3">
-                                        {% for value in variants %}
-                                        <button type="button" class="btn btn-light"><a href="{% url 'product_detail'  product_variant_slug=value.product_variant_slug %}">{{ value.variant_name }}</a></button>
-                                        {% endfor %}
-                                </div>
-                                
-                                
-                                <li>
-                                    <span>Promotions:</span>
-                                    <p>Free shipping</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-12">
-                    <div class="product__details__tab">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( 2 )</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
-                                <h6>Description</h6>
-                                <p>{{i.product.description}}</p>
-                               
-                            </div>
-                            <div class="tab-pane" id="tabs-2" role="tabpanel">
-                                <h6>Specification</h6>
-                                <p></p>
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                quis, sem.</p>
-                            </div>
-                            <div class="tab-pane" id="tabs-3" role="tabpanel">
-                                <h6>Reviews ( 2 )</h6>
-                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
-                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
-                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
-                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
-                                    consequat massa quis enim.</p>
-                                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
-                                        dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                        nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
-                                        quis, sem.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor%}  
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="related__title">
-                        <h5>RELATED PRODUCTS</h5>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/related/rp-1.jpg">
-                            <div class="label new">New</div>
-                            <ul class="product__hover">
-                                <li><a href="img/product/related/rp-1.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Buttons tweed blazer</a></h6>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
-                            <div class="product__price">$ 59.0</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/related/rp-2.jpg">
-                            <ul class="product__hover">
-                                <li><a href="img/product/related/rp-2.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Flowy striped skirt</a></h6>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
-                            <div class="product__price">$ 49.0</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/related/rp-3.jpg">
-                            <div class="label stockout">out of stock</div>
-                            <ul class="product__hover">
-                                <li><a href="img/product/related/rp-3.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Cotton T-Shirt</a></h6>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
-                            <div class="product__price">$ 59.0</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/product/related/rp-4.jpg">
-                            <ul class="product__hover">
-                                <li><a href="img/product/related/rp-4.jpg" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Slim striped pocket shirt</a></h6>
-                            <div class="rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
-                            <div class="product__price">$ 59.0</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- Product Details Section End -->
-
-    <!-- Instagram Begin -->
-    <div class="instagram">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-1.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+            <div class="col-lg-6">
+                <div class="product__details__text">
+                    <h3>{{detail.product.product_name}} <span>{{ detail.variant_name}}</span></h3>
+                    <div class="rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <span>( 138 reviews )</span>
+                    </div>
+                    {% if offer %}
+                    <div class="product__details__price">{{offer_discount}}<span>{{detail.offer}} </span></div>
+                    <h4><span style="color: red;">{{offer.offer_name}} offer</span><br> {{offer.discount_percentage}}% off</h4>
+                    {% else %}
+                    <div class="product__details__price">{{detail.sale_price}} <span></span></div>
+                    {% endif %}
+                    <div class="product__details__button">
+                        <div class="">
+                            {% if detail.stock <= 0 %}
+                            <h6>out of stock</h6>
+                            {% else %}
+                            <div class="quantity">
+                                <span>Quantity:</span>
+                                <div id='myform' method='POST' class='quantity d-flex' action='#'>
+                                    <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', -1)" />
+                                    <input type='text' name='quantity' value="1" class='qty' id="quantityInput{{ cart_item.id }}" max='{{detail.stock}}' />
+                                    <input type='button' value='+' class='qtyplus plus' field='quantity' onclick="updateQuantity('{{ cart_item.id }}', 1)" />
+                                </div>
+                            </div>
+                            <div class="add-to-cart-btn">
+                                <a href="{% url 'cart-add' product_id=detail.id %}" id="addToCartBtn" class="cart-btn">Add to cart</a>
+                            </div>
+                            <div class="other-actions">
+                                <ul>
+                                    <li><a href="{% url 'wishlist-add'  product_id=detail.id %}"><span class="icon_heart_alt"></span></a></li>
+                                    <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
+                                </ul>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-2.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
+                    <div class="product__details__widget">
+                        <ul>
+                            <li>
+                                <span>Availability:</span>
+                                <div class="stock__checkbox">
+                                    <label for="stockin">
+                                        <h4>{{detail.stock}}</h4>
+                                    </label>
+                                </div>
+                            </li>
+                            <span>Available option:</span>
+                            <div class="col-md-4 mb-3">
+                                {% for value in variants %}
+                                <button type="button" class="btn btn-light"><a href="{% url 'product_detail'  product_variant_slug=value.product_variant_slug %}">{{ value.variant_name }}</a></button>
+                                {% endfor %}
+                            </div>
+                            <li>
+                                <span>Promotions:</span>
+                                <p>Free shipping</p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-3.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+            </div>
+            <div class="col-lg-12">
+                <div class="product__details__tab">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( 2 )</a>
+                        </li> -->
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                            <h6>Description</h6>
+                            <p>{{detail.product.description}}</p>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-4.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                        <div class="tab-pane" id="tabs-2" role="tabpanel">
+                            <h6>Specification</h6>
+                            <p></p>
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-5.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                    <div class="instagram__item set-bg" data-setbg="img/instagram/insta-6.jpg">
-                        <div class="instagram__text">
-                            <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
-                        </div>
+                        <!-- <div class="tab-pane" id="tabs-3" role="tabpanel">
+                            <h6>Reviews ( 2 )</h6>
+                            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret. Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla consequat massa quis enim.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
+                        </div> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Instagram End -->
-    <!-- Footer Section Begin -->
-  <footer class="footer">
+</section>
+<!-- Product Details Section End -->
+
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="related__title">
+            <h5>RELATED PRODUCTS</h5>
+        </div>
+    </div>
+    {% for i in related_product %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="product__item">
+            <a href="{% url 'product_detail' product_variant_slug=i.product_variant_slug %}">
+                <div class="product__item__pic set-bg" data-setbg="{{ i.thumbnail_image.url }}">
+                    {% if i.stock <= 0 %}
+                    <div class="label stockout">out of stock</div>
+                    {% endif %}
+
+                    <ul class="product__hover">
+                        <li><a href="{{ i.thumbnail_image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                        <li><a href="{% url 'wishlist-add'  product_id=i.id %}"><span class="icon_heart_alt"></span></a></li>
+                        <li><a href="{% url 'cart-add' product_id=i.id %}"><span class="icon_bag_alt"></span></a></li>
+                    </ul>
+                </div>
+                <div class="product__item__text">
+                    <h6><a href="#">{{i.product}}<br>{{i.variant_name}}</a></h6>
+                    <div class="rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                    </div>
+                    <div class="product__price">{{i.sale_price}}</div>
+                </div>
+            </a>    
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+</div>
+</section>
+<!-- Product Details Section End -->
+
+<!-- Footer Section Begin -->
+<footer class="footer">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-6 col-sm-7">
@@ -315,8 +174,7 @@
                     <div class="footer__logo">
                         <a href="./index.html"><img src="{% static 'user_static/img/logo.png' %}" alt=""></a>
                     </div>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                    cilisis.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.</p>
                     <div class="footer__payment">
                         <a href="#"><img src="{% static 'user_static/img/payment/payment-1.png' %}" alt=""></a>
                         <a href="#"><img src="{% static 'user_static/img/payment/payment-2.png' %}" alt=""></a>
@@ -349,21 +207,16 @@
                 </div>
             </div>
             <div class="col-lg-4 col-md-8 col-sm-8">
-              <div class="footer__newslatter">
-                  <h6>NEWSLETTER</h6>
-                  <form action="#">
-                      <input type="text" placeholder="Email">
-                      <button type="submit" class="site-btn">Subscribe</button>
-                  </form>
-                  <div class="footer__social">
-                      <a href="#"><i class="fa fa-facebook"></i></a>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                      <a href="#"><i class="fa fa-youtube-play"></i></a>
-                      <a href="#"><i class="fa fa-instagram"></i></a>
-                      <a href="#"><i class="fa fa-pinterest"></i></a>
-                  </div>
-              </div>
-          </div>
+                <div class="footer__newslatter">
+                    <div class="footer__social">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-youtube-play"></i></a>
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                        <a href="#"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-12">
@@ -375,101 +228,100 @@
             </div>
         </div>
     </div>
-  </footer>
-  <!-- Footer Section End -->
+</footer>
+<!-- Footer Section End -->
 
-  <!-- Search Begin -->
-  <div class="search-model">
+<!-- Search Begin -->
+<div class="search-model">
     <div class="h-100 d-flex align-items-center justify-content-center">
         <div class="search-close-switch">+</div>
         <form class="search-model-form">
             <input type="text" id="search-input" placeholder="Search here.....">
         </form>
     </div>
-  </div>
-  <!-- Search End -->
+</div>
+<!-- Search End -->
 
-  <!-- Js Plugins -->
-  <script src="{% static 'user_static/js/jquery-3.3.1.min.js' %}"></script>
-  <script src="{% static 'user_static/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'user_static/js/jquery.magnific-popup.min.js' %}"></script>
-  <script src="{% static 'user_static/js/jquery-ui.min.js' %}"></script>
-  <script src="{% static 'user_static/js/mixitup.min.js' %}"></script>
-  <script src="{% static 'user_static/js/jquery.countdown.min.js' %}"></script>
-  <script src="{% static 'user_static/js/jquery.slicknav.js' %}"></script>
-  <script src="{% static 'user_static/js/owl.carousel.min.js' %}"></script>
-  <script src="{% static 'user_static/js/jquery.nicescroll.min.js' %}"></script>
-  <script src="{% static 'user_static/js/main.js' %}"></script>
-  <script src="{% static 'user_static/js/login.js' %}"></script>
-  </body>
+<!-- Js Plugins -->
+<script src="{% static 'user_static/js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'user_static/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'user_static/js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'user_static/js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'user_static/js/mixitup.min.js' %}"></script>
+<script src="{% static 'user_static/js/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'user_static/js/jquery.slicknav.js' %}"></script>
+<script src="{% static 'user_static/js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'user_static/js/jquery.nicescroll.min.js' %}"></script>
+<script src="{% static 'user_static/js/main.js' %}"></script>
+<script src="{% static 'user_static/js/login.js' %}"></script>
+</body>
+</html>
 
-  </html>
-    <script>
-      document.getElementById('addToCartBtn').addEventListener('click', function () {
-    var quantityInput = document.getElementById('quantityInput');
-    var selectedQuantity = quantityInput.value;
+<script>
+    document.getElementById('addToCartBtn').addEventListener('click', function () {
+        var quantityInput = document.getElementById('quantityInput');
+        var selectedQuantity = quantityInput.value;
 
-    // Modify the href attribute to include the selected quantity
-    var addToCartBtn = document.getElementById('addToCartBtn');
-    addToCartBtn.href = addToCartBtn.href.split('?')[0] + '?quantity=' + selectedQuantity;
+        // Modify the href attribute to include the selected quantity
+        var addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.href = addToCartBtn.href.split('?')[0] + '?quantity=' + selectedQuantity;
 
-    console.log(selectedQuantity);
-    console.log(quantityInput.value);
-});
-  
+        console.log(selectedQuantity);
+        console.log(quantityInput.value);
+    });
 
-function updateQuantity(cartItemId, change) {
-    const quantityInput = document.getElementById(`quantityInput${cartItemId}`);
-    let newQuantity = parseInt(quantityInput.value) + change;
-    console.log(cartItemId)
 
-    // Ensure the new quantity stays within the stock limit
-    const maxStock = parseInt(quantityInput.getAttribute('max'));
-    if (newQuantity < 0) {
-        newQuantity = 1; // Prevent decreasing quantity below 1
-    } else if (newQuantity > maxStock) {
-        newQuantity = maxStock; // Prevent increasing quantity above maximum stock
-        showToast('Stock limit Reached', "error");
+    function updateQuantity(cartItemId, change) {
+        const quantityInput = document.getElementById(`quantityInput${cartItemId}`);
+        let newQuantity = parseInt(quantityInput.value) + change;
+        console.log(cartItemId)
+
+        // Ensure the new quantity stays within the stock limit
+        const maxStock = parseInt(quantityInput.getAttribute('max'));
+        if (newQuantity < 0) {
+            newQuantity = 1; // Prevent decreasing quantity below 1
+        } else if (newQuantity > maxStock) {
+            newQuantity = maxStock; // Prevent increasing quantity above maximum stock
+            showToast('Stock limit Reached', "error");
+        }
+
+        // Update the quantity input field value
+        quantityInput.value = newQuantity;
+
+        // Call the updateCart function with the new quantity
+
     }
+</script>
 
-    // Update the quantity input field value
-    quantityInput.value = newQuantity;
-
-    // Call the updateCart function with the new quantity
-   
-}
-
-    </script>
-    
 <style>
     /* Style for the quantity input container */
-.quantity {
-  display: flex;
-  align-items: center;
-}
+    .quantity {
+        display: flex;
+        align-items: center;
+    }
 
-/* Style for the minus button */
-.qtyminus, .qtyplus {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  cursor: pointer;
-}
+    /* Style for the minus button */
+    .qtyminus,
+    .qtyplus {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+    }
 
-/* Style for the text input */
-.qty {
-  width: 50px;
-  height: 30px;
-  text-align: center;
-  border: 1px solid #ccc;
-  margin: 0 5px;
-}
+    /* Style for the text input */
+    .qty {
+        width: 50px;
+        height: 30px;
+        text-align: center;
+        border: 1px solid #ccc;
+        margin: 0 5px;
+    }
 
-/* Style for the plus button */
-.qtyplus {
-  border-left: none;
-}
-
+    /* Style for the plus button */
+    .qtyplus {
+        border-left: none;
+    }
 </style>
-{% endblock content %} 
+{% endblock content %}

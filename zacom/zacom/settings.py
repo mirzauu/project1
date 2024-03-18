@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     #custom app
-    'User','Admin','products','customers','orders','cart','wallet','offer_management',
+    'User','Admin','products','customers','orders','cart','wallet','offer_management','additional_management',
     # google auth
     'allauth',
     'allauth.account',
@@ -72,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'Admin.middleware.SuperuserAdminMiddleware',
         # Add the account middleware:
     'allauth.account.middleware.AccountMiddleware',
 ]
@@ -91,7 +92,11 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                    # `allauth` needs this from django
                 'django.template.context_processors.request',
-                'chatbot.context_processors.chat_history'
+                'chatbot.context_processors.chat_history',
+                'offer_management.context_processors.referral_offer_active',
+                'cart.context_processors.wishlist_count',
+                'cart.context_processors.cart_count',
+
             ],
         },
     },
@@ -106,9 +111,13 @@ AUTH_USER_MODEL = 'customers.Account'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ecommerce',
+        'USER': 'postgres',
+        'PASSWORD': 'Alimirsa1',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

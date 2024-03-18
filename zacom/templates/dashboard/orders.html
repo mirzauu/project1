@@ -26,22 +26,25 @@
         <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
             <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
                 
-                 
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'profile' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                    <a href="{% url 'profile' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">profile</button> </a>
                 </li>
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                   <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
+                    <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
                 </li>
-               
+                
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'order' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Orders</button> </a>
+                    <a href="{% url 'order' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">Orders</button></a>
                 </li>
+                
                 <li class="d-flex nav-item justify-content-center" role="presentation">
                     <a href="{% url 'wallet' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Wallet</button> </a>
                 </li>
                 <li class="d-flex nav-item justify-content-center" role="presentation">
                     <a href="{% url 'coupon-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button> </a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'referral-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Referral</button> </a>
                 </li>
               
         
@@ -99,53 +102,21 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
+                                        <th>Order</th>
                                         <th>Total</th>
                                         <th>Order Placed</th>
-                                        <th>Status</th>
-                                        <th>Id</th>
-                                        <th>Actions</th>
+                                       
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for order in order_dtails %}
                                     <tr>
-                                        <td class="d-flex justify-content-center align-content-center"><img src="{{order.images.url}}" style="width: 60px;"  alt="hi">
-                                            <a href="" class="view"></a>{{order.product_variant}} x {{order.quantity}}</td>
-                                        <td>Rs. {{ order.product_price  }}</td>
-                                        <td>{{ order.created_at|date:"j M Y" }}</td>
-                                        {% if order.order_status == "New" %}
-                                            <td>New</td>
-                                        {% elif order.order_status == "Accepted" %}
-                                            <td>Accepted</td>
-                                        {% elif order.order_status == "Delivered" %}
-                                            <td>Delivered</td>
-                                        {% elif order.order_status == "Cancelled Admin" %}
-                                            <td>Seller Cancelled</td>
-                                        {% elif order.order_status == "Cancelled User" %}
-                                           <td>Cancelled</td>
-                                        {% elif order.order_status == "Returned" %}
-                                            <td>Returned</td>
-                                        {% elif order.order_status == "Return Status" %}
-                                            <td>Return Pending</td>
-                                        {% elif order.order_status == "Returned Rejected" %}
-                                            <td>Returned Rejected</td>
-                                        {% endif %}
-                                        <td><a href="{% url 'order-detail' product_id=order.id %}" class="view">{{order.order.order_number}}</a></td>
                                         <td>
-                                            {% if order.order_status == 'Delivered' %}
-                                            <a href="#" class="return-order" data-order-id="{{ order.order.id }}" data-order-created-at='{{ order.created_at|date:"Y-m-d\TH:i:s" }}'>Return</a>
-                                            {% elif order.order_status == 'Cancelled User' %}
-                                            <a  class="view">Cancelled</a>
-                                            {% elif order.order_status == 'Returned' %}
-                                            <a href="" class="view">Returned</a>
-                                            {% elif order.order_status == "New" or order.order_status == "Accepted" or order.order_status == "Shipped" %}
-
-                                            <a href="#" class="view" onclick="cancelOrderConfirmation('{{ order.id }}')">Cancel</a>
-                                            {% else %}
-                                            
-                                            {% endif %}
-                                        </td>
+                                            <a href="{% url 'order-item' orderid=order.id %}" class="view">{{order.order_number}}</td></a>
+                                        <td>Rs. {{ order.order_total  }}</td>
+                                        <td>{{ order.created_at|date:"j M Y" }}</td>
+                                       
+                                       
                                     </tr>
                                     {% endfor %}
                                 </tbody>

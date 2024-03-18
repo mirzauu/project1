@@ -35,7 +35,7 @@
                             </div>
                             <div class="col-md-4  mb-3">
                                 <label for="product_size" class="form-label">Expire date</label>
-                                <input type="date" placeholder="Type here" class="form-control" id="product_size" name="expire_date"  value="{{category_offer.expire_date}}" >
+                                <input type="date" placeholder="Type here" class="form-control" id="expire_date" name="expire_date"  value="" >
                             </div>
                         </div>
                     </div>
@@ -72,6 +72,71 @@
         
     </div>
 </div>
+
+<script>
+    var final_date = document.getElementById('expire_date');
+            var new_date = '{{category_offer.expire_date}}';
+            var dateString = '{{category_offer.expire_date}}';
+            var date = new Date(dateString);
+
+            var year = date.getFullYear();
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
+
+            var formattedDate = year + "-" + month + "-" + day;
+            final_date.value=formattedDate;
+
+
+
+
+            
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the form element
+        const form = document.getElementById('form1');
+
+        // Add event listener for form submission
+        form.addEventListener('submit', function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Validate the form fields
+            const offerNameInput = form.querySelector('input[name="offer_name"]');
+            const categorySelect = form.querySelector('select[name="category"]');
+            const discountInput = form.querySelector('input[name="discount_percentage"]');
+            const expireDateInput = form.querySelector('input[name="expire_date"]');
+
+            // Check if offer name is empty
+            if (offerNameInput.value.trim() === '') {
+                alert('Please enter offer name');
+                return;
+            }
+
+            // Check if category is selected
+            if (categorySelect.value === '') {
+                alert('Please select a category');
+                return;
+            }
+
+            // Check if discount percentage is a valid number
+            const discount = parseFloat(discountInput.value);
+            if (isNaN(discount) || discount <= 0 || discount > 100) {
+                alert('Please enter a valid discount percentage (between 0 and 100)');
+                return;
+            }
+
+            // Check if expire date is selected
+            if (expireDateInput.value.trim() === '') {
+                alert('Please select an expiration date');
+                return;
+            }
+
+            // If all validations pass, submit the form
+            form.submit();
+        });
+    });
+</script>
 
 
 {% endblock content %} 

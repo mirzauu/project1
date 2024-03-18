@@ -50,6 +50,10 @@
                             
 				<input type="password" placeholder="Confirm Password" name="password2" id="password2"  oninput="validatePassword2()"/>
 				<span class="error" id="password2Error" style="font-size: 14px; font-weight: 400; color: rgb(54, 50, 50);transition: opacity 0.5s;"></span>
+                {% if referal_offer_active == True %}         
+                    <input type="text" placeholder="Referal code" name="referal_code" id="referal_code"  />
+                    <span class="error" id="password2Error" style="font-size: 14px; font-weight: 400; color: rgb(54, 50, 50);transition: opacity 0.5s;"></span>
+                {% endif %}    
                           
 
 			</div>
@@ -98,6 +102,25 @@
 
 
 <!-- sinin page -->
+
+<script>
+    const signUpButton = document.getElementById('signUp');
+const signInButton = document.getElementById('signIn');
+const container = document.getElementById('container');
+
+signUpButton.addEventListener('click', () => {
+	container.classList.add("right-panel-active");
+});
+
+signInButton.addEventListener('click', () => {
+	container.classList.remove("right-panel-active");
+});
+
+
+setTimeout(function(){
+	$('#message').fadeOut('slow')
+}, 4000)
+</script>
 
 <script>
 

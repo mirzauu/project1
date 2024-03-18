@@ -4,7 +4,7 @@ from requests import request
 from .models import Product,Product_Variant,Atribute,Category,Brand, Atribute_value,Additional_Product_Image,Coupon
 from Admin import urls
 from django.contrib.auth.decorators import login_required
-
+from django.views.decorators.cache import never_cache
 
 from .form import EditProductForm,EditProductVariantForm,CreateProductForm,CreateProductVariantForm,AddProductVariantForm
 from django.shortcuts import render,redirect,HttpResponse
@@ -101,11 +101,7 @@ def edit_product(request,product_id):
         
     return render(request,"admin_templates/edit-product.html",context)    
     
-
-    
-    
-
-
+@never_cache
 def create_product_with_variant(request):
     
     attributes = Atribute.objects.prefetch_related('atribute_value_set').filter(is_active=True)
@@ -128,45 +124,42 @@ def create_product_with_variant(request):
             product_image=request.FILES.getlist('product_image')
             sale_price = request.POST['sale_price']
             stock = request.POST['stock']      
-            thumbnail_image = request.FILES.get('thumbnail_image')  
-            
+            thumbnail_image = request.FILES.get('existing_product_images')  
+            print("ooooooooooo")   
         
             #getting all atributes  
             attribute_values = request.POST.getlist('attributes')
             attribute_ids = []
             varient_value=[]
+            print(attribute_values,'att')
 
             for req_atri in attribute_values:
-                if req_atri != 'None': 
-                   a=Atribute_value.objects.filter(id=req_atri).values_list('atribute_value',flat=True)
-                   for i in a:
-                        varient_value.append(i)
-                        attribute_ids.append(req_atri)
+                a=Atribute_value.objects.filter(id=req_atri).values_list('atribute_value',flat=True)
+                print(a,'a')
+                for i in a:
+                    varient_value.append(i)
+                    attribute_ids.append(req_atri)
 
-            with transaction.atomic():
-       
-       
+            product_id =Product.objects.get(id=product)
+            product_varient = Product_Variant(
+                product = product_id,
+                sku_id = sku_id,
+                variant_name =' '.join(varient_value),
+                max_price  = max_price, 
+                sale_price  = sale_price, 
+                stock  = stock, 
+                thumbnail_image = thumbnail_image
+            )   
+            print('=============')
+            print(attribute_ids,'ll')
+            print(varient_value,'kk')
+            product_varient.save()
+            product_varient.atributes.set(attribute_ids)
+            for image in product_image:
+                Additional_Product_Image.objects.create(product_variant=product_varient,image=image)
+            messages.success(request, 'Product variation Added.')
+            return redirect('product-create-variant')
         
-
-                product_id =Product.objects.get(id=product)
-                product_varient = Product_Variant(
-                    product = product_id,
-                    sku_id = sku_id,
-                    variant_name =' '.join(varient_value),
-                    max_price  = max_price, 
-                    sale_price  = sale_price, 
-                    stock  = stock, 
-                    thumbnail_image = thumbnail_image
-                )   
-                
-                
-                product_varient.save()
-                product_varient.atributes.set(attribute_ids)
-                for image in product_image:
-                    Additional_Product_Image.objects.create(product_variant=product_varient,image=image)
-                messages.success(request, 'Product variation Added.')
-                return redirect('product-create-variant')
-            
 
         except IntegrityError:
             # Handle the IntegrityError
@@ -241,9 +234,14 @@ def edit_product_with_variant(request,product_id):
             attribute_values = request.POST.getlist('attributes')
         
             attribute_ids = []
+            varient_value = []
             for req_atri in attribute_values:
                 if req_atri != 'None':
-                  attribute_ids.append(req_atri)   
+                    a=Atribute_value.objects.filter(id=req_atri).values_list('atribute_value',flat=True)
+                    for i in a:
+                        varient_value.append(i)
+                        attribute_ids.append(req_atri)
+
 
             product_id =Product.objects.get(id=product)
             print('=========================')
@@ -253,13 +251,12 @@ def edit_product_with_variant(request,product_id):
             old_product.sku_id = sku_id
             old_product.max_price  = max_price 
             old_product.sale_price  = sale_price 
-            old_product.stock  = stock 
+            old_product.stock = stock 
 
             if thumbnail_image != None:
                 old_product.thumbnail_image = thumbnail_image
-             
 
-            old_product.save()
+            old_product.save() 
             old_product.atributes.set(attribute_ids)
             if not product_image :
                 for image in product_image:
@@ -269,7 +266,6 @@ def edit_product_with_variant(request,product_id):
                 for image in product_image:
                     Additional_Product_Image.objects.create(product_variant=old_product,image=image)
             messages.success(request, 'Product variation Added.')
-        
             return redirect(reverse('product_varient_detail', kwargs={'product_id': product_id.id}))
    
     except IntegrityError:

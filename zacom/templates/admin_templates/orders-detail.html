@@ -151,12 +151,12 @@ $('#myModal').on('shown.bs.modal', function () {
                                                     {% endif %}
 
 
-                                                    {% if  i.order_status != "Delivered" and i.order_status != "Returned" and i.order_status != "Returned Rejected"  %}
+                                                    {% if  i.order_status != "Delivered" and i.order_status != "Returned" and i.order_status != "Returned Rejected" and i.order_status != "Cancelled User" and i.order_status != "Cancelled Admin" %}
                                                     <td>
                                                         <select id="status2-select_{{i.id}}" data-order_id="{{i.id}}" class="form-select d-inline-block mb-lg-0 mb-15 mw-200 ">
                                                         {% for status in order_status %}
 
-                                                                {% if status.1 == 'Cancelled User' or status.1 == 'Returned User' %}
+                                                                {% if status.1 == 'Cancelled User' or status.1 == 'Returned User'%}
                                                     
                                                                 {% else %}
                                                                 <option {% if status.0 == orders.order_status %} selected {% endif %}>{{ status.1 }}</option>
@@ -180,8 +180,16 @@ $('#myModal').on('shown.bs.modal', function () {
                                                         <dd>$10.00</dd> -->
                                                     </dl>
                                                     <dl class="dlist">
+                                                        <dt>Total:</dt>
+                                                        <dd> <b>$ {{orders.grand_total}}</b> </dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>Discount:</dt>
+                                                        <dd> <b>$ {{orders.additional_discount}}</b> </dd>
+                                                    </dl>
+                                                    <dl class="dlist">
                                                         <dt>Grand total:</dt>
-                                                        <dd> <b class="h5">$ {{grand_total}}</b> </dd>
+                                                        <dd> <b class="h5">$ {{orders.order_total}}</b> </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>

@@ -1,0 +1,54 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Home page</h2>
+                        <div>
+                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                            <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                   
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>Promotion Banner</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post"  enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <div class="mb-4">
+                                    <label for="image_field" class="form-label">Image</label>
+                                    <input type="file" accept="image/*" class="form-control" name="image_field">
+                                    {% if instance.image %}
+                                    <img src="{{ instance.image.url }}" alt="Image 1">
+                                    {% endif %}
+                                </div>
+                                <div class="mb-4">
+                                    <label for="text_field_1" class="form-label">Text Field 1</label>
+                                    <input type="text" placeholder="Enter text" class="form-control" name="text_field_1" value="{{instance.title1}}">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="text_field_2" class="form-label">Text Field 2</label>
+                                    <input type="text" placeholder="Enter text" class="form-control" name="text_field_2" value="{{instance.title2}}">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="text_field_3" class="form-label">Text Field 3</label>
+                                    <input type="text" placeholder="Enter text" class="form-control" name="text_field_3" value="{{instance.title3}}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+
+                            </form>
+                        </div>
+                    </div>
+                     <!-- card end// -->
+                </div>
+               
+            </div>
+        </section> <!-- content-main end// -->
+{% endblock content %}

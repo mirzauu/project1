@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 import razorpay
 import json
-
+from django.views.decorators.cache import never_cache
 from django.core.cache import cache
 
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -14,53 +14,56 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.conf import settings
 
 # Create your views here.
-
+@never_cache 
 def wallet(request):
-    user = request.user.id
-    user_detail= Account.objects.get(id=user)
-    print(user_detail)
-    order_dtails=OrderProduct.objects.filter(user=user).count()
-    wallet, created = Wallet.objects.get_or_create(user=user_detail, defaults={'balance': 0})
-    print(wallet)
-    transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-created_at')
-    print(wallet.balance,'Wallet balance')
-    context = {'wallet': wallet,
-               'transactions': transactions,
-               'user_detail':user_detail,
-               'order_dtails':order_dtails,}
+
+    if request.user.is_authenticated:
+        user = request.user.id
+        user_detail= Account.objects.get(id=user)
+        print(user_detail)
+        order_dtails=OrderProduct.objects.filter(user=user).count()
+        wallet, created = Wallet.objects.get_or_create(user=user_detail, defaults={'balance': 0})
+        print(wallet)
+        transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-created_at')
+        print(wallet.balance,'Wallet balance')
+        context = {'wallet': wallet,
+                'transactions': transactions,
+                'user_detail':user_detail,
+                'order_dtails':order_dtails,}
 
 
-    if request.method == 'POST':
-        currency = 'INR'
-        amount = int(json.loads(request.body)['amount']) 
-        print(amount,user,currency)
-        data = {'amount': amount}
-        serialized_data = json.dumps(data)
-        cache.set('payment_data', serialized_data)
-        client = razorpay.Client(auth=("rzp_test_vAeyohaspEahRA", "076FQiZmu52B1ODs1UWKe2HF"))
+        if request.method == 'POST':
+            currency = 'INR'
+            amount = int(json.loads(request.body)['amount']) 
+            print(amount,user,currency)
+            data = {'amount': amount}
+            serialized_data = json.dumps(data)
+            cache.set('payment_data', serialized_data)
+            client = razorpay.Client(auth=("rzp_test_vAeyohaspEahRA", "076FQiZmu52B1ODs1UWKe2HF"))
 
 
-        print('==========fff==============')
-        try:
-          
-            data = {
-                'amount':(int(amount)* 100),
-                'currency':'INR',
-            }
-            payment1 = client.order.create(data=data)
-            print(payment1)
-            payment_order_id = payment1['id']
-            context = {
-                'amount': amount,
-                'payment_order_id': payment_order_id,
-                'RAZOR_PAY_KEY_ID':'rzp_test_vAeyohaspEahRA'
-            }
-            return JsonResponse(context)
-        except Exception as e:
-            print('Error creating Razorpay order:', str(e))
-            return JsonResponse({'error': 'Internal Server Error'}, status=500)
-        
-    return render(request,'dashboard/wallet.html',context)
+            print('==========fff==============')
+            try:
+            
+                data = {
+                    'amount':(int(amount)* 100),
+                    'currency':'INR',
+                }
+                payment1 = client.order.create(data=data)
+                print(payment1)
+                payment_order_id = payment1['id']
+                context = {
+                    'amount': amount,
+                    'payment_order_id': payment_order_id,
+                    'RAZOR_PAY_KEY_ID':'rzp_test_vAeyohaspEahRA'
+                }
+                return JsonResponse(context)
+            except Exception as e:
+                print('Error creating Razorpay order:', str(e))
+                return JsonResponse({'error': 'Internal Server Error'}, status=500)
+            
+        return render(request,'dashboard/wallet.html',context)
+    return redirect("home") 
 
 
 @csrf_exempt

@@ -1,0 +1,123 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row">
+         <form method="POST" enctype="multipart/form-data" id="form1"> 
+            {% csrf_token %}
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                      
+                        <div class="mb-4">
+                            <label class="form-label">offer name</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="offer_name" value="{{old_product.sku_id}}" >
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label class="form-label">category</label>
+                                <select class="form-select" name="product">
+                                    {% for i in product %}
+                                    <option value="{{ i.id }}">{{i}}</option>    
+                                    {% endfor %}
+                                </select>
+                            </div>  
+                             
+                           
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label" >discount_percentage</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_size" name="discount_percentage"  >
+                            </div>
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label">Expire date</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="product_size" name="expire_date"  >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <!-- <div>
+                                <label class="form-label">Image</label>
+                                    <input type="file" name="category_offer_image" >
+                            
+                            </div> -->
+                        </div>
+                        <!-- <div class="card-body">
+                            <div>
+                                <label class="form-label">Product-Images</label>
+                                {% if old_product.additional_product_images.all %}
+                                    {% for image in old_product.additional_product_images.all %}
+                                        <img src="{{ image.image.url }}" alt="Product Image" >
+                                        <a>{{ image.image.url }}</a>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No product images available</p>
+                                {% endif %}
+                                <input class="form-control" type="file" name="product_image" multiple accept="image/*" onchange="validateImage(this)" required >
+                            </div>
+                        </div> -->
+                        <div>
+                            <button class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD </button>
+                        </div>
+                    </div> card end//
+                </div> <!-- card end// -->
+            </div>
+        </form>   
+       
+        
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the form element
+        const form = document.getElementById('form1');
+
+        // Add event listener for form submission
+        form.addEventListener('submit', function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Validate the form fields
+            const offerNameInput = form.querySelector('input[name="offer_name"]');
+            const productSelect = form.querySelector('select[name="product"]');
+            const discountInput = form.querySelector('input[name="discount_percentage"]');
+            const expireDateInput = form.querySelector('input[name="expire_date"]');
+
+            // Check if offer name is empty
+            if (offerNameInput.value.trim() === '') {
+                alert('Please enter offer name');
+                return;
+            }
+
+            // Check if product is selected
+            if (productSelect.value === '') {
+                alert('Please select a product');
+                return;
+            }
+
+            // Check if discount percentage is a valid number
+            const discount = parseFloat(discountInput.value);
+            if (isNaN(discount) || discount <= 0 || discount > 100) {
+                alert('Please enter a valid discount percentage (between 0 and 100)');
+                return;
+            }
+
+            // Check if expire date is selected
+            if (expireDateInput.value.trim() === '') {
+                alert('Please select an expiration date');
+                return;
+            }
+
+            // If all validations pass, submit the form
+            form.submit();
+        });
+    });
+</script>
+
+
+{% endblock content %} 

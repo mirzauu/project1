@@ -105,6 +105,7 @@ class Product_Variant(models.Model):
     
 
     def save(self, *args, **kwargs):
+        self.offer=self.sale_price
         # img=Image.open(self.thumbnail_image.path)
 
         # if img.height > 300 or img.weight > 300:
@@ -179,28 +180,69 @@ class Product_Variant(models.Model):
                 condition=Q(sku_id__isnull=False),
             )
         ]
-    def apply_category_offer_discount(self):
-        # Get the category of the product
-        from offer_management.models import CategoryOffer
+    def apply_offer_discount(self):
+        from offer_management.models import CategoryOffer, ProductOffer
         
         # Get the category of the product
-        from products.models import Category  # Import Category here to avoid circular import
         category = self.product.product_catg
 
-        # Check if there's an active CategoryOffer for the category
+        # Check for available offers
         category_offer = CategoryOffer.objects.filter(category=category, is_active=True).first()
-
-        if category_offer:
-            # Apply the discount percentage to the sale price
-            
-            discounted = self.offer *  (category_offer.discount_percentage / 100)
-            discounted_price=self.offer - discounted
-            self.sale_price = discounted_price
+        product_offers = ProductOffer.objects.filter(products=self.product, is_active=True)
+        
+        # If both category and product offers are present, choose the one with the highest discount
+        if category_offer and product_offers:
+            max_product_discount = max(product_offer.discount_percentage for product_offer in product_offers)
+            if max_product_discount > category_offer.discount_percentage:
+                self.sale_price = self.offer * (1 - max_product_discount / 100)
+                self.save()
+                return self.sale_price
+            else:
+                self.sale_price = self.offer * (1 - category_offer.discount_percentage / 100)
+                self.save()
+                return self.sale_price
+        # If only category offer is present
+        elif category_offer:
+            self.sale_price = self.offer * (1 - category_offer.discount_percentage / 100)
             self.save()
-            return discounted_price  # Return the discounted price after applying the discount
+            return self.sale_price
+        # If only product offers are present
+        elif product_offers:
+            max_product_discount = max(product_offer.discount_percentage for product_offer in product_offers)
+            self.sale_price = self.offer * (1 - max_product_discount / 100)
+            self.save()
+            return self.sale_price
+        # If no offers are present
         else:
             self.sale_price = self.offer
-            return self.sale_price  # Return the discounted price after applying the discount
+            self.save()
+            return self.sale_price
+    # Return the discounted price after applying the discount
+            
+    # def apply_offer_discount(self):
+    #     # Get the category of the product
+    #     from offer_management.models import CategoryOffer,ProductOffer
+        
+    #     # Get the category of the product
+    #     from products.models import Category  # Import Category here to avoid circular import
+    #     category = self.product.product_catg
+    #     product=self.product
+
+    #     # Check if there's an active CategoryOffer for the category
+    #     category_offer = CategoryOffer.objects.filter(category=category, is_active=True).first()
+    #     product_offer = ProductOffer.objects.filter(products=product, is_active=True).first()
+
+    #     if category_offer:
+    #         # Apply the discount percentage to the sale price
+            
+    #         discounted = self.offer *  (category_offer.discount_percentage / 100)
+    #         discounted_price=self.offer - discounted
+    #         self.sale_price = discounted_price
+    #         self.save()
+    #         return discounted_price  # Return the discounted price after applying the discount
+    #     else:
+    #         self.sale_price = self.offer
+    #         return self.sale_price  # Return the discounted price after applying the discount
          
     def get_product_name(self):
         return f'{self.product.product_brand} {self.product.product_name} - {", ".join([value[0] for value in self.atributes.all().values_list("atribute_value")])}'    

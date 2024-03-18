@@ -6,12 +6,13 @@ from . import views
 from products import  views as productView
 from customers import  views as customView   
 from offer_management import  views as offerView   
+from additional_management import views as additional
 
 
 urlpatterns = [
     
-    path('',views.admin_login,name='admin_login'),
-    path('home/',views.adminhome,name='adminhome'),
+    path('',views.adminhome,name='adminhome'),
+    path('report/<filter>',views.export_data_to_excel,name='sales-report'),
     path('adminllogout/',views.adminlogout,name='admin_logout'),
     path('product/',views.productdetail,name='productdetail'),
     path('product/varient/<int:product_id>/',views.product_varient_detail,name='product_varient_detail'),
@@ -75,5 +76,22 @@ urlpatterns = [
     path('categoryoffer/activate/<int:offer_id>/', offerView .activate_category_offer, name='activateCatOffer'),
     path('categoryoffer/deactivate/<int:offer_id>/', offerView .deactivate_category_offer, name='deactivateCatOffer'),
 
-]
+    path('referaloffer/',offerView.referal_offer, name='admin_referal_offer'),
+    path('referaloffer/edit/<int:offer_id>',offerView.referal_offer_edit, name='admin_referal_offer_edit'),
+    path('activate-category-offer/<int:offer_id>/', offerView.toggle_referral_offer, name='activate-referral-offer'),
+    path('deactivate-category-offer/<int:offer_id>/', offerView.toggle_referral_offer, {'activate': False}, name='deactivate-referral-offer'),
+    path('activate-referral-user/<int:user_id>/', offerView.toggle_referral_user, name='activate-referral-user'),
+    path('deactivate-referral-user/<int:user_id>/', offerView.toggle_referral_user, {'activate': False}, name='deactivate-referral-user'),
 
+    path('productoffer/', offerView .product_offer, name='admin-product-offer'),
+    path('productoffer/create', offerView .create_product_offer, name='admin-create-product-offer'),
+    path('productoffer/create/<int:offer_id>/', offerView .edit_product_offer, name='admin-create-product-offer'),
+    path('productoffer/deactivate/<int:offer_id>/', offerView.toggle_product_offer, {'activate': False}, name='deactivate-product-offer'),
+    path('productoffer/activate/<int:offer_id>/', offerView.toggle_product_offer, name='activate-product-offer'),
+
+# banner
+    path('homepage/', additional.homepage, name='homepage'),
+    path('banner1/', additional.banner1, name='banner1'),
+    path('banner2/', additional.banner2, name='banner2'),
+
+]

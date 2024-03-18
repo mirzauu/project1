@@ -226,6 +226,26 @@ class Paymentt(View):
                 Discount_float = float(Discount)
 
                 grand_total = total_float - Discount_float
+                address = AdressBook.objects.get(is_default=True, user=user_instance)
+
+                
+                address1 =[address.name,
+                        address.address_line_1,
+                        address.locality,
+                        address.city,
+                        address.state,
+                        address.country,
+                        address.pincode,
+                        address.phone
+                        ]
+              
+                for cart_item in cart_items:
+                    product = cart_item.product
+                    product.stock -= cart_item.quantity
+                    product.save()
+                    
+                
+            
         
 
                 # Create ShippingAddress instance
@@ -242,11 +262,124 @@ class Paymentt(View):
                 payment = Payment.objects.create(user=user_instance,
                                             payment_method=payment_methods_instance,
                                             amount_paid=grand_total,
-                                            payment_status='PENDING',
+                                            payment_status='SUCESS',
                                             payment_order_id=payment_order_id
-                                            )   
+                                            )  
+                 
+                draft_order= Order.objects.create(
+                    user=user_instance,
+                    shipping_address=address1,
+                    order_total=grand_total,
+                    is_ordered  = True,
+                    payment = payment,
+                    additional_discount=Discount_float,
+                    grand_total=total_float
+                )
+
+                for cart_item in cart_items:
+                        
+                        OrderProduct.objects.create(
+                            order           = draft_order,
+                            user            = user_instance,
+                            product_variant = cart_item.product.get_product_name(),
+                            product_id      = cart_item.product.id,
+                            quantity        = cart_item.quantity,
+                            product_price   = float(cart_item.product.sale_price),
+                            images          = cart_item.product.thumbnail_image,
+                            ordered         = True,
+                        )     
+                cart_items.delete() 
 
                 return JsonResponse({'message': 'Success', 'context': payment1})
+            
+            
+# @csrf_exempt
+# def paymenthandler(request):
+    
+   
+#     # only accept POST request.
+#     if request.method == "POST":
+
+#         try:
+#             # Extract payment details from the POST request
+#             payment_id        = request.POST.get('razorpay_payment_id', '')
+#             razorpay_order_id = request.POST.get('razorpay_order_id', '')
+#             signature         = request.POST.get('razorpay_signature', '')
+#             print(f'1:{payment_id},2:{razorpay_order_id},3:{signature}')
+#             # Create a dictionary of payment parameters
+#             params_dict = {
+#                 'razorpay_order_id': razorpay_order_id,
+#                 'razorpay_payment_id': payment_id,
+#                 'razorpay_signature': signature,
+#             }
+
+#             # Verify the payment signature
+#             client = razorpay.Client(auth=('rzp_test_vAeyohaspEahRA', '076FQiZmu52B1ODs1UWKe2HF'))
+#             result = client.utility.verify_payment_signature(params_dict)
+
+#             if not result :
+#                 return JsonResponse({'message': 'Payment signature verification failed'})
+
+#             else:
+              
+#                 payment = Payment.objects.get(payment_order_id=razorpay_order_id)
+#                 payment.payment_status = 'SUCCESS'
+#                 payment.payment_id = payment_id
+#                 payment.save()
+
+                
+#                 user_instance = payment.user
+
+#                 total_with_original_price = 0
+#                 total = 0
+#                 quantity = 0
+
+#                 cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
+
+
+#                 for cart_item in cart_items:
+#                     total += cart_item.sub_total()
+#                     total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+#                     quantity += cart_item.quantity
+#                 Discount = request.session.get('discount', Decimal('0')) 
+#                 total_float = float(total)
+#                 Discount_float = float(Discount)
+
+#                 grand_total = total_float - Discount_float
+        
+            
+               
+#                 order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
+
+
+#                 for i in order_dtails:
+#                     address=i.order.shipping_address
+
+#                 cleaned_string = address.replace('[', '').replace(']', '')
+
+#                     # Split the string by comma and remove empty strings and 'None' values
+#                 split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+#                 # Remove single quotes from each item
+#                 cleaned_data = [item.replace("'", "") for item in split_data]
+                
+
+#                 context = {
+#                             'order_dtails' : draft_order,
+#                             'address' : cleaned_data,
+#                             'order_product' : order_dtails,
+#                             }
+
+#                 return render (request,'user_templates/order_sucess.html',context)
+               
+#         except Exception as e:
+#             # Exception occurred during payment handling
+#             print('Exception:', str(e))
+#             return HttpResponseBadRequest()
+#     else:
+#         return redirect('payment')
+
+
                 
         else:
             print('selected')
@@ -296,6 +429,9 @@ def order_place_cod(request):
                         order_total=grand_total,
                         is_ordered  = True,
                         payment = payment,
+                        additional_discount=Discount_float,
+                        grand_total=total_float
+
                     )
         for cart_item in cart_items:
             product= cart_item.product
@@ -320,8 +456,6 @@ def order_place_cod(request):
         cart_items.delete()    
        
         order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
-
-
 
         for i in order_dtails:
             address=i.order.shipping_address
@@ -389,7 +523,7 @@ def order_place_Wallet(request):
         payment = Payment.objects.create(user=user_instance,
                                     payment_method=payment_methods_instance,
                                     amount_paid=grand_total,
-                                    payment_status='PENDING',
+                                    payment_status='SUCESS',
                                     
                                     )   
 
@@ -403,6 +537,8 @@ def order_place_Wallet(request):
                         order_total=grand_total,
                         is_ordered  = True,
                         payment = payment,
+                        additional_discount=Discount_float,
+                        grand_total=total_float
                     )
         
         for cart_item in cart_items:
@@ -496,73 +632,14 @@ def paymenthandler(request):
                 
                 user_instance = payment.user
 
-                total_with_original_price = 0
-                total = 0
-                quantity = 0
-
-                cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
-
-
-                for cart_item in cart_items:
-                    total += cart_item.sub_total()
-                    total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
-                    quantity += cart_item.quantity
-                Discount = request.session.get('discount', Decimal('0')) 
-                total_float = float(total)
-                Discount_float = float(Discount)
-
-                grand_total = total_float - Discount_float
-        
-            
                 address = AdressBook.objects.get(is_default=True, user=user_instance)
 
-                
-                address1 =[address.name,
-                        address.address_line_1,
-                        address.locality,
-                        address.city,
-                        address.state,
-                        address.country,
-                        address.pincode,
-                        address.phone
-                        ]
 
-                draft_order= Order.objects.create(
-                        user=user_instance,
-                        shipping_address=address1,
-                        order_total=grand_total,
-                        is_ordered  = True,
-                        payment = payment,
-                    )
-                
-                
-                for cart_item in cart_items:
-                    product = cart_item.product
-                    product.stock -= cart_item.quantity
-                    product.save()
-                    
-                for cart_item in cart_items:
-                        
-                        OrderProduct.objects.create(
-                            order           = draft_order,
-                            user            = user_instance,
-                            product_variant = cart_item.product.get_product_name(),
-                            product_id      = cart_item.product.id,
-                            quantity        = cart_item.quantity,
-                            product_price   = float(cart_item.product.sale_price),
-                            images          = cart_item.product.thumbnail_image,
-                            ordered         = True,
-                        )
-                        cart_id=Cart.objects.get(id=cart_item.cart.id)
-                        print(cart_id)
-                cart_id.delete()       
-                cart_items.delete() 
-                if 'discount' in request.session:
-                   del request.session['discount']
-
+                draft_order= Order.objects.get(payment=payment)
+               
                 order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
 
-
+                print(draft_order,'gggg')
                 for i in order_dtails:
                     address=i.order.shipping_address
 
@@ -581,7 +658,7 @@ def paymenthandler(request):
                             'order_product' : order_dtails,
                             }
 
-                return render (request,'user_templates/order_sucess.html',context)
+                return redirect('success_page', draft_order.id)
                
         except Exception as e:
             # Exception occurred during payment handling
@@ -589,6 +666,31 @@ def paymenthandler(request):
             return HttpResponseBadRequest()
     else:
         return redirect('payment')
+    
+
+def success_page(request, id):
+
+    draft_order= Order.objects.get(id = id)
+    order_dtails=OrderProduct.objects.filter(order=draft_order) 
+
+    print(draft_order,'gggg')
+    for i in order_dtails:
+        address=i.order.shipping_address
+
+    cleaned_string = address.replace('[', '').replace(']', '')
+
+        # Split the string by comma and remove empty strings and 'None' values
+    split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+    # Remove single quotes from each item
+    cleaned_data = [item.replace("'", "") for item in split_data]
+               
+    context={
+        'order_dtails' : draft_order,
+        'address' : cleaned_data,
+        'order_product' : order_dtails,
+    }
+    return render (request,'user_templates/order_sucess.html',context)
 
 
 def get_current_step(request):

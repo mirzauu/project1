@@ -25,3 +25,13 @@ class CartItem(models.Model):
     
     def __str__(self):
         return str(self.product)
+    
+
+class Wishlist(models.Model):
+
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    product = models.ManyToManyField(Product_Variant)
+ 
+
+    def __str__(self):
+        return f"{self.user.username}'s Wishlist" 

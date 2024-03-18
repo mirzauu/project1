@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from .models import CartItem,Cart
+from .models import CartItem,Cart,Wishlist
 from products.models import Product_Variant
 from django.http import JsonResponse
 from orders.models import Payment
@@ -12,6 +12,10 @@ from products.models import Coupon,UserCoupon
 import json
 from django.utils import timezone
 from decimal import Decimal
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+
 
 # Create your views here.
 #to get the cart id if present
@@ -22,7 +26,7 @@ def _cart_id(request):
     return cart
 
 
-
+@never_cache 
 def cart(request,total=0,quantity=0,cart_items=None):
     
     total_with_orginal_price =0
@@ -62,7 +66,8 @@ def cart(request,total=0,quantity=0,cart_items=None):
 
         for cart_item in cart_items:
             total += cart_item.sub_total()
-            offer=cart_item.product.apply_category_offer_discount()
+            offer=cart_item.product.apply_offer_discount()
+            print('offer',offer)
             total_with_orginal_price +=( cart_item.product.max_price * cart_item.quantity)
             quantity += cart_item.quantity
             print('ss',offer)
@@ -199,8 +204,8 @@ def add_cart(request,product_id):
                 messages.error(request, 'Product Added')
             else:
                 messages.error(request, 'Stock limit exceed')
-    return redirect(reverse('product_detail', kwargs={'product_variant_slug': product.product_variant_slug}))
-
+    # return redirect(reverse('product_detail', kwargs={'product_variant_slug': product.product_variant_slug}))
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 def update_cart(request, cart_item_id, new_quantity):
 
@@ -246,7 +251,7 @@ def delete_cart_item(request, cart_item_id):
 
     return JsonResponse(response_data)
 
-
+@never_cache 
 def order_summary(request):
     # Your existing code to calculate order summary
     total = Decimal(0) 
@@ -405,3 +410,62 @@ def delete_applied_coupon(request,cart_item_id):
     }
 
     return JsonResponse(response_data)
+
+@login_required(login_url='login')
+@never_cache 
+def wishlist(request):
+    current_user = request.user
+    try:
+        wishlist_instance= Wishlist.objects.get(user=current_user)
+    except Wishlist.DoesNotExist:
+        wishlist_instance = Wishlist.objects.create(user=current_user)
+        
+    products = wishlist_instance.product.all()
+    count=products.count()
+    
+    context={
+        'wishlist' : products,
+        'count':count
+
+    }
+    return render(request, 'user_templates/wishlist.html',context)
+
+@login_required(login_url='login')
+def wishlist_add(request, product_id):
+    current_user = request.user
+    product = get_object_or_404(Product_Variant, id=product_id) 
+    
+    try:
+        # Get or create the Wishlist object for the current user
+        wishlist_instance, created = Wishlist.objects.get_or_create(user=current_user)
+        
+        # Check if the product is already in the wishlist
+        if product in wishlist_instance.product.all():
+            messages.error(request, 'Product already exists in your wishlist.')
+        else:
+            wishlist_instance.product.add(product)
+            messages.success(request, 'Product added to your wishlist.')
+
+    except Wishlist.DoesNotExist:
+        # Create a new Wishlist object for the current user
+        wishlist_instance = Wishlist.objects.create(user=current_user)
+        wishlist_instance.product.add(product)
+        messages.success(request, 'Product added to your wishlist.')
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required(login_url='login')
+def wishlist_remove(request, product_id):
+    current_user = request.user
+    product = get_object_or_404(Product_Variant, id=product_id) 
+    
+    try:
+     
+        wishlist_instance= Wishlist.objects.get(user=current_user)
+        wishlist_instance.product.remove(product)
+        messages.success(request, 'Product removed from your wishlist.')
+
+    except Wishlist.DoesNotExist:
+        pass
+        
+    return redirect('wishlist')

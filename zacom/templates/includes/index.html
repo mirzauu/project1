@@ -133,7 +133,7 @@ const handleChat = () => {
 
     // Append the user's message to the chatbox
     chatbox.appendChild(createChatLi(userMessage, "outgoing"));
-    chatbox.scrollTo(0, chatbox.scrollHeight);
+    chatbox.scrollTo(100, chatbox.scrollHeight);
     
     setTimeout(() => {
         // Display "Thinking..." message while waiting for the response
@@ -189,7 +189,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #724ae8;
+  background: #c51147;
   transition: all 0.2s ease;
 }
 body.show-chatbot .chatbot-toggler {
@@ -209,8 +209,9 @@ body.show-chatbot .chatbot-toggler span:last-child {
 .chatbot {
   position: fixed;
   right: 35px;
-  bottom: 90px;
-  width: 420px;
+  bottom: 60px; 
+  /* bottom 90  width 420*/
+  width: 390px;
   background: #fff;
   border-radius: 15px;
   overflow: hidden;
@@ -232,7 +233,7 @@ body.show-chatbot .chatbot {
   position: relative;
   text-align: center;
   color: #fff;
-  background: #724ae8;
+  background: #ce1c49;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .chatbot header span {
@@ -278,7 +279,7 @@ header h2 {
   text-align: center;
   line-height: 32px;
   align-self: flex-end;
-  background: #724ae8;
+  background: #d31353;
   border-radius: 4px;
   margin: 0 10px 7px 0;
 }
@@ -289,7 +290,7 @@ header h2 {
   max-width: 75%;
   color: #fff;
   font-size: 0.95rem;
-  background: #724ae8;
+  background: #c5135d;
 }
 .chatbox .incoming p {
   border-radius: 10px 10px 10px 0;
@@ -324,7 +325,7 @@ header h2 {
 }
 .chat-input span {
   align-self: flex-end;
-  color: #724ae8;
+  color: #c92424;
   cursor: pointer;
   height: 55px;
   display: flex;

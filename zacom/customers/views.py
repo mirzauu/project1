@@ -18,7 +18,7 @@ from django.http import JsonResponse
 import json
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
-
+from offer_management.models import ReferralOffer,ReferralUser
 
 
 @receiver(pre_social_login)
@@ -28,7 +28,7 @@ def check_user_blocked(sender,request, sociallogin, **kwargs):
         # If user is blocked, prevent the login attempt
         raise PermissionDenied("User is blocked")
      
-
+@never_cache 
 def customer_list(request):
 
     all_customer=Account.objects.filter(is_superadmin=False,is_admin=False)
@@ -37,6 +37,7 @@ def customer_list(request):
     }
     return render(request, "admin_templates/customer_list.html",context)
 
+@never_cache 
 def customer_details(request):
     user_id = request.GET.get('userId')
     user = Account.objects.get(id=user_id)
@@ -69,6 +70,7 @@ def deactivate_customer(request, user_id):
 
 # address
 
+@never_cache 
 def Address_detail(request):
     user = request.user.id
     address = AdressBook.objects.filter(user=user).order_by('-created_at')
@@ -110,7 +112,7 @@ def Address_detail(request):
 #     return JsonResponse({'addresses': address_data})
 
 
-
+@never_cache 
 def Address_add(request):
     user = request.user.id
     address = AdressBook.objects.filter(user=user)
@@ -134,6 +136,7 @@ def Address_add(request):
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
+@never_cache 
 def Address_edit(request,id):
     user = request.user.id
     address = AdressBook.objects.get(id=id)
@@ -184,83 +187,121 @@ def delete_address(request):
     messages.success(request, 'Address deleted successfully.')
     return redirect('address-detail')    
 
+@never_cache 
 def profile(request):
-    user = request.user.id
-    user_detail= Account.objects.get(id=user)
-    order_dtails=OrderProduct.objects.filter(user=user).count()
-    if request.method == "POST":
-        first_name = request.POST.get("First_name")
-        last_name = request.POST.get("Last_name")
-        username = request.POST.get("Username")
-        phone = request.POST.get("Phone")
+    if request.user.is_authenticated:
+        user = request.user.id
+        user_detail= Account.objects.get(id=user)
+        order_dtails=OrderProduct.objects.filter(user=user).count()
+        if request.method == "POST":
+            first_name = request.POST.get("First_name")
+            last_name = request.POST.get("Last_name")
+            username = request.POST.get("Username")
+            phone = request.POST.get("Phone")
 
-        user_detail.first_name = first_name
-        user_detail.last_name = last_name  
-        user_detail.username = username
-        user_detail.phone_number = phone
+            user_detail.first_name = first_name
+            user_detail.last_name = last_name  
+            user_detail.username = username
+            user_detail.phone_number = phone
+            
         
-       
-    context = {
-               'user':user_detail,
-               'order_dtails':order_dtails
-               }
-        
-    return render(request,'dashboard/profile.html',context)
-
-
-
-def orders(request):
-    
-    user = request.user.id
-    user_detail= Account.objects.get(id=user)
-    order_dtails=OrderProduct.objects.filter(user=user).order_by('-created_at')
-   
-        
-       
-    context = {
-               'user':user_detail,
-               'order_dtails':order_dtails,
-               'user_detail': user_detail,
-               }
-        
-    return render(request,'dashboard/orders.html',context)
-
-
-
-   
-   
-
-
-def orders_detail(request,product_id):
-    user = request.user.id
-
-    print('===================================')
-   
-    order_dtails=OrderProduct.objects.filter(user=user,id=product_id)
-
-    order_dt=OrderProduct.objects.get(user=user,id=product_id)
-
-    payment_method=order_dt.order.payment.payment_method
-
-    for i in order_dtails:
-            address=i.order.shipping_address
-
-    cleaned_string = address.replace('[', '').replace(']', '')
-
-    # Split the string by comma and remove empty strings and 'None' values
-    split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
-
-    # Remove single quotes from each item
-    cleaned_data = [item.replace("'", "") for item in split_data]
-
-    context = {
-                'order' : order_dt,
-                'address' : cleaned_data,
-                'payment' :payment_method,
+        context = {
+                'user':user_detail,
+                'order_dtails':order_dtails
                 }
+            
+        return render(request,'dashboard/profile.html',context)
+    return redirect("home")
     
-    return render(request,'dashboard/order_detail.html',context)
 
+
+
+@never_cache 
+def orders(request):
+    if request.user.is_authenticated:
+        user = request.user.id
+        user_detail= Account.objects.get(id=user)
+        order_dtails=Order.objects.filter(user=user).order_by('-created_at')
+    
+            
+        
+        context = {
+                'user':user_detail,
+                'order_dtails':order_dtails,
+                'user_detail': user_detail,
+                }
+            
+        return render(request,'dashboard/orders.html',context) 
+    return redirect("home")                                                     
+
+
+@never_cache 
+def order_items(request,orderid):
+    if request.user.is_authenticated:
+        user = request.user.id
+        user_detail= Account.objects.get(id=user)
+        order_dtails=Order.objects.get(id=orderid)
+        order_products=OrderProduct.objects.filter(order=order_dtails)
+        
+        address=order_dtails.shipping_address
+
+        cleaned_string = address.replace('[', '').replace(']', '')
+
+        # Split the string by comma and remove empty strings and 'None' values
+        split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+        # Remove single quotes from each item
+        cleaned_data = [item.replace("'", "") for item in split_data]   
+        
+        context = {
+                'user':user_detail,
+                'order_dtails':order_dtails,
+                'user_detail': user_detail,
+                'address' : cleaned_data,
+                'order_products' : order_products,
+                }
+            
+        return render(request,'dashboard/icons.html',context)
+    return redirect("home") 
+
+
+
+   
+   
+
+@never_cache 
+def orders_detail(request,product_id):
+
+    if request.user.is_authenticated:
+        user = request.user.id
+
+        print('===================================')
+    
+        order_dtails=OrderProduct.objects.filter(user=user,id=product_id)
+
+        order_dt=OrderProduct.objects.get(user=user,id=product_id)
+
+        payment_method=order_dt.order.payment.payment_method
+
+        for i in order_dtails:
+                address=i.order.shipping_address
+
+        cleaned_string = address.replace('[', '').replace(']', '')
+
+        # Split the string by comma and remove empty strings and 'None' values
+        split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+        # Remove single quotes from each item
+        cleaned_data = [item.replace("'", "") for item in split_data]
+
+        context = {
+                    'order' : order_dt,
+                    'address' : cleaned_data,
+                    'payment' :payment_method,
+                    }
+        
+        return render(request,'dashboard/order_detail.html',context)
+    return redirect("home") 
 
 
 
@@ -316,22 +357,94 @@ def email_activate(request):
             'message': 'Not Verified',
             }
         return JsonResponse(response_data)      
-            
+
+@never_cache             
 def coupon(request):
 
-   
-    # all_coupon=Coupon.objects.all()
+    if request.user.is_authenticated:
+        # all_coupon=Coupon.objects.all()
+        user = request.user.id
+        user_detail= Account.objects.filter(id=user)
+        order_dtails=OrderProduct.objects.filter(user=user).count()
+        available_coupon=UserCoupon.objects.filter(user=user)
+    
+        
+        context = {
+                'user':user_detail,
+                'order_dtails':order_dtails,
+                'coupon':available_coupon
+                }
+            
+        return render(request,'dashboard/coupon.html',context)
+    return redirect("home") 
+
+import random
+
+def generate_four_digit_code():
+    return random.randint(1000, 9999)
+
+@never_cache 
+def referral(request):
+
+    if request.user.is_authenticated:
+        # all_coupon=Coupon.objects.all()
+        user = request.user.id  
+        user_detail= Account.objects.get(id=user)
+        try:
+            referral_dtails=ReferralUser.objects.get(user=user_detail)
+            referral_offer=ReferralOffer.objects.first()
+            print('i')
+        except ObjectDoesNotExist:
+            referral_code = generate_four_digit_code()
+            print('isss')
+            referral_dtails=ReferralUser.objects.create(user=user_detail,
+                                                        count=0,
+                                                        code=referral_code
+                                                        )
+            
+            print(referral_dtails,'sds')   
+            
+        
+        context = {
+                'user_detail':user_detail,
+                #    'order_dtails':order_dtails,
+                #    'coupon':available_coupon
+                'referral':referral_dtails,
+                'referral_offer':referral_offer,
+                }
+            
+        return render(request,'dashboard/Referral.html',context)
+    
+    return redirect("home") 
+
+
+
+@never_cache 
+def invoice(request,orderid):
+    
     user = request.user.id
-    user_detail= Account.objects.filter(id=user)
-    order_dtails=OrderProduct.objects.filter(user=user).count()
-    available_coupon=UserCoupon.objects.filter(user=user)
-   
+    user_detail= Account.objects.get(id=user)
+    order_dtails=Order.objects.get(id=orderid)
+    order_products=OrderProduct.objects.filter(order=order_dtails)
+    
+    address=order_dtails.shipping_address
+
+    cleaned_string = address.replace('[', '').replace(']', '')
+
+    # Split the string by comma and remove empty strings and 'None' values
+    split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
+
+    # Remove single quotes from each item
+    cleaned_data = [item.replace("'", "") for item in split_data]   
        
     context = {
                'user':user_detail,
                'order_dtails':order_dtails,
-               'coupon':available_coupon
+               'user_detail': user_detail,
+               'address' : cleaned_data,
+               'order_products' : order_products,
                }
         
-    return render(request,'dashboard/coupon.html',context)
+    return render(request,'dashboard/invoice.html',context)
+
 

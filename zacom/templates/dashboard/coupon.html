@@ -25,9 +25,8 @@
     <div class="row">
         <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
             <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
-                
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'profile' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">profile</button></a>
+                   <a href="{% url 'profile' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">profile</button> </a>
                 </li>
                 <li class="d-flex nav-item justify-content-center" role="presentation">
                    <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
@@ -40,7 +39,10 @@
                     <a href="{% url 'wallet' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Wallet</button> </a>
                 </li>
                 <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'coupon-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button> </a>
+                    <a href="{% url 'coupon-detail' %}"> <button class="nav-link active rounded-5 justify-content-center"  data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button></a>
+                </li>
+                <li class="d-flex nav-item justify-content-center" role="presentation">
+                    <a href="{% url 'referral-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Referral</button> </a>
                 </li>
               
             </div>

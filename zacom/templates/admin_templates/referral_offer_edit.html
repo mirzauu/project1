@@ -1,0 +1,99 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row">
+         <form method="POST" enctype="multipart/form-data" id="form1"> 
+            {% csrf_token %}
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                      
+                        <div class="mb-4">
+                            <label class="form-label">Amount</label>
+                            <input type="number" placeholder="Type here" class="form-control" name="Amount" value="{{referaldetail.Amount}}" >
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label class="form-label">User limit</label>
+                                <input type="number" placeholder="Type here" class="form-control" name="user_limit" value="{{referaldetail.limit}}" >
+                            </div>  
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-4  mb-3">
+                                <label for="product_size" class="form-label">Expire date</label>
+                                <input type="date"  class="form-control" id="expire_date" name="expire_date" value="" >
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="card mb-4">
+                        <div>
+                            <button class="btn  btn-md rounded font-sm hover-up" style="margin-left: 20px;" >ADD</button>
+                        </div>
+                    </div> 
+                </div> <!-- card end// -->
+            </div>
+        </form>   
+       
+        
+    </div>
+</div>
+<script>
+    var final_date = document.getElementById('expire_date');
+            var new_date = '{{referaldetail.expire_date}}';
+
+            var dateString = '{{referaldetail.expire_date}}';
+
+            var date = new Date(dateString);
+
+            var year = date.getFullYear();
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            var day = ("0" + date.getDate()).slice(-2);
+
+            var formattedDate = year + "-" + month + "-" + day;
+            final_date.value=formattedDate;
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the form element
+        const form = document.getElementById('form1');
+
+        // Add event listener for form submission
+        form.addEventListener('submit', function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Validate the form fields
+            const amountInput = form.querySelector('input[name="Amount"]');
+            const userLimitInput = form.querySelector('input[name="user_limit"]');
+            const expireDateInput = form.querySelector('input[name="expire_date"]');
+
+            // Check if amount is empty or not a positive number
+            const amount = parseFloat(amountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            // Check if user limit is empty or not a positive integer
+            const userLimit = parseInt(userLimitInput.value);
+            if (isNaN(userLimit) || userLimit <= 0 || userLimit !== parseFloat(userLimitInput.value)) {
+                alert('Please enter a valid user limit (a positive integer)');
+                return;
+            }
+
+            // Check if expire date is selected
+            if (expireDateInput.value.trim() === '') {
+                alert('Please select an expiration date');
+                return;
+            }
+
+            // If all validations pass, submit the form
+            form.submit();
+        });
+    });
+</script>
+
+
+{% endblock content %} 

@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
-from products.models import Category
+from products.models import Category,Product
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from customers.models import Account
+from datetime import datetime
 
 # Create your models here.
 class CategoryOffer(models.Model):
@@ -24,11 +25,7 @@ class CategoryOffer(models.Model):
 
     def __str__(self):
         return self.offer_name
-    
-    # def calculate_discounted_price(self, product_variant):
-    #     return calculate_discounted_price (product_variant, self.discount_percentage)
-
-
+  
     def get_absolute_url(self):
         return reverse('category_offer_detail', kwargs={'slug': self.category_offer_slug})
     
@@ -41,8 +38,13 @@ class ReferralOffer(models.Model):
     Amount    = models.DecimalField(max_digits=5, decimal_places=2)
     limit     = models.IntegerField()
     is_active = models.BooleanField(default=True)
-
-        
+    # def save(self, *args, **kwargs):
+    #     # Check if the current date is after the expire_date
+    #     expire_date = datetime.strptime(self.expire_date, '%Y-%m-%d').date()
+    #     if expire_date < timezone.now().date():
+    #         self.is_active = False  # Set is_active to False if expired
+    #     super().save(*args, **kwargs) 
+            
 
 class ReferralUser(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
@@ -51,9 +53,11 @@ class ReferralUser(models.Model):
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        if self.count >= self.user.referraloffer.limit:
-            self.is_active = False
-        super().save(*args, **kwargs)
+        referral_offer = ReferralOffer.objects.first()  # Assuming there's only one ReferralOffer object
+        if referral_offer:
+            if self.count >= referral_offer.limit:
+                self.is_active = False
+        super().save(*args, **kwargs)            
 
     def clean(self):
         if self.code < 1000 or self.code > 9999:
@@ -61,3 +65,26 @@ class ReferralUser(models.Model):
 
     def __str__(self):
         return str(self.code)
+
+
+
+class ProductOffer(models.Model):
+    offer_name = models.CharField(max_length=100)
+    expire_date = models.DateField()
+    products = models.ForeignKey(Product, related_name='product_offers',on_delete=models.CASCADE)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    product_offer_slug = models.SlugField(max_length=200, unique=True)
+    product_offer_image = models.ImageField(upload_to='media/product_offer/', blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        # Automatically generate the slug from the offer name
+        if not self.product_offer_slug:
+            self.product_offer_slug = slugify(self.offer_name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.offer_name
+
+    def get_absolute_url(self):
+        return reverse('product_offer_detail', kwargs={'slug': self.product_offer_slug})

@@ -167,7 +167,7 @@
                                     <div class="label new">new</div>
                                     <ul class="product__hover">
                                         <li><a href="{{ p.thumbnail_image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                        <li><a href="{% url 'wishlist-add'  product_id=p.id %}"><span class="icon_heart_alt"></span></a></li>
                                         <li><a href="{% url 'cart-add' product_id=p.id %}"><span class="icon_bag_alt"></span></a></li>
                                     </ul>
                                 </div>

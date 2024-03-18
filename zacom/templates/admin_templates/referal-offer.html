@@ -1,0 +1,103 @@
+{% extends 'admin_templates/admin-base.html' %}
+{% load static  %}
+{% block content %}
+
+        <section class="content-main">
+            <div class="content-header">
+                <h2 class="content-title">Referral Management</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <header class="border-bottom mb-4 pb-4">
+                                <div class="row">
+                                    
+                                </div>
+                            </header> <!-- card-header end// -->
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>User </th>
+                                            <th>Invite</th>
+                                            <th>Status</th>
+                                            <th class="text-end"> Action </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in user %}
+                                        <tr>
+                                            <td><b>{{i.user}}</b></td>
+                                            <td>{{i.count}}</td>
+                                            {% if i.is_active %}
+                                            <td>
+                                                <span style="color: green; font-weight: bold;">Active</span>
+                                            </td>  
+                                            <td class="text-end">
+                                                <a href="{% url 'deactivate-referral-user' user_id=i.id %}" class="btn btn-sm btn-light font-sm rounded">Inactive</a>
+                                            </td>      
+                                            {% else %}
+                                            <td>
+                                                <span style="color: red; font-weight: bold;">Inactive</span>
+                                            </td>                                       
+                                            <td class="text-end">
+                                                <a href="{% url 'activate-referral-user' user_id=i.id %}" class="btn btn-sm btn-light font-sm rounded">Active</a>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div> <!-- table-responsive.// -->
+                        </div> <!-- col end// -->
+                        <aside class="col-lg-3">
+                            <div class="box bg-light" style="min-height:80%">
+                                <h6 class="mt-15">Refferal Details</h6>
+                                <hr>
+                                <h6 class="mb-0">Amount:</h6>
+                                <p class="h4">${{referaldetail.Amount}}</p><br>
+                                <h6 class="mb-0">Date:</h6>
+                                <p>{{referaldetail.expire_date}}</p><br>
+                                <h6 class="mb-0">User limit:</h6>
+                                <p>{{referaldetail.limit}}</p><br>
+                                <!-- <h6 class="mb-0">Item purchased:</h6><br>
+                                <p>
+                                    <a href="#"> Adidas Air Jordan <i class="icons material-icons md-launch"></i> </a>
+                                    <br>
+                                </p> -->
+                              
+                            
+                                {% if referaldetail.is_active %}
+                                    <span style="color: green; font-weight: bold;">Active</span>
+                                {% else %}
+                                    <span style="color: red; font-weight: bold;">Inactive</span>
+                                {% endif %}
+                            
+                              
+                                <hr>
+                                <a class="btn btn-light" href="{% url 'admin_referal_offer_edit' offer_id=referaldetail.id %}">Edit</a>
+                                {% if referaldetail.is_active == True %}
+                                <a class="btn btn-light" href="{% url 'deactivate-referral-offer' offer_id=referaldetail.id   %}">Deactivate</a>
+                                {% else %}
+                                <a class="btn btn-light" href="{% url 'activate-referral-offer' offer_id=referaldetail.id   %}">Active</a>
+                                {% endif %}
+                            </div>
+                        </aside> <!-- col end// -->
+                    </div> <!-- row end// -->
+                </div> <!-- card-body // -->
+            </div> <!-- card end// -->
+            <!-- <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div> -->
+        </section>
+{% endblock content %}      
