@@ -120,26 +120,25 @@
                                     <ul class=" list-unstyled font-sm">
                                         {% for i in sorted_product_attributes|slice:":5"   %}
                                         <li class="">
-                                            <div class="event-timeline-dot">
+                                            <!-- <div class="event-timeline-dot">
                                                 <i class="font-xxl"></i>
-                                            </div>
+                                            </div> -->
                                             <div class="media">
-                                                <div class="me-3">
-                                                    <!-- <img  src="{{ i.images}}" alt="{{ product.name }}" class="img-fluid" style="max-width: 100px;">
-                                                    <img src="{{ i.images }}">
-                                                    <div style="background-image: url('{{ i.images}}'); width: 100px; height: 100px;"></div>
-                                                    <span style="background-image: url('{{ i.images }}'); display: inline-block; width: 100px; height: 100px;">{{ i.images }}</span> -->
-
-
-                                                </div>
+                                                <!-- <div class="me-3">
+                                                    
+                                                    <img  src="{{ i.images.url }}"  class="img-fluid" style="max-width: 100px;">
+                                                  
+                                                </div> -->
                                                 <div class="media-body">
-                                                    <h6> {{ i.product_variant }} <span style="color: rgb(165, 134, 88);">{% for val in product_attribute.value.all %} {{val}} {% if not forloop.last %} , {% endif %} {% endfor %}</span></h6>
+                                                    <h6> {{ i.product_variant }} </h6>
                                                     <p>Unit Price: {{ i.product_price }}</p>
                                                     <p>Quantity Sold: {{ i.order_count }}</p>
+                                                    <br>
                                                 </div>
                                             </div>
                                         </li>
                                         {% endfor %}
+                                        <br>
                                     </ul>
                                 </article>
                             </div>
@@ -186,16 +185,16 @@
                     <form action="" method="get">
                         {% csrf_token %}
                     <div class="row align-items-center">
-                        <div class="col-md-2 col-6">
-                            <input type="date" id="date" name="date" value="02.05.2021" class="form-control">
+                        <div class="col-md-2 col-6"  style="display: block;">
+                            <input type="date" id="date" name="date" value="02.05.2021" class="form-control" style="display: block;">
                         </div>
                         <div class="col-md-2 col-6">
                             <div class="custom_select">
-                                <select class="form-select select-nice" id="order_filter" name="order_filter">
+                                <!-- <select class="form-select select-nice" id="order_filter" name="order_filter">
                                     <option selected>All</option>
                                     
                                  
-                                </select>
+                                </select> -->
                             </div>
                         </div>
                         <!-- <div class="col-md-2 col-6">

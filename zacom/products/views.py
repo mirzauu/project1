@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from django.urls import reverse
 from requests import request
-from .models import Product,Product_Variant,Atribute,Category,Brand, Atribute_value,Additional_Product_Image,Coupon
+from .models import Product,Product_Variant,Atribute,Category,Brand, Atribute_value,Additional_Product_Image,Coupon,UserCoupon
 from Admin import urls
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-
+from django.shortcuts import get_object_or_404
 from .form import EditProductForm,EditProductVariantForm,CreateProductForm,CreateProductVariantForm,AddProductVariantForm
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib import messages
-
+from customers.models import Account,AdressBook
 from django.db import IntegrityError, transaction
 from datetime import datetime
 
@@ -251,6 +251,7 @@ def edit_product_with_variant(request,product_id):
             old_product.sku_id = sku_id
             old_product.max_price  = max_price 
             old_product.sale_price  = sale_price 
+            old_product.offer  = sale_price 
             old_product.stock = stock 
 
             if thumbnail_image != None:
@@ -318,14 +319,13 @@ def Coupon_list(request):
 def Coupon_create(request): 
 
     if request.method == "POST":
-            
-            # Convert string values to appropriate data types
+
             coupon_code = request.POST['coupon_code']
             discount = int(request.POST['discount'])
-            amount = int(request.POST['amount'])  # Renamed to lowercase to follow Python naming conventions
-            user_limit = int(request.POST['user_limit'])  # Renamed to lowercase to follow Python naming conventions
-            expire_date = datetime.strptime(request.POST['expire_date'], '%Y-%m-%d').date()  # Convert string to datetime object
-            coupon_count = int(request.POST['coupon_count'])  # Renamed to lowercase to follow Python naming conventions
+            amount = int(request.POST['amount'])  
+            user_limit = int(request.POST['user_limit']) 
+            expire_date = datetime.strptime(request.POST['expire_date'], '%Y-%m-%d').date()  
+            coupon_count = int(request.POST['coupon_count'])  
 
             # Create and save the Coupon instance
             Coupon_Create = Coupon(
@@ -336,9 +336,52 @@ def Coupon_create(request):
                 expire_date=expire_date,
                 total_coupons=coupon_count,
             )
-
             Coupon_Create.save()
+
+            account=Account.objects.all()
+            for i in account:
+                user_coupon=UserCoupon(
+                    user=i,
+                    coupon=Coupon_Create
+                )
+                user_coupon.save()
+
             messages.error(request, 'coupon created.')
             return render(request, "admin_templates/coupon_create.html")
     
     return render(request, "admin_templates/coupon_create.html")
+
+def Coupon_edit(request,id): 
+    coupon_instance = get_object_or_404(Coupon, id=id)
+    print(coupon_instance)
+
+    if request.method == "POST":
+
+            coupon_code = request.POST['coupon_code']
+            discount = int(request.POST['discount'])
+            amount = int(request.POST['amount'])  
+            user_limit = int(request.POST['user_limit']) 
+            expire_date = datetime.strptime(request.POST['expire_date'], '%Y-%m-%d').date()  
+            coupon_count = int(request.POST['coupon_count']) 
+            is_active = request.POST.get('is_active') == 'on' 
+            print(is_active)
+            if is_active:
+                is_active = False
+            else:
+                is_active = True
+
+            # Create and save the Coupon instance
+           
+            coupon_instance.coupon_code=coupon_code
+            coupon_instance.is_expired=is_active
+            coupon_instance.discount=discount
+            coupon_instance.minimum_amount=amount
+            coupon_instance.max_uses=user_limit
+            coupon_instance.expire_date=expire_date
+            coupon_instance.total_coupons=coupon_count
+            coupon_instance.save()
+
+            messages.error(request, 'coupon edited.')
+            return redirect('admin-coupon')
+    
+    return render(request, "admin_templates/coupon_edit.html",{'coupon_instance':coupon_instance})

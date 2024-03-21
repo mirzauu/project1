@@ -8,7 +8,7 @@ from customers.models import Account,AdressBook
 from orders.models import Order,OrderProduct
 from orders.models import OrderProduct,Payment,PaymentMethod
 from products.models import Coupon,UserCoupon
-
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect
 import random 
 from django.core.exceptions import PermissionDenied
@@ -19,7 +19,7 @@ import json
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from offer_management.models import ReferralOffer,ReferralUser
-
+import razorpay
 
 @receiver(pre_social_login)
 def check_user_blocked(sender,request, sociallogin, **kwargs):
@@ -106,10 +106,6 @@ def Address_detail(request):
         
     return render(request,'dashboard/address.html',context)
 
-# def Address_add(request):
-#     all_addresses = AdressBook.objects.all()
-#     address_data = [{'id': address.id, 'name': address.name} for address in all_addresses]
-#     return JsonResponse({'addresses': address_data})
 
 
 @never_cache 
@@ -241,6 +237,8 @@ def order_items(request,orderid):
         user = request.user.id
         user_detail= Account.objects.get(id=user)
         order_dtails=Order.objects.get(id=orderid)
+        payment_status=order_dtails.payment.payment_status
+        print(payment_status)
         order_products=OrderProduct.objects.filter(order=order_dtails)
         
         address=order_dtails.shipping_address
@@ -259,6 +257,7 @@ def order_items(request,orderid):
                 'user_detail': user_detail,
                 'address' : cleaned_data,
                 'order_products' : order_products,
+                "payment_status":payment_status
                 }
             
         return render(request,'dashboard/icons.html',context)
@@ -319,7 +318,7 @@ def otp_sender(request):
     # request.session['storedemail'].set_expiry(300)
     request.session.modified = True
 
-    subject = "Verify Your One-Time Password (OTP) - Home Decor Ecommerce Store"
+    subject = "Verify Your One-Time Password (OTP) - Ashion Ecommerce Store"
     sendermail = "noreply@homedecorestore.com"
     otp = f"Dear User,\n\n Your One-Time Password (OTP) for verification is: {randomotp}\n\nThank you for choosing Home Decor Ecommerce Store."
     send_mail(subject,otp,sendermail,[email])
@@ -366,13 +365,15 @@ def coupon(request):
         user = request.user.id
         user_detail= Account.objects.filter(id=user)
         order_dtails=OrderProduct.objects.filter(user=user).count()
+        all_coupon=Coupon.objects.all()
         available_coupon=UserCoupon.objects.filter(user=user)
     
         
         context = {
                 'user':user_detail,
                 'order_dtails':order_dtails,
-                'coupon':available_coupon
+                'coupon':available_coupon,
+                'all_coupon':all_coupon
                 }
             
         return render(request,'dashboard/coupon.html',context)
@@ -388,13 +389,15 @@ def referral(request):
 
     if request.user.is_authenticated:
         # all_coupon=Coupon.objects.all()
+        
         user = request.user.id  
         user_detail= Account.objects.get(id=user)
         try:
             referral_dtails=ReferralUser.objects.get(user=user_detail)
-            referral_offer=ReferralOffer.objects.first()
+            referral_offer=ReferralOffer.objects.all().first()
             print('i')
         except ObjectDoesNotExist:
+            referral_offer=ReferralOffer.objects.all().first()
             referral_code = generate_four_digit_code()
             print('isss')
             referral_dtails=ReferralUser.objects.create(user=user_detail,
@@ -448,3 +451,57 @@ def invoice(request,orderid):
     return render(request,'dashboard/invoice.html',context)
 
 
+
+
+def repay(request):
+    data = json.loads(request.body)
+    selected_option = data.get('payment_option')
+    print(selected_option)
+    order=Order.objects.get(id=selected_option)
+    payment_instance=Payment.objects.get(id=order.payment.id)
+    amount=payment_instance.amount_paid
+    print(amount)
+
+    client = razorpay.Client(auth=("rzp_test_vAeyohaspEahRA", "076FQiZmu52B1ODs1UWKe2HF"))
+    data = { "amount":(int(float(amount))*100), "currency": "INR" }
+    payment1 = client.order.create(data=data)
+    payment_order_id = payment1['id']
+    payment_instance.payment_order_id=payment_order_id
+    payment_instance.save()
+    
+    return JsonResponse({'message': 'Success', 'context': payment1})      
+
+
+
+@csrf_exempt
+def paymenthandler3(request):
+    print("Payment Handler endpoint reached")
+    user = request.user
+    if request.method == "POST":
+        try:
+            payment_id        = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature         = request.POST.get('razorpay_signature', '')
+            print(f'1:{payment_id},2:{razorpay_order_id},3:{signature}')
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            } 
+            client = razorpay.Client(auth=("rzp_test_vAeyohaspEahRA", "076FQiZmu52B1ODs1UWKe2HF"))
+            result = client.utility.verify_payment_signature(params_dict)
+
+            if not result :
+                return redirect('payment_failure')
+            else:
+                payment=Payment.objects.get(payment_order_id=razorpay_order_id)
+                payment.payment_status = 'SUCCESS'
+                payment.payment_id = payment_id
+                payment.save()
+                order = get_object_or_404(Order, payment=payment)
+                return redirect('order-item',order.id)
+        except Exception as e:
+            print('Exception:', str(e))
+            return redirect('payment_failure')
+    else:
+        return redirect('shop')

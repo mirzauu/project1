@@ -193,21 +193,17 @@ class Paymentt(View):
         selected_option = data.get('payment_option')
         
         if selected_option == 'option3':
-            print('selected')
+           
             url='/order-place-cod/'
 
         elif selected_option == 'option1':
-            print('OPTION1111')
             user_id = request.user.id
 
             # Get necessary instances
             
             payment_methods_instance = PaymentMethod.objects.get(method_name="RAZORPAY")
-
             user_instance = Account.objects.get(id=user_id)
-
             address = AdressBook.objects.get(is_default=True, user=user_instance)
-
             cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
             
             if cart_items.count()>=1:
@@ -243,10 +239,7 @@ class Paymentt(View):
                     product = cart_item.product
                     product.stock -= cart_item.quantity
                     product.save()
-                    
-                
             
-        
 
                 # Create ShippingAddress instance
                 
@@ -262,7 +255,7 @@ class Paymentt(View):
                 payment = Payment.objects.create(user=user_instance,
                                             payment_method=payment_methods_instance,
                                             amount_paid=grand_total,
-                                            payment_status='SUCESS',
+                                            payment_status='PENDING',
                                             payment_order_id=payment_order_id
                                             )  
                  
@@ -290,97 +283,7 @@ class Paymentt(View):
                         )     
                 cart_items.delete() 
 
-                return JsonResponse({'message': 'Success', 'context': payment1})
-            
-            
-# @csrf_exempt
-# def paymenthandler(request):
-    
-   
-#     # only accept POST request.
-#     if request.method == "POST":
-
-#         try:
-#             # Extract payment details from the POST request
-#             payment_id        = request.POST.get('razorpay_payment_id', '')
-#             razorpay_order_id = request.POST.get('razorpay_order_id', '')
-#             signature         = request.POST.get('razorpay_signature', '')
-#             print(f'1:{payment_id},2:{razorpay_order_id},3:{signature}')
-#             # Create a dictionary of payment parameters
-#             params_dict = {
-#                 'razorpay_order_id': razorpay_order_id,
-#                 'razorpay_payment_id': payment_id,
-#                 'razorpay_signature': signature,
-#             }
-
-#             # Verify the payment signature
-#             client = razorpay.Client(auth=('rzp_test_vAeyohaspEahRA', '076FQiZmu52B1ODs1UWKe2HF'))
-#             result = client.utility.verify_payment_signature(params_dict)
-
-#             if not result :
-#                 return JsonResponse({'message': 'Payment signature verification failed'})
-
-#             else:
-              
-#                 payment = Payment.objects.get(payment_order_id=razorpay_order_id)
-#                 payment.payment_status = 'SUCCESS'
-#                 payment.payment_id = payment_id
-#                 payment.save()
-
-                
-#                 user_instance = payment.user
-
-#                 total_with_original_price = 0
-#                 total = 0
-#                 quantity = 0
-
-#                 cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
-
-
-#                 for cart_item in cart_items:
-#                     total += cart_item.sub_total()
-#                     total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
-#                     quantity += cart_item.quantity
-#                 Discount = request.session.get('discount', Decimal('0')) 
-#                 total_float = float(total)
-#                 Discount_float = float(Discount)
-
-#                 grand_total = total_float - Discount_float
-        
-            
-               
-#                 order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
-
-
-#                 for i in order_dtails:
-#                     address=i.order.shipping_address
-
-#                 cleaned_string = address.replace('[', '').replace(']', '')
-
-#                     # Split the string by comma and remove empty strings and 'None' values
-#                 split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
-
-#                 # Remove single quotes from each item
-#                 cleaned_data = [item.replace("'", "") for item in split_data]
-                
-
-#                 context = {
-#                             'order_dtails' : draft_order,
-#                             'address' : cleaned_data,
-#                             'order_product' : order_dtails,
-#                             }
-
-#                 return render (request,'user_templates/order_sucess.html',context)
-               
-#         except Exception as e:
-#             # Exception occurred during payment handling
-#             print('Exception:', str(e))
-#             return HttpResponseBadRequest()
-#     else:
-#         return redirect('payment')
-
-
-                
+                return JsonResponse({'message': 'Success', 'context': payment1})      
         else:
             print('selected')
             url='/order-place-wallet/'
@@ -401,23 +304,24 @@ def order_place_cod(request):
 
     cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
     
-    if cart_items.count()>=1:
+   
 
-        total_with_original_price = 0
-        total = 0
-        quantity = 0
+    total_with_original_price = 0
+    total = 0
+    quantity = 0
 
-        for cart_item in cart_items:
-            total += cart_item.sub_total()
-            total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
-            quantity += cart_item.quantity
-        Discount = request.session.get('discount', Decimal('0')) 
-        total_float = float(total)
-        Discount_float = float(Discount)
+    for cart_item in cart_items:
+        total += cart_item.sub_total()
+        total_with_original_price += (cart_item.product.max_price * cart_item.quantity)
+        quantity += cart_item.quantity
+    Discount = request.session.get('discount', Decimal('0')) 
+    total_float = float(total)
+    Discount_float = float(Discount)
 
-        grand_total = total_float - Discount_float
-        
-        # Create ShippingAddress instance
+    grand_total = total_float - Discount_float
+    
+    if grand_total <= 100000:
+    # Create ShippingAddress instance
         address1 =[address.name,address.address_line_1,address.locality,address.city,address.state,address.country,address.pincode,address.phone]
 
         payment = Payment.objects.create(user=user_instance,payment_method=payment_methods_instance,amount_paid=0,payment_status='SUCCESS')
@@ -454,18 +358,17 @@ def order_place_cod(request):
         cart_id.delete() 
 
         cart_items.delete()    
-       
+    
         order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
 
         for i in order_dtails:
             address=i.order.shipping_address
-        
     else:
+        messages.error(request, 'COD not available of order above 100000 ,choose another option')
+        return redirect('order-payment')
 
-        draft_order=Order.objects.filter(user=user_instance).order_by('-created_at').first()
-        order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order)
-        for i in order_dtails:
-            address=i.order.shipping_address
+        
+
 
     cleaned_string = address.replace('[', '').replace(']', '')
 
@@ -597,8 +500,6 @@ def order_place_Wallet(request):
 
 @csrf_exempt
 def paymenthandler(request):
-    
-   
     # only accept POST request.
     if request.method == "POST":
 
@@ -620,7 +521,7 @@ def paymenthandler(request):
             result = client.utility.verify_payment_signature(params_dict)
 
             if not result :
-                return JsonResponse({'message': 'Payment signature verification failed'})
+                return redirect('payment_failure')
 
             else:
               
@@ -629,14 +530,10 @@ def paymenthandler(request):
                 payment.payment_id = payment_id
                 payment.save()
 
-                
                 user_instance = payment.user
 
                 address = AdressBook.objects.get(is_default=True, user=user_instance)
-
-
                 draft_order= Order.objects.get(payment=payment)
-               
                 order_dtails=OrderProduct.objects.filter(user=user_instance,order=draft_order) 
 
                 print(draft_order,'gggg')
@@ -663,9 +560,15 @@ def paymenthandler(request):
         except Exception as e:
             # Exception occurred during payment handling
             print('Exception:', str(e))
-            return HttpResponseBadRequest()
+            return redirect('payment_failure')
     else:
         return redirect('payment')
+    
+
+def payment_failure(request):
+
+    order=Order.objects.all().order_by('-created_at').first()
+    return render(request, 'user_templates/failure_page.html',{"order":order})    
     
 
 def success_page(request, id):
@@ -679,7 +582,7 @@ def success_page(request, id):
 
     cleaned_string = address.replace('[', '').replace(']', '')
 
-        # Split the string by comma and remove empty strings and 'None' values
+    # Split the string by comma and remove empty strings and 'None' values
     split_data = [item.strip() for item in cleaned_string.split(',') if item.strip() != '' and item.strip() != 'None']
 
     # Remove single quotes from each item
@@ -701,14 +604,14 @@ def get_current_step(request):
     if order_dtails.order_status=='New':
         current_step = 1
     elif order_dtails.order_status=='Accepted':
-        current_step = 2  # Example: You can fetch this from the database or any other source
+        current_step = 2 
     elif order_dtails.order_status=='Shipped':
-        current_step = 3  # Example: You can fetch this from the database or any other source
+        current_step = 3  
     elif order_dtails.order_status=='Delivered':
-        current_step = 4  # Example: You can fetch this from the database or any other source
-      # Example: You can fetch this from the database or any other source
+        current_step = 4  
+
     print(current_step)
-    # Return the current step as JSON response
+
     return JsonResponse({'currentStep': current_step})
 
 

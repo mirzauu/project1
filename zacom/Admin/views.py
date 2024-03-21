@@ -57,7 +57,7 @@ def adminhome(request):
     orders=OrderProduct.objects.filter(order_status='Delivered')
     print(orders,'ffff')
     count = orders.__len__()
-    revenue = Order.objects.filter(order_status='Delivered').aggregate(total_revenue=Sum('order_total'))['total_revenue'] or 0
+    revenue = OrderProduct.objects.filter(order_status='Delivered').aggregate(total_revenue=Sum('grand_totol'))['total_revenue'] or 0
 
     chart_month = []
     new_users = []
@@ -83,6 +83,8 @@ def adminhome(request):
         orders_count.append(order_c)
 
     all_orders = Order.objects.all().order_by('-created_at')
+
+    print(chart_month, user_count, order_c)
 
     if request.method == 'GET':
         date = request.GET.get('date')
@@ -527,33 +529,26 @@ def update_order_status(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
 
-@never_cache 
 def update_orderitem_status(request):
+    print('--------')
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
             new_status = data.get('new_status')
-            print('xxxx',order_id, new_status)
-            print('---------------------------')
-            
+            print('=================')
             # Update the order status
             order = OrderProduct.objects.get(id=order_id)
-            print('1')
+            print('11')
             order_instance=Order.objects.get(id=order.order.id)
-
             user_id = request.user.id
-
             user_instance = Account.objects.get(id=user_id)
-            print('2')
-
-            wallet= Wallet.objects.get(user=user_instance)
-            print('3')
-
+            print('22') 
+            wallet, created = Wallet.objects.get_or_create(user=user_instance)
+            print('ff')
             payment_order=order.order.payment
-            print('4')
-
             method1=payment_order.payment_method
+            method=str(method1)
          
             print(method1)
 
@@ -561,40 +556,97 @@ def update_orderitem_status(request):
                 discount = order_instance.additional_discount
                 total = order_instance.grand_total
                 order_total = order_instance.order_total
-                print('dis',discount)
-                print('didddds',total)
-                print('diffs',order_total)
-                print('grandtotal',order.grand_totol)
                 Total= order_total+discount
-                print('refund',Total)
                 Total-= order.grand_totol
-                print('refunddd',order_total)
-                print('=======')
                 walletamount = order.grand_totol-discount
                 order.order_status = new_status
                 order.save()
-                print('inside',method1)
                 product=order.product_id
                 product_instance=Product_Variant.objects.get(id=product)
                 product_instance.stock += order.quantity
                 product_instance.save()
-                wallet.balance += walletamount
-                wallet.save()
-                WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
 
-                print('5')
+                if method != 'CASH ON DELIVERY':
+                    wallet.balance += walletamount
+                    wallet.save()
+                    WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
+
+                    print('5')
 
                 order_instance.additional_discount=0
                 order_instance.grand_total =Total
                 order_instance.order_total=Total
                 order_instance.save()
         
-                if method1 == 'CASH ON DELIVERY':
-                    print('razropay')
-                    
-                else:
-                    print('nop')    
+                
+               
+            print('++++++++++++++')
+            order.order_status = new_status
+            order.save()
+                
 
+
+            return JsonResponse({'message': 'Order status updated successfully'}, status=200)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'Order not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+
+def update_orderitem_status_admin(request):
+    print('----dd----')
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            new_status = data.get('new_status')
+            print('=================')
+            # Update the order status
+            order = OrderProduct.objects.get(id=order_id)
+            print('11')
+            order_instance=Order.objects.get(id=order.order.id)
+            user_id = order_instance.user.id
+            user_instance = Account.objects.get(id=user_id)
+            print('22')
+            wallet, created = Wallet.objects.get_or_create(user=user_instance)
+
+            print('ff')
+            payment_order=order.order.payment
+            method1=payment_order.payment_method
+            method=str(method1)
+         
+            print(method1)
+
+            if new_status in ('Cancelled User', 'Cancelled Admin','Returned'):
+                discount = order_instance.additional_discount
+                total = order_instance.grand_total
+                order_total = order_instance.order_total
+                Total= order_total+discount
+                Total-= order.grand_totol
+                walletamount = order.grand_totol-discount
+                order.order_status = new_status
+                order.save()
+                product=order.product_id
+                product_instance=Product_Variant.objects.get(id=product)
+                product_instance.stock += order.quantity
+                product_instance.save()
+
+                if method != 'CASH ON DELIVERY':
+                    wallet.balance += walletamount
+                    wallet.save()
+                    WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
+
+                    print('5')
+
+                order_instance.additional_discount=0
+                order_instance.grand_total =Total
+                order_instance.order_total=Total
+                order_instance.save()
+        
+                
+               
             print('++++++++++++++')
             order.order_status = new_status
             order.save()

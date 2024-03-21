@@ -20,7 +20,6 @@ urlpatterns = [
     path('adminlogin/',admin.admin_login,name='admin_login'),
 
 #user dash
- 
     path('address/',custview.Address_detail,name='address-detail'),
     path('address/add/',custview.Address_add,name='address-add'),
     path('address/edit/<int:id>',custview.Address_edit,name='address-edit'),
@@ -34,12 +33,14 @@ urlpatterns = [
     path('profile/coupon/',custview.coupon,name='coupon-detail'),
     path('profile/referral/',custview.referral,name='referral-detail'),
     path('invoice/<int:orderid>/',custview.invoice,name='invoice'),
+    path('order/repay',custview.repay,name='repay'),
+    path('paymenthandler3/',custview.paymenthandler3,name='paymenthandler3'),
+    
 
 
 # wallet
     path('wallet/',walletview.wallet,name='wallet'),
     path('paymenthandler2/',walletview.paymenthandler2,name='paymenthandler2'),
-
 
 # cart management
     path('cart/', cartview.cart,name='cart'),
@@ -54,9 +55,7 @@ urlpatterns = [
     path('wishlist/',cartview.wishlist,name='wishlist'),
     path('wishlist/add/<int:product_id>/',cartview.wishlist_add,name='wishlist-add'),
     path('wishlist/delete/<int:product_id>/',cartview.wishlist_remove,name='wishlist-delete'),
-   
- 
- 
+
 # order
     path('order-address/',orderview.Address.as_view(),name='order-address'),
     path('order-review/',orderview.Review.as_view(),name='order-review'),
@@ -66,10 +65,8 @@ urlpatterns = [
     path('order-status/',orderview.get_current_step,name='order_status'),
     path('order-return/',orderview.orders_return,name='order_return'),
     path('paymenthander/',orderview.paymenthandler,name='paymenthander'),
+    path('payment_failure/',orderview.payment_failure,name='payment_failure'),
     path('success_page/<id>',orderview.success_page,name='success_page'),
-
     path('webhook/', chatbot.webhook_view, name='webhook'),
-
-
 
 ]

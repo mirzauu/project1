@@ -8,9 +8,6 @@ import razorpay
 import json
 from django.views.decorators.cache import never_cache
 from django.core.cache import cache
-
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-
 from django.conf import settings
 
 # Create your views here.

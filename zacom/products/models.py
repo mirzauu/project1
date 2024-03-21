@@ -105,7 +105,7 @@ class Product_Variant(models.Model):
     
 
     def save(self, *args, **kwargs):
-        self.offer=self.sale_price
+        
         # img=Image.open(self.thumbnail_image.path)
 
         # if img.height > 300 or img.weight > 300:
@@ -280,17 +280,19 @@ class Coupon(models.Model):
     def save(self, *args, **kwargs):
         # Get the current date
         current_date = datetime.now().date()
-
-        # Convert expire_date to a date object if it's a string
-        if isinstance(self.expire_date, str):
-            self.expire_date = datetime.strptime(self.expire_date, '%Y-%m-%d').date()
-        
-        # Compare expire_date with current_date
-        if self.total_coupons <= 0 or self.expire_date < current_date:
-            self.is_expired = True
+        if self.is_expired==False:
+            # Convert expire_date to a date object if it's a string
+            if isinstance(self.expire_date, str):
+                self.expire_date = datetime.strptime(self.expire_date, '%Y-%m-%d').date()
+            
+            # Compare expire_date with current_date
+            if self.total_coupons <= 0 or self.expire_date < current_date:
+                self.is_expired = True
+            else:
+                self.is_expired = False
         else:
-            self.is_expired = False
-        
+             self.is_expired = True       
+            
         # Save the instance
         super().save(*args, **kwargs)
     def __str__(self):

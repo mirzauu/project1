@@ -60,6 +60,7 @@ urlpatterns = [
     path("order/detail/<int:order_id>/", views.orderdetail, name="admin-order-detail"),
     path('update-order-status/', views.update_order_status, name='update_order_status'),
     path('update-orderitem-status/', views.update_orderitem_status, name='update_orderitem_status'),
+    path('update-orderitem-status-admin/', views.update_orderitem_status_admin, name='update_orderitem_status_admin'),
  
     path('order/return/<int:order_id>/', views.order_return, name='order-return'),
     path('return/approve/<int:return_id>/', views.order_return_approve, name='order-return-approve'),
@@ -68,6 +69,7 @@ urlpatterns = [
 # coupon 
     path('Coupon/', productView.Coupon_list, name='admin-coupon'),
     path('Coupon/create', productView.Coupon_create, name='admin-create'),
+    path('Coupon/edit/<int:id>/', productView.Coupon_edit, name='admin-edit'),
 
 # offer   
     path('categoryoffer/', offerView .category_offer, name='admin-category-offer'),
@@ -83,9 +85,9 @@ urlpatterns = [
     path('activate-referral-user/<int:user_id>/', offerView.toggle_referral_user, name='activate-referral-user'),
     path('deactivate-referral-user/<int:user_id>/', offerView.toggle_referral_user, {'activate': False}, name='deactivate-referral-user'),
 
-    path('productoffer/', offerView .product_offer, name='admin-product-offer'),
-    path('productoffer/create', offerView .create_product_offer, name='admin-create-product-offer'),
-    path('productoffer/create/<int:offer_id>/', offerView .edit_product_offer, name='admin-create-product-offer'),
+    path('productoffer/', offerView.product_offer, name='admin-product-offer'),
+    path('productoffer/create', offerView.create_product_offer, name='admin-create-product-offer'),
+    path('productoffer/create/<int:offer_id>/', offerView.edit_product_offer, name='admin-create-product-offer'),
     path('productoffer/deactivate/<int:offer_id>/', offerView.toggle_product_offer, {'activate': False}, name='deactivate-product-offer'),
     path('productoffer/activate/<int:offer_id>/', offerView.toggle_product_offer, name='activate-product-offer'),
 

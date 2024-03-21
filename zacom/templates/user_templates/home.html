@@ -119,14 +119,15 @@
                         {% if k.stock == 0 %}
                         <div class="label stockout">out of stock</div>
                         {% endif %}
+                        
                         <ul class="product__hover">
                             <li><a href="{{k.thumbnail_image.url}}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                            <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                            <li><a href="#"><span class="icon_bag_alt"></span></a></li>
+                            <li><a href="{% url 'wishlist-add'  product_id=k.id %}"><span class="icon_heart_alt"></span></a></li>
+                            <li><a href="{% url 'cart-add' product_id=k.id %}"><span class="icon_bag_alt"></span></a></li>
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="#">{{k.product}}{{k.variant_name}}</a></h6>
+                        <h6><a href="{% url 'product_detail' product_variant_slug=k.product_variant_slug %}">{{k.product}}{{k.variant_name}}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -134,7 +135,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">$ 59.0</div>
+                        <div class="product__price">{{k.apply_offer_discount}}</div>
                     </div>
                 </div>
             </div>              

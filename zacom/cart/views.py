@@ -94,13 +94,10 @@ def cart(request,total=0,quantity=0,cart_items=None):
    
      
     if total_with_orginal_price == 0:
-      
         if 'discount' in request.session:
             del request.session['discount']
         return render(request, 'user_templates/shop_cart_empty.html')
-    
     else:
-
         return render(request, 'user_templates/shop-cart.html', {
                     'total': total,
                     'quantity': quantity,
@@ -313,10 +310,11 @@ def apply_coupon(request):
         
             try:
                 # Attempt to get the Coupon object based on the provided coupon code
-                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                coupon = Coupon.objects.get(coupon_code=coupon_code,is_expired= False)
                 print(coupon,'1')
             except Coupon.DoesNotExist:
                 # Handle the case where the coupon does not exist
+                messages.error(request, 'Coupon does not exist')
                 data = {'error': 'Coupon does not exist'}
                 return JsonResponse(data, status=200)
             
@@ -338,6 +336,7 @@ def apply_coupon(request):
                 print(coupon_usage.id, '2')
             except UserCoupon.DoesNotExist:
                 # Handle the case where the UserCoupon does not exist
+                messages.error(request, 'Coupon does not exist')
                 data = {'error': 'UserCoupon does not exist'}
                 return JsonResponse(data, status=200)
             
@@ -419,9 +418,16 @@ def wishlist(request):
         wishlist_instance= Wishlist.objects.get(user=current_user)
     except Wishlist.DoesNotExist:
         wishlist_instance = Wishlist.objects.create(user=current_user)
-        
+
     products = wishlist_instance.product.all()
+    for product in products:
+        if CartItem.objects.filter(user=current_user, product=product).exists():
+            # Remove the product from the wishlist
+            wishlist_instance.product.remove(product)
+
+
     count=products.count()
+
     
     context={
         'wishlist' : products,
@@ -439,12 +445,16 @@ def wishlist_add(request, product_id):
         # Get or create the Wishlist object for the current user
         wishlist_instance, created = Wishlist.objects.get_or_create(user=current_user)
         
-        # Check if the product is already in the wishlist
-        if product in wishlist_instance.product.all():
-            messages.error(request, 'Product already exists in your wishlist.')
+    
+        if CartItem.objects.filter(user=current_user, product=product).exists():
+            messages.error(request, 'Product already exists in your Cart.')
         else:
-            wishlist_instance.product.add(product)
-            messages.success(request, 'Product added to your wishlist.')
+            # Check if the product is already in the wishlist
+            if product in wishlist_instance.product.all():
+                messages.error(request, 'Product already exists in your wishlist.')
+            else:
+                wishlist_instance.product.add(product)
+                messages.success(request, 'Product added to your wishlist.')
 
     except Wishlist.DoesNotExist:
         # Create a new Wishlist object for the current user

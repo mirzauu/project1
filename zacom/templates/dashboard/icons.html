@@ -11,8 +11,11 @@
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">Order Details</h5>
+            {% if payment_status == 'PENDING'%}
+            <a href="#" class="btn btn-danger cancel-product" onclick="handlePlaceOrderClick({{order_dtails.id}})">Pay again</a>
+            {% else %}
             <a href="{% url 'invoice' orderid=order_dtails.id %}"><i class="fa-solid fa-print"></i></a>
-
+            {% endif %}
         </div>
         <div class="card-body">
             <div class="row">
@@ -66,9 +69,18 @@
 								<td class="product-details">{{ item.product_variant }}</td>
 								<td class="product-details">{{ item.quantity }}</td>
 								<td class="product-details">₹{{ item.product_price }}</td>
+                                {% if payment_status == 'PENDING'%}
+								<td class="product-details">Payment pending</td>
+                                {% else %}
 								<td class="product-details">{{ item.order_status }}</td>
+                                {% endif %}
 								<td>
-										<a href="{% url 'order-detail' product_id=item.id %}" class="btn btn-danger cancel-product">Detail</a>
+                                    {% if payment_status == 'PENDING'%}
+                                  
+                                    {% else %}
+                                    <a href="{% url 'order-detail' product_id=item.id %}" class="btn btn-danger cancel-product">Detail</a>
+                                    {% endif %}
+										
 								</td>
 							
 						</tr>
@@ -83,6 +95,90 @@
         </div>
     </div>
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    // Function to handle the click event on the "Place Order" button
+    function handlePlaceOrderClick(selectedOptionId) {
+    // Your existing code
+
+    // Make a POST request to your Django view
+    fetch('{% url "repay" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+        },
+        body: JSON.stringify({ payment_option: selectedOptionId }) // Send selected option ID as JSON data
+    })
+    .then(response => response.json())
+    .then(data => {
+            console.log('POST request successful',data);
+            if (data.url){
+                console.log('iofjfji',data.url)
+                window.location.href = data.url;
+
+            }
+
+                const paymentOrderId = data.context.id;
+                const paymentAmount = data.context.amount;
+                var razorpayKeyId = 'rzp_test_vAeyohaspEahRA';
+                console.log('Payment information:', razorpayKeyId);
+                // e.preventDefault();
+                console.log(razorpayKeyId);
+                console.log(paymentAmount);
+                console.log(paymentOrderId);
+              
+                var options = {
+                    "key": "rzp_test_vAeyohaspEahRA", 
+                    "amount": paymentAmount,
+                    "name": "ASHION",
+                    "description": "Test Transaction",
+                    "image": "https://example.com/your_logo",
+                    "order_id": paymentOrderId, 
+                    "callback_url": `http://127.0.0.1:8000/paymenthandler3/`,
+
+                    "prefill": {
+                        "name": "{{request.user.get_usernme}}",
+                        "email": "{{request.user.email}}",
+                        "contact": "{{request.user.phone_number}}"
+                    },
+                    "theme": {
+                        "color": "#b19361"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function(response) {
+                    alert(response.error.code);
+                });
+
+                rzp1.open();
+                e.preventDefault();
+
+        })
+        .catch(error => {
+            // Handle error here if needed
+            console.error('Error:', error);
+        });
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Extract CSRF token
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 
 
 

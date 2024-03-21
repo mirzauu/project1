@@ -264,7 +264,7 @@ $('#myModal').on('shown.bs.modal', function () {
                     };
         
                     // Send the AJAX request
-                    fetch('{% url "update_order_status" %}', {
+                    fetch('{% url "update_orderitem_status_admin" %}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ $('#myModal').on('shown.bs.modal', function () {
             };
 
             // Send the AJAX request
-            fetch('{% url "update_orderitem_status" %}', {
+            fetch('{% url "update_orderitem_status_admin" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

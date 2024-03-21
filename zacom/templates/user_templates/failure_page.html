@@ -1,0 +1,35 @@
+{% extends 'user_templates/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                        <span>Payment Failed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+    <!-- Payment Failed Section Begin -->
+    <section class="payment-failed spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="payment-failed__text">
+                        <h2>Payment Failed</h2>
+                            <p style="text-align: center;">Your payment was unsuccessful. Please try again in the order dashboard or contact support for assistance.</p>
+                        <a href="{% url 'order-item' orderid=order.id %}" class="primary-btn">Retry Payment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Payment Failed Section End -->
+{% endblock content %}
