@@ -1,140 +1,117 @@
 {% extends 'user_templates/base.html' %}
 
-
-
 {% block content %}
 {% load static %}
 
-    <!-- Bootstrap core CSS     -->
+<!-- Bootstrap core CSS -->
+<link href="{% static 'user_static/assets/css/bootstrap.min.css' %}" rel="stylesheet">
 
-  
+<!-- Paper Dashboard core CSS -->
+<link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
 
-    <!--  Paper Dashboard core CSS    -->
-    <link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
+<!-- CSS for Demo Purpose, don't include it in your project -->
+<link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
 
-    <!--  CSS for Demo Purpose, don't include it in your project     -->
-    <link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
+<!-- Fonts and icons -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+<link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
 
-    <!--  Fonts and icons     -->
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
-    <link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
-
-    
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-11 " style="margin-top: 50px;margin-left: 60px; ">
-            <div class="nav column  gap-4 p-3 small bg-danger rounded-5 shadow-sm"  role="tablist">
-                
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'profile' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">profile</button> </a>
+        <div class="col-md-11 mx-auto mt-5">
+            <div class="nav column gap-4 p-3 small bg-danger rounded-5 shadow-sm" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'profile' %}">Profile</a>
                 </li>
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'address-detail' %}"> <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Address</button> </a>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'address-detail' %}">Address</a>
                 </li>
-                
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'order' %}"> <button class="nav-link active rounded-5 justify-content-center" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">Orders</button></a>
+                <li class="nav-item">
+                    <a class="nav-link active rounded-5" href="{% url 'order' %}">Orders</a>
                 </li>
-                
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'wallet' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Wallet</button> </a>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'wallet' %}">Wallet</a>
                 </li>
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'coupon-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Coupon</button> </a>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'coupon-detail' %}">Coupon</a>
                 </li>
-                <li class="d-flex nav-item justify-content-center" role="presentation">
-                    <a href="{% url 'referral-detail' %}">  <button class="nav-link rounded-5" id="contact-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Referral</button> </a>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'referral-detail' %}">Referral</a>
                 </li>
-              
-        
             </div>
         </div>
-      
-    <div class="col-md-10" style="margin-top: 50px;margin-left: 60px; ">
-        
-       
+    </div>
 
-        <div class="content mt-5">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-4 col-md-5">
-                     
-                        <div class="card card-user">
-                            <div class="image">
-                                <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="..."/>
-                            </div>
-                         
-                            <div class="content">
-                                <div class="author">
-                                  <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="..."/>
-                              
-                                  <h4 class="title">{{user_detail.first_name}}{{user_detail.last_name}}<br />
-                                     <a href="#"><small>@{{user_detail.username}}</small></a>
-                                  </h4>
+    <div class="row">
+        <div class="col-md-10 mx-auto mt-5">
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card card-user">
+                                <div class="image">
+                                    <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="Background"/>
                                 </div>
-                                <p class="description text-center">
-                                    {{user_detail.email}} <br>
-                                    {{user_detail.phone_number}} <br>
-                       
-                                </p>
-                            </div>
-                            <hr>
-                            <div class="text-center">
-                                <div class="row">
-                                    <div class="col-md-3 col-md-offset-1">
-                                        <h5>{{order_dtails.count}}<br /><small>Orders</small></h5>
+                                <div class="content">
+                                    <div class="author">
+                                        <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="User Profile"/>
+                                        <h4 class="title">{{ user_detail.first_name }} {{ user_detail.last_name }}<br />
+                                            <small>@{{ user_detail.username }}</small>
+                                        </h4>
                                     </div>
-                                    <div class="col-md-4">
-                                        <h5>2GB<br /><small>Used</small></h5>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5>24,6$<br /><small>Spent</small></h5>
+                                    <p class="description text-center">
+                                        {{ user_detail.email }} <br>
+                                        {{ user_detail.phone_number }} <br>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="text-center">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <h5>{{ order_dtails.count }}<br /><small>Orders</small></h5>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5>2GB<br /><small>Used</small></h5>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5>24,6$<br /><small>Spent</small></h5>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                      
-                       
-                    </div>
-                    <div class="col-lg-8 col-md-7">
-                        <div class="table_page table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Order</th>
-                                        <th>Total</th>
-                                        <th>Order Placed</th>
-                                       
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for order in order_dtails %}
-                                    <tr>
-                                        <td>
-                                            <a href="{% url 'order-item' orderid=order.id %}" class="view">{{order.order_number}}</td></a>
-                                        <td>Rs. {{ order.order_total  }}</td>
-                                        <td>{{ order.created_at|date:"j M Y" }}</td>
-                                       
-                                       
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                        <div class="col-lg-8">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order</th>
+                                            <th>Total</th>
+                                            <th>Order Placed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in order_dtails %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'order-item' orderid=order.id %}" class="view">{{ order.order_number }}</a>
+                                            </td>
+                                            <td>Rs. {{ order.order_total }}</td>
+                                            <td>{{ order.created_at|date:"j M Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                     
                     </div>
-                
-                
-
                 </div>
             </div>
         </div>
-
-      </div>
     </div>
-  </div>
-</section>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 <script>
 function cancelOrderConfirmation(orderId) {
@@ -191,86 +168,7 @@ function getCookie(name) {
         return cookieValue;
     }
 </script>
-  
-<style>
-    .custom-btn {
-  background-color: #ee7c7c; /* Change background color */
-  color: #fff; /* Change text color */
-  border-radius: 5px; /* Add rounded corners */
-  padding: 10px 20px; /* Add padding */
-  border: none; /* Remove border */
-  cursor: pointer; /* Add pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Add smooth transition for background color */
-}
-
-.custom-btn:hover {
-  background-color: #ca1515; /* Change background color on hover */
-}
-
-    /* Override Bootstrap classes */
-    .bg-danger {
-      background-color: #ca1515 !important; /* Change background color to grey */
-    }
-  
-    .nav-link {
-      color: rgb(24, 24, 43) !important; /* Change text color to blue */
-    }
-  
-    .nav-link.active {
-      background-color: #ca1515 !important; /* Change background color of active link to grey */
-      color: rgb(255, 255, 255) !important; /* Change text color of active link to blue */
-    }
-  </style>
-  <style>
-   .table_page {
-    width: 100%;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-td img {
-    width: 60px;
-    margin-right: 10px;
-}
-
-.actions {
-    display: flex;
-    justify-content: space-between;
-}
-
-.view {
-    text-decoration: none;
-    color: blue;
-}
-
-.return-order {
-    color: red;
-}
-
-/* Optional: Hover effect for rows */
-tr:hover {
-    background-color: #f5f5f5;
-}
-
-</style>
-    
+ 
 
 {% endblock content %}
 

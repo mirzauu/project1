@@ -1,39 +1,216 @@
 {% extends 'user_templates/base.html' %}
 
-
-
 {% block content %}
 {% load static %}
-z
-<style>
-    .custom-btn {
-  background-color: #ee7c7c; /* Change background color */
-  color: #fff; /* Change text color */
-  border-radius: 5px; /* Add rounded corners */
-  padding: 10px 20px; /* Add padding */
-  border: none; /* Remove border */
-  cursor: pointer; /* Add pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Add smooth transition for background color */
-}
 
-.custom-btn:hover {
-  background-color: #ca1515; /* Change background color on hover */
-}
+<!-- Bootstrap core CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11" rel="stylesheet">
 
-    /* Override Bootstrap classes */
-    .bg-danger {
-      background-color: #ca1515 !important; /* Change background color to grey */
-    }
+<!-- Paper Dashboard core CSS -->
+<link href="{% static 'user_static/assets/css/paper-dashboard.css' %}" rel="stylesheet"/>
+
+<!-- CSS for Demo Purpose, don't include it in your project -->
+<link href="{% static 'user_static/assets/css/demo.css' %}" rel="stylesheet" />
+
+<!-- Fonts and icons -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+<link href="{% static 'user_static/assets/css/themify-icons.css' %}" rel="stylesheet">
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-11 mx-auto mt-5">
+            <div class="nav column gap-4 p-3 small bg-danger rounded-5 shadow-sm" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'profile' %}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active rounded-5" href="{% url 'address-detail' %}">Address</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link  rounded-5" href="{% url 'order' %}">Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'wallet' %}">Wallet</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'coupon-detail' %}">Coupon</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-5" href="{% url 'referral-detail' %}">Referral</a>
+                </li>
+            </div>
+        </div>
+    </div>
+
+        <div class="col-md-10 mx-auto my-5">
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        
+                        <div class="col-lg-4 col-md-5">
+                            {% for i in user %}
+                            <div class="card card-user">
+                                <div class="image">
+                                    <img src="{% static 'user_static/assets/img/background.jpg' %}" alt="...">
+                                </div>
+                                <div class="content">
+                                    <div class="author">
+                                        <img class="avatar border-white" src="{% static 'user_static/img/user-profile.jpg' %}" alt="...">
+                                        <h4 class="title">{{ i.first_name }} {{ i.last_name }}<br>
+                                            <a href="#"><small>@{{ i.username }}</small></a>
+                                        </h4>
+                                    </div>
+                                    <p class="description text-center">
+                                        {{ i.email }} <br>
+                                        {{ i.phone_number }} <br>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="text-center">
+                                    <div class="row">
+                                        <div class="col-md-3 col-md-offset-1">
+                                            <h5>{{ order_dtails }}<br><small>Orders</small></h5>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5>2GB<br><small>Used</small></h5>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h5>24,6$<br><small>Spent</small></h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-lg-6 col-md-7">
+                            <div class="card">
+                                <div class="header">
+                                    <h4 class="title">Address</h4>
+                                    <div class="container d-flex justify-content-end align-items-center">
+                                        <a style="font-size: 23px;" id="add-form-button"><i class="fa-solid fa-circle-plus"></i></a>
+                                    </div>
+                                </div>
+                                <div class="content" id="address-form" >
+                                    <form id="new-address-form" style="display: none;" onsubmit="return validateForm()">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label>Name</label>
+                                                    <input type="text" id="nameInput" class="form-control border-input" placeholder="Name" name="name" >
+                                                    <span id="nameError" class="error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">Phone Number</label>
+                                                    <input type="number" class="form-control border-input" placeholder="Phone" name="phone" id="Phone">
+                                                    <span id="phoneError" class="error"></span>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Pincode</label>
+                                                    <input type="number" class="form-control border-input" placeholder="Pincode" name="pincode" id="pincode">
+                                                    <span id="pincodeError" class="error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Locality</label>
+                                                    <input type="text" class="form-control border-input" placeholder="Locality" name="locality" id="locality" >
+                                                    <span id="localityError" class="error"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-11">
+                                                <div class="form-group">
+                                                    <label>Address</label>
+                                                    <textarea  class="form-control border-input" placeholder="Address" name="address" id="address"></textarea>
+                                                    <span id="addressError" class="error"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>City</label>
+                                                    <input type="text" class="form-control border-input" placeholder="City" id="city" name="city">
+                                                    <span id="cityError" class="error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>State</label>
+                                                    <input type="text" class="form-control border-input" placeholder="State" id="state" name="state">
+                                                    <span id="stateError" class="error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Country</label>
+                                                    <input type="text" class="form-control border-input" placeholder="Country" id="country"  name="country">
+                                                    <span id="countryError" class="error"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn custom-btn">Add Address</button>
+                      
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="address-list">
+                                    <ul class="d-flex flex-column justify-content-center">
+                                        {% for i in adress %}
+                                        <!-- Single Address Start -->
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <label for="address-{{ i.id }}" class="d-flex">
+                                                <div class="flex-column">
+                                                    <div class="d-flex flex-row align-items-center">
+                                                        <input type="radio" class="address-radio mr-2" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %}>
+                                                        <div class="d-flex flex-column">
+                                                            <h5>{{ i.name }}</h5>
+                                                            <div class="d-flex flex-column">
+                                                                <span>{{ i.street_address }}</span>
+                                                                <span>{{ i.city }}, {{ i.state }}, {{ i.country }}, {{ i.pincode }}</span>
+                                                            </div>
+                                                            <span>{{ i.phone }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                            <div class="d-flex flex-column align-items-center justify-content-center">
+                                                <div class="align-content-center fs-7 mb-2" style="font-size: 20px;" onclick="delete_add('{{ i.id }}')">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </div>
+                                                <a class="fs-7" style="font-size: 20px;" href="{% url 'address-edit' id=i.id %}">
+                                                    <i class="fa-light fa-user-pen"></i>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        
+
+                                        {% endfor %}
+                                        <!-- Single Address End -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
   
-    .nav-link {
-      color: rgb(24, 24, 43) !important; /* Change text color to blue */
-    }
-  
-    .nav-link.active {
-      background-color: #ca1515 !important; /* Change background color of active link to grey */
-      color: rgb(255, 255, 255) !important; /* Change text color of active link to blue */
-    }
-  </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
 <script>

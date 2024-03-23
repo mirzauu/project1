@@ -20,7 +20,7 @@ urlpatterns = [
     path('activateproduct/<int:product_id>/',views.activateproduct,name='activateproduct'),
     path('deactivate/<int:product_id>/',views.deactivate_varient,name='deactivatevarient'),
     path('activate/<int:product_id>/',views.activate_varient,name='activatevarient'),
-
+    path('sales',views.sales,name='sales'),
 
 
 #Product management

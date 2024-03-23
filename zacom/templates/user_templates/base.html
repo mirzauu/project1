@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.4.2/css/all.css
     " >
     <!-- Css Styles -->
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    
 
@@ -92,19 +93,24 @@
       href="{% static 'user_static/css/product_detail.css' %}"
       type="text/css"
     />
+
+
     
     
     <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js'></script><script  src="./script.js"></script>
+  
 
   </head>
 
   <body>
+
+   
     <!-- Page Preloder -->
-    <!-- <div id="preloder">
+    <div id="preloder">
         <div class="loader"></div>
-    </div> -->
+    </div>
 
     <!-- Offcanvas Menu Begin -->
     <div class="offcanvas-menu-overlay"></div>
@@ -126,17 +132,16 @@
         </li>
       </ul>
       <div class="offcanvas__logo">
-        <a href="./index.html"
+        <a href="{% url 'home' %}"
           ><img src="{% static 'user_static/img/logo.png' %}" alt=""
         /></a>
       </div>
       {% if user.id is None %}
       <div id="mobile-menu-wrap"></div>
       <div class="offcanvas__auth">
-        <a href="#">Signin</a>
-        <a href="#">signup</a>
-        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'admin_static/imgs/people/avatar2.jpg' %}" alt="User"></a>
-        
+        <a href="{% url 'register' %}">Signin</a>
+        <a href="{% url 'register' %}">Signup</a>
+     
       </div>
       {% else %}
       <div id="mobile-menu-wrap"></div>
@@ -144,11 +149,11 @@
         <h> <a href="{% url 'profile' %}">{{ user.first_name }}</a> </h>
         <a href="{% url 'logout' %}">logout</a>
         
-          
-    
+        
+        
       </div>
-
       {% endif %}
+      
     </div>
     <!-- Offcanvas Menu End -->
 
@@ -156,9 +161,9 @@
     <header class="header">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-xl-3 col-lg-2">
+          <div class="col-xl-3 col-lg-2 col-md-4 col-sm-6 col-12">
             <div class="header__logo">
-              <a href="./index.html"
+              <a href="{% url 'home' %}"
                 ><img src="{% static 'user_static/img/logo.png' %}" alt=""
               /></a>
             </div>
@@ -190,16 +195,14 @@
             <div class="header__right">
               {% if user.id is None %}
               <div class="header__right__auth">
-                <a href="{% url 'register' %}">Login</a>
-                <a href="{% url 'register' %}">Register</a>
+                <a href="{% url 'register' %}">Signin</a>
+                <a href="{% url 'register' %}">Signip</a>
               </div>
               {% else %}
               <div class="header__right__auth">
                 <a href="{% url 'profile' %}">{{ user.first_name }}</a>
-                
+ 
                 <a href="{% url 'logout' %}">logout</a>
-              
-                
               </div>
 
               {% endif %}
@@ -221,7 +224,7 @@
             </div>
           </div>
         </div>
-        <div class="canvas__open">
+        <div  class="canvas__open">
           <i class="fa fa-bars"></i>
         </div>
       </div>
@@ -232,6 +235,17 @@
       
       
       {% endblock %}
+      <script src="{% static 'user_static/js/jquery-3.3.1.min.js' %}"></script>
+      <script src="{% static 'user_static/js/bootstrap.min.js' %}"></script>
+      <script src="{% static 'user_static/js/jquery.magnific-popup.min.js' %}"></script>
+      <script src="{% static 'user_static/js/jquery-ui.min.js' %}"></script>
+      <script src="{% static 'user_static/js/mixitup.min.js' %}"></script>
+      <script src="{% static 'user_static/js/jquery.countdown.min.js' %}"></script>
+      <script src="{% static 'user_static/js/jquery.slicknav.js' %}"></script>
+      <script src="{% static 'user_static/js/owl.carousel.min.js' %}"></script>
+      <script src="{% static 'user_static/js/jquery.nicescroll.min.js' %}"></script>
+      <script src="{% static 'user_static/js/main.js' %}"></script>
+      <script src="{% static 'user_static/js/login.js' %}"></script>
   
         {% include 'includes/alerts.html'%}
 
@@ -278,5 +292,7 @@
         toast.show();
      }
      </script>
+
   </main>
+  
   
