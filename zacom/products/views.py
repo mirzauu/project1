@@ -147,6 +147,7 @@ def create_product_with_variant(request):
                 variant_name =' '.join(varient_value),
                 max_price  = max_price, 
                 sale_price  = sale_price, 
+                offer=sale_price,
                 stock  = stock, 
                 thumbnail_image = thumbnail_image
             )   
