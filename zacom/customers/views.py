@@ -69,7 +69,7 @@ def deactivate_customer(request, user_id):
 
 
 # address
-
+@login_required
 @never_cache 
 def Address_detail(request):
     user = request.user.id

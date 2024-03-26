@@ -3250,7 +3250,7 @@ ol {
 		width: 100%;
 		background: rgba(0, 0, 0, 0.7);
 		content: "";
-		z-index: 98;
+		z-index: 1000 ;
 		-webkit-transition: all, 0.5s;
 		-o-transition: all, 0.5s;
 		transition: all, 0.5s;

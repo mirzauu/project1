@@ -93,6 +93,7 @@
                                 
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
+                                        {% if transactions %}
                                         <thead>
                                             <tr>
                                                 <th>No</th>
@@ -112,6 +113,13 @@
                                                 <td>{{ i.created_at }}</td>
                                             </tr>
                                             {% endfor %}
+                                            {% else %}
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3" class="text-center">No transaction found. Add money to your wallet now</td>
+                                                </tr>
+                                            </tbody>
+                                            {% endif %}
                                         </tbody>
                                     </table>
                                 </div>

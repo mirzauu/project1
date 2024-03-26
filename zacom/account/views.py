@@ -47,46 +47,48 @@ def register(request):
                 myuser.is_admin     = False
                 myuser.is_superadmin = False
                 myuser.is_staff     = False
- 
                 myuser.save()
-            if code:
-                print(code,'ddddddd')
-                try:
-                    referral_user = ReferralUser.objects.get(code=code,is_active=True)
-                    referral_user.count += 1
-                    referral_user.save()
-                    referral_offer = ReferralOffer.objects.get(id=1)
-                    wallet, created = Wallet.objects.get_or_create(user=referral_user.user, defaults={'balance': 0})
-                    print(wallet)
-                    transactions = WalletTransaction.objects.filter(wallet=wallet)
-                    wallet.balance += referral_offer.Amount
-                    WalletTransaction.objects.create(wallet=wallet, amount=referral_offer.Amount, transaction_type='CREDIT')
-                    wallet.save()
-                    print(wallet.balance,'Wallet balance')
 
-                except ReferralUser.DoesNotExist:   
-                    messages.error(request,'invalid referral code')
-        
-              
-            # user activation
-            current_site=get_current_site(request)
-            mail_subject='please activate your account'
-            message = render_to_string('user_templates/verification.html',{
-                'user': myuser,
-                'domain' : current_site,
-                'uid' : urlsafe_base64_encode(force_bytes(myuser.pk)),
-                'token' : default_token_generator.make_token(myuser),
-            })
-            to_email = email
-            send_email = EmailMessage(mail_subject,message,to=[to_email])
-            send_email.send()
-            # messages.success(request,'Thank you for registering with us. We have sent you a verification email to your email address.Please verify it.')
-            return redirect('/accounts/register/?command=verification&email='+email)
+                if code:
+                    print(code,'ddddddd')
+                    try:
+                        referral_user = ReferralUser.objects.get(code=code,is_active=True)
+                        referral_user.count += 1
+                        referral_user.save()
+                        referral_offer = ReferralOffer.objects.get(id=1)
+                        wallet, created = Wallet.objects.get_or_create(user=referral_user.user, defaults={'balance': 0})
+                        print(wallet)
+                        transactions = WalletTransaction.objects.filter(wallet=wallet)
+                        wallet.balance += referral_offer.Amount
+                        WalletTransaction.objects.create(wallet=wallet, amount=referral_offer.Amount, transaction_type='CREDIT')
+                        wallet.save()
+                        print(wallet.balance,'Wallet balance')
+
+                    except ReferralUser.DoesNotExist:   
+                        messages.error(request,'invalid referral code')
+            
+                
+                # user activation
+                current_site=get_current_site(request)
+                mail_subject='please activate your account'
+                message = render_to_string('user_templates/verification.html',{
+                    'user': myuser,
+                    'domain' : current_site,
+                    'uid' : urlsafe_base64_encode(force_bytes(myuser.pk)),
+                    'token' : default_token_generator.make_token(myuser),
+                })
+                to_email = email
+                send_email = EmailMessage(mail_subject,message,to=[to_email])
+                send_email.send()
+                # messages.success(request,'Thank you for registering with us. We have sent you a verification email to your email address.Please verify it.')
+                return redirect('/accounts/register/?command=verification&email='+email)
     return render(request, 'user_templates/login.html',)
 
 
 @never_cache
 def login(request):
+    if 'chat_history' in request.session:
+            chat_history = request.session['chat_history']
 
     if request.user.is_authenticated:
         return redirect("home")
@@ -145,12 +147,15 @@ def login(request):
                             for item in cart_items:
                                 item.user = user
                                 item.cart = cart
-                                item.save()
+                                item.save()        
                 except:
                     pass
 
-
+         
                 auth.login(request,user)
+
+                if chat_history is not None:
+                    request.session['chat_history'] = chat_history 
                 
                 if request.GET.get('next'):
                     return redirect(request.GET.get('next'))

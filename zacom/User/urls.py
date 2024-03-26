@@ -35,9 +35,7 @@ urlpatterns = [
     path('invoice/<int:orderid>/',custview.invoice,name='invoice'),
     path('order/repay',custview.repay,name='repay'),
     path('paymenthandler3/',custview.paymenthandler3,name='paymenthandler3'),
-    
-
-
+ 
 # wallet
     path('wallet/',walletview.wallet,name='wallet'),
     path('paymenthandler2/',walletview.paymenthandler2,name='paymenthandler2'),

@@ -23,7 +23,7 @@ urlpatterns = [
     path('sales',views.sales,name='sales'),
 
 
-#Product management
+#Product managemento
 
   
     path("product/create/", productView.create_product, name="product-create"),

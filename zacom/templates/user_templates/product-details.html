@@ -132,7 +132,6 @@
     {% for i in related_product %}
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="product__item">
-            <a href="{% url 'product_detail' product_variant_slug=i.product_variant_slug %}">
                 <div class="product__item__pic set-bg" data-setbg="{{ i.thumbnail_image.url }}">
                     {% if i.stock <= 0 %}
                     <div class="label stockout">out of stock</div>
@@ -145,7 +144,7 @@
                     </ul>
                 </div>
                 <div class="product__item__text">
-                    <h6><a href="#">{{i.product}}<br>{{i.variant_name}}</a></h6>
+                    <h6><a href="{% url 'product_detail' product_variant_slug=i.product_variant_slug %}">{{i.product}}<br>{{i.variant_name}}</a></h6>
                     <div class="rating">
                         <i class="fa fa-star"></i>
                         <i class="fa fa-star"></i>
@@ -161,8 +160,7 @@
     {% endfor %}
 
 </div>
-</div>
-</section>
+
 <!-- Product Details Section End -->
 
 <!-- Footer Section Begin -->
@@ -243,9 +241,6 @@
 <!-- Search End -->
 
 <!-- Js Plugins -->
-
-</body>
-</html>
 
 <script>
     document.getElementById('addToCartBtn').addEventListener('click', function () {

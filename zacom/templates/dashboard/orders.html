@@ -84,6 +84,7 @@
                         <div class="col-lg-8">
                             <div class="table-responsive">
                                 <table class="table">
+                                    {% if order_dtails %}
                                     <thead>
                                         <tr>
                                             <th>Order</th>
@@ -102,6 +103,13 @@
                                         </tr>
                                         {% endfor %}
                                     </tbody>
+                                    {% else %}
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="text-center">No orders found. Place your first order now.</td>
+                                        </tr>
+                                    </tbody>
+                                    {% endif %}
                                 </table>
                             </div>
                         </div>

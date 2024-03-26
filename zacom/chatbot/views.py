@@ -51,7 +51,7 @@ def webhook_view(request):
             elif intent_name == 'SearchOrder':
                 print('ordeer')
                 # bot_response = search_order(intent_name, entities)
-                bot_response="i didn't get that 😔" 
+                bot_response="Oops, it seems I didn't catch that. Feel free to ask about a product, like 'Is iPhone 14 available?' Or, if you've placed an order, just share your order number, and I'll help you track it down." 
             else:
                 bot_response="i didn't get that 😔,its not in my control"   
 

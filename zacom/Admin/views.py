@@ -23,7 +23,8 @@ from django.utils import timezone
 import calendar
 from django.db.models import Q
 import pandas as pd
-from datetime import timedelta, datetime
+from datetime import timedelta
+import datetime
 from io import BytesIO
 from django.http import HttpResponse
 from django.db.models import Prefetch
@@ -530,28 +531,23 @@ def update_order_status(request):
     
 
 def update_orderitem_status(request):
-    print('--------')
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
             new_status = data.get('new_status')
-            print('=================')
+            
             # Update the order status
             order = OrderProduct.objects.get(id=order_id)
-            print('11')
             order_instance=Order.objects.get(id=order.order.id)
             user_id = request.user.id
             user_instance = Account.objects.get(id=user_id)
-            print('22') 
             wallet, created = Wallet.objects.get_or_create(user=user_instance)
-            print('ff')
             payment_order=order.order.payment
             method1=payment_order.payment_method
             method=str(method1)
          
-            print(method1)
-
             if new_status in ('Cancelled User', 'Cancelled Admin','Returned'):
                 discount = order_instance.additional_discount
                 total = order_instance.grand_total
@@ -571,16 +567,11 @@ def update_orderitem_status(request):
                     wallet.save()
                     WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
 
-                    print('5')
-
                 order_instance.additional_discount=0
                 order_instance.grand_total =Total
                 order_instance.order_total=Total
                 order_instance.save()
-        
-                
-               
-            print('++++++++++++++')
+       
             order.order_status = new_status
             order.save()
                 
@@ -596,23 +587,21 @@ def update_orderitem_status(request):
     
 
 def update_orderitem_status_admin(request):
-    print('----dd----')
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
             new_status = data.get('new_status')
-            print('=================')
+      
             # Update the order status
             order = OrderProduct.objects.get(id=order_id)
-            print('11')
             order_instance=Order.objects.get(id=order.order.id)
             user_id = order_instance.user.id
             user_instance = Account.objects.get(id=user_id)
-            print('22')
             wallet, created = Wallet.objects.get_or_create(user=user_instance)
 
-            print('ff')
+     
             payment_order=order.order.payment
             method1=payment_order.payment_method
             method=str(method1)

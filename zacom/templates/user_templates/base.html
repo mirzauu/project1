@@ -125,7 +125,7 @@
           </a>
         </li>
         <li>
-          <a href="#"
+          <a href="{% url 'cart' %}"
             ><span class="icon_bag_alt"></span>
             <div class="tip">{{cart_count}}</div>
           </a>
@@ -133,7 +133,7 @@
       </ul>
       <div class="offcanvas__logo">
         <a href="{% url 'home' %}"
-          ><img src="{% static 'user_static/img/logo.png' %}" alt=""
+          ><img src="{% static 'user_static/pixellogo.jpg' %}" alt=""
         /></a>
       </div>
       {% if user.id is None %}
@@ -164,7 +164,7 @@
           <div class="col-xl-3 col-lg-2 col-md-4 col-sm-6 col-12">
             <div class="header__logo">
               <a href="{% url 'home' %}"
-                ><img src="{% static 'user_static/img/logo.png' %}" alt=""
+                ><img src="{% static 'user_static/logo4.jpg' %}" style="height: 50px;" alt=""
               /></a>
             </div>
           </div>
@@ -175,7 +175,7 @@
                 <li><a href="#"></a></li>
                 <li><a href="#"></a></li>
                 <li><a href="{% url 'shop' %}">Shop</a></li>
-                <li>
+                <!-- <li>
                   <a href="#">Pages</a>
                   <ul class="dropdown">
                     <li>
@@ -185,9 +185,9 @@
                     <li><a href="./checkout.html">Checkout</a></li>
                     <li><a href="./blog-details.html">Blog Details</a></li>
                   </ul>
-                </li>
-                <li><a href="./blog.html">Blog</a></li>
-                <li><a href="./contact.html">Contact</a></li>
+                </li> -->
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Contact</a></li>
               </ul>
             </nav>
           </div>
@@ -196,7 +196,7 @@
               {% if user.id is None %}
               <div class="header__right__auth">
                 <a href="{% url 'register' %}">Signin</a>
-                <a href="{% url 'register' %}">Signip</a>
+                <a href="{% url 'register' %}">Signup</a>
               </div>
               {% else %}
               <div class="header__right__auth">
@@ -248,6 +248,7 @@
       <script src="{% static 'user_static/js/login.js' %}"></script>
   
         {% include 'includes/alerts.html'%}
+        
 
         <div class="position-fixed end-0 p-3" style="z-index: 11; top: 70px;">
           <div id="toastContainer"></div>

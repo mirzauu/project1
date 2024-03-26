@@ -50,7 +50,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price">${{i.product.apply_offer_discount}}</td>
+                                    <td class="cart__price">₹{{i.product.apply_offer_discount}}</td>
                                     <td class="cart__quantity">
                                         <div id='myform' method='POST' class='quantity d-flex' action='#'>
                                             <input type='button' value='-' class='qtyminus minus' field='quantity' onclick="updateQuantity('{{ i.id }}', -1)"  />
@@ -58,7 +58,7 @@
                                             <input type='button' value='+' class='qtyplus plus' field='quantity' onclick="updateQuantity('{{ i.id }}', 1)"  />
                                         </div>
                                     </td>
-                                    <td class="cart__total"  id="subtotal-{{ i.id }}">{{i.sub_total}}</td>
+                                    <td class="cart__total"  id="subtotal-{{ i.id }}">₹{{i.sub_total}}</td>
                                     <td class="cart__close"><a  onclick="deleteCartItem('{{ i.id }}')"><span class="icon_close"></span></a></td>
                                 </tr>       
                                 {% endfor %}
@@ -98,12 +98,12 @@
                     <div class="cart__total__procced">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span id="total" style="font-size: large;">$0.00</span></li>
+                            <li>Subtotal <span id="total" style="font-size: large;">₹0.00</span></li>
                             <li>Quantity <span id="quantity">Subtotal (0 items)</span></li>
-                            <li style="display: none;">Shipping <span id="shipping" style="font-size: large;">$0.00</span></li>
-                            <li>Discount <span id="Discount" style="font-size: large;">$0.00</span></li>
-                            <li style="display: none;">Tax <span id="tax" style="font-size: large;">$0.00</span></li>
-                            <li>Grand Total <span id="grandtotal" style="font-size: large;">$0.00</span></li>
+                            <li style="display: none;">Shipping <span id="shipping" style="font-size: large;">₹0.00</span></li>
+                            <li>Discount <span id="Discount" style="font-size: large;">₹0.00</span></li>
+                            <li style="display: none;">Tax <span id="tax" style="font-size: large;">₹0.00</span></li>
+                            <li>Grand Total <span id="grandtotal" style="font-size: large;">₹0.00</span></li>
                         </ul>
                         {% if limit == 0 %}
                         <a href="{% url 'order-review' %}" class="primary-btn">Proceed to checkout</a>
@@ -176,7 +176,7 @@ function formatCurrency(amount) {
     }
 
     // Use toFixed method on the parsedAmount
-    return `$${parsedAmount.toFixed(2)}`;
+    return `₹${parsedAmount.toFixed(2)}`;
 }
 
 
@@ -216,7 +216,7 @@ updateOrderSummary();
                 if (data.success) {
                     // Update the subtotal in your HTML
                     const subtotalElement = document.getElementById(`subtotal-${cartItemId}`);
-                    subtotalElement.innerText = `$${data.subtotal}`;
+                    subtotalElement.innerText = `₹${data.subtotal}`;
                     // Call the endpoint to update the order summary
                     updateOrderSummary();
                 } else {

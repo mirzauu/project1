@@ -203,7 +203,12 @@ class Paymentt(View):
             
             payment_methods_instance = PaymentMethod.objects.get(method_name="RAZORPAY")
             user_instance = Account.objects.get(id=user_id)
-            address = AdressBook.objects.get(is_default=True, user=user_instance)
+            try:
+                address = AdressBook.objects.get(is_default=True, user=user_instance)
+            except AdressBook.DoesNotExist:
+                address = None
+                messages.error(request, 'address not added')
+
             cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
             
             if cart_items.count()>=1:
@@ -300,7 +305,11 @@ def order_place_cod(request):
 
     user_instance = Account.objects.get(id=user_id)
 
-    address = AdressBook.objects.get(is_default=True, user=user_instance)
+    try:
+        address = AdressBook.objects.get(is_default=True, user=user_instance)
+    except AdressBook.DoesNotExist:
+        address = None
+        messages.error(request, 'address not added')
 
     cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
     
@@ -393,7 +402,12 @@ def order_place_Wallet(request):
 
     payment_methods_instance = PaymentMethod.objects.get(method_name="WALLET")
 
-    address = AdressBook.objects.get(is_default=True, user=user_instance)
+    
+    try:
+        address = AdressBook.objects.get(is_default=True, user=user_instance)
+    except AdressBook.DoesNotExist:
+        address = None
+        messages.error(request, 'address not added')
 
     cart_items = CartItem.objects.filter(user=user_instance, is_active=True)
   

@@ -29,11 +29,12 @@
 }
 
 .progresses ul li.blue {
-    color: #ff6232;
+    color: #000000;
     background-color: #3268ff;
 }
 
 .progresses ul li::after {
+  
     position: absolute;
     top: 35px;
     left: -15px;
@@ -117,6 +118,22 @@
 }
 
 </style>
+<style>
+    /* Define custom styles for the plus button */
+    #add-form-button {
+        display: inline-block;
+        width: 30px; /* Set width to desired size */
+        height: 30px; /* Set height to desired size */
+        text-align: center;
+        line-height: 30px; /* Center plus icon vertically */
+        border: 1px solid #ccc; /* Add border */
+        border-radius: 5px; /* Add border radius for rounded corners */
+    }
+    /* Style the plus icon */
+    #add-form-button i {
+        font-size: 20px; /* Set font size of the plus icon */
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Breadcrumb Begin -->
@@ -163,40 +180,47 @@
                         <h4 class="title">Address</h4>
                         <div class="container">
                             <a id="add-form-button"><i class="fa-solid fa-plus"></i></a>
-            
+        
                         </div>
                         <div id="form-container"></div>
                     </div>
                     <div class="content">
-                        <ul class="d-flex flex-column justify-content-center" >
-                            {% for i in adress %}
+                        <ul class="d-flex flex-column justify-content-center">
+                            {% if adress %}
+                                {% for i in adress %}
                                     <!-- Single Address Start -->
-                                
-                                <li class="d-flex flex-row p-2"  style="border-bottom: 1px solid #777777 ;">
-                                    <label for="address-{{ i.id }}" class="d-flex ">
-                                        <div class="flex-column" >
-                                            <div class="d-flex flex-row px-3 align-content-center " style="width: 400px; height: 100px;">
-                                                <input type="radio" class="address-radio" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}"style="width: 25px; height: 16px;position: relative;bottom: -15px" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %}  />
-                                                <div class="col pl-2">
-                                                    <h5>{{i.name}}<span> {{i.phone}}</span></h5>
-                                                    <div class="col">
-                                                        <span>{{i.street_address}}</span>,
-                                                        <span>{{i.city}}</span>,
-                                                        <span>{{i.state}}</span>,
-                                                        <span>{{i.country}}</span>,
-                                                        <span>{{i.pincode}}</span>
+                                    <li class="d-flex flex-row p-2" style="border-bottom: 1px solid #777777;">
+                                        <label for="address-{{ i.id }}" class="d-flex">
+                                            <div class="flex-column">
+                                                <div class="d-flex flex-row px-3 align-content-center" style="width: 400px; height: 100px;">
+                                                    <input type="radio" class="address-radio" onclick="sweet_alert('{{ i.id }}')" id="address-{{ i.id }}" style="width: 25px; height: 16px;position: relative;bottom: -15px" name="address" value="{{ i.id }}" {% if i.is_default %}checked{% endif %} />
+                                                    <div class="col pl-2">
+                                                        <h5>{{ i.name }}<span> {{ i.phone }}</span></h5>
+                                                        <div class="col">
+                                                            <span>{{ i.street_address }}</span>,
+                                                            <span>{{ i.city }}</span>,
+                                                            <span>{{ i.state }}</span>,
+                                                            <span>{{ i.country }}</span>,
+                                                            <span>{{ i.pincode }}</span>
+                                                        </div>
+                                                        <span>{{ i.phone }}</span>
                                                     </div>
-                                                    <span>{{i.phone}}</span>
                                                 </div>
-                                            </div>
-                                    </label>
-                                    
-                                </li>
-                            {% endfor %}
-                                    <!-- Single Address End  -->
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <!-- No address available message -->
+                                <div class="text-center py-3">
+                                    <p class="text-muted mb-0">You haven't added any addresses yet.</p>
+                                    <p class="text-muted mb-0">Click the button a bove to add a new address.</p>
+                                  
+                                </div>
+                            {% endif %}
+                            <!-- Single Address End  -->
                         </ul>
-                        
-                    </div> 
+                    </div>
+                    
                 </div>
                      
                 <div class="col-lg-4">
@@ -211,15 +235,15 @@
                                     {% for i in cart_items %}
                                     <li>{{i.product.get_product_name }}<br>
                                         {{i.product.variant_name}}
-                                        <span>${{i.sub_total}}</span></li>
+                                        <span>₹{{i.sub_total}}</span></li>
                                     {% endfor %}
                                 </ul>
                             </div>
                             <div class="checkout__order__total">
                                 <ul>
-                                    <li>Subtotal <span>${{total}}</span></li>
-                                    <li>Discount <span>${{discount}}</span></li>
-                                    <li>Total <span>${{grand_total}}</li>
+                                    <li>Subtotal <span>₹{{total}}</span></li>
+                                    <li>Discount <span>₹{{discount}}</span></li>
+                                    <li>Total <span>₹{{grand_total}}</li>
                                 </ul>
                             </div>
                     </div>
