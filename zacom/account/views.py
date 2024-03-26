@@ -87,6 +87,8 @@ def register(request):
 
 @never_cache
 def login(request):
+    
+    chat_history = None 
     if 'chat_history' in request.session:
             chat_history = request.session['chat_history']
 
