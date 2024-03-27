@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-8 col-lg-12">
+                <div class="col-xl-12 col-lg-12">
                     <div class="card mb-4">
                         <article class="card-body">
                             <h5 class="card-title">Sale statistics</h5>
@@ -91,7 +91,7 @@
                         </article>
                     </div>
                     <div class="row">
-                        <div class="col-lg-5">
+                        <div class="col-lg-4">
                             <div class="card mb-4">
                                 <article class="card-body">
                                     <h5 class="card-title">New Members</h5>
@@ -113,7 +113,7 @@
                                 </article>
                             </div>
                         </div>
-                        <div class="col-lg-7">
+                        <div class="col-lg-5">
                             <div class="card mb-4">
                                 <article class="card-body">
                                     <h5 class="card-title">Top selling products</h5>
@@ -133,6 +133,35 @@
                                                     <h6> {{ i.product_variant }} </h6>
                                                     <p>Unit Price: {{ i.product_price }}</p>
                                                     <p>Quantity Sold: {{ i.order_count }}</p>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                        <br>
+                                    </ul>
+                                </article>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="card mb-4">
+                                <article class="card-body">
+                                    <h5 class="card-title">Top selling Brand</h5>
+                                    <ul class=" list-unstyled font-sm">
+                                        {% for i in brand|slice:":5"   %}
+                                        <li class="">
+                                            <!-- <div class="event-timeline-dot">
+                                                <i class="font-xxl"></i>
+                                            </div> -->
+                                            <div class="media">
+                                                <div class="me-3">
+                                                    
+                                                    <img  src="{{ i.brand_image.url }}"  class="img-fluid" style="max-width: 100px;">
+                                                  
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6> {{ i.brand_name }} </h6>
+                                                
                                                     <br>
                                                 </div>
                                             </div>

@@ -333,7 +333,7 @@ def order_place_cod(request):
     # Create ShippingAddress instance
         address1 =[address.name,address.address_line_1,address.locality,address.city,address.state,address.country,address.pincode,address.phone]
 
-        payment = Payment.objects.create(user=user_instance,payment_method=payment_methods_instance,amount_paid=0,payment_status='SUCCESS')
+        payment = Payment.objects.create(user=user_instance,payment_method=payment_methods_instance,amount_paid=grand_total,payment_status='SUCCESS')
         
         
         draft_order= Order.objects.create(
@@ -390,6 +390,7 @@ def order_place_cod(request):
     context = {
                 'order_dtails' : draft_order,
                 'order_product' : order_dtails,
+                'address':cleaned_data
                 }
 
     return render (request,'user_templates/order_sucess.html',context)

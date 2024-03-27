@@ -356,33 +356,19 @@ def Coupon_edit(request,id):
     coupon_instance = get_object_or_404(Coupon, id=id)
     print(coupon_instance)
 
-    if request.method == "POST":
 
-            coupon_code = request.POST['coupon_code']
-            discount = int(request.POST['discount'])
-            amount = int(request.POST['amount'])  
-            user_limit = int(request.POST['user_limit']) 
-            expire_date = datetime.strptime(request.POST['expire_date'], '%Y-%m-%d').date()  
-            coupon_count = int(request.POST['coupon_count']) 
-            is_active = request.POST.get('is_active') == 'on' 
-            print(is_active)
-            if is_active:
-                is_active = False
-            else:
-                is_active = True
-
-            # Create and save the Coupon instance
-           
-            coupon_instance.coupon_code=coupon_code
-            coupon_instance.is_expired=is_active
-            coupon_instance.discount=discount
-            coupon_instance.minimum_amount=amount
-            coupon_instance.max_uses=user_limit
-            coupon_instance.expire_date=expire_date
-            coupon_instance.total_coupons=coupon_count
-            coupon_instance.save()
-
-            messages.error(request, 'coupon edited.')
-            return redirect('admin-coupon')
+    if coupon_instance.is_expired:
+        coupon_instance.is_expired = False
+        action = "deactivated"
+        messages.error(request, 'coupon activated.')
+    else:
+        coupon_instance.is_expired = True
+        action = "activated"
+        messages.error(request, 'coupon deactivated.')
     
-    return render(request, "admin_templates/coupon_edit.html",{'coupon_instance':coupon_instance})
+    coupon_instance.save()
+
+           
+
+    return redirect('admin-coupon')
+   

@@ -274,24 +274,26 @@ class Coupon(models.Model):
     expire_date         = models.DateField()
     total_coupons       = models.IntegerField(default=0)
 
+
     
     # if number of the coupon is 0 or the expired date is over set it as expired
 
     def save(self, *args, **kwargs):
         # Get the current date
-        current_date = datetime.now().date()
-        if self.is_expired==False:
-            # Convert expire_date to a date object if it's a string
-            if isinstance(self.expire_date, str):
-                self.expire_date = datetime.strptime(self.expire_date, '%Y-%m-%d').date()
+        # current_date = datetime.now().date()
+        # if self.is_expired==False:
+        #     # Convert expire_date to a date object if it's a string
+        #     if isinstance(self.expire_date, str):
+        #         self.expire_date = datetime.strptime(self.expire_date, '%Y-%m-%d').date()
             
-            # Compare expire_date with current_date
-            if self.total_coupons <= 0 or self.expire_date < current_date:
-                self.is_expired = True
-            else:
-                self.is_expired = False
-        else:
-             self.is_expired = True       
+        #     # Compare expire_date with current_date
+        #     if self.total_coupons <= 0 or self.expire_date < current_date:
+        #         self.is_expired = True
+        #     else:
+        #         self.is_expired = False
+        # else:
+        #      self.is_expired = True     
+          
             
         # Save the instance
         super().save(*args, **kwargs)

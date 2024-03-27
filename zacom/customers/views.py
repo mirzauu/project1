@@ -273,9 +273,7 @@ def orders_detail(request,product_id):
 
     if request.user.is_authenticated:
         user = request.user.id
-
-        print('===================================')
-    
+        
         order_dtails=OrderProduct.objects.filter(user=user,id=product_id)
 
         order_dt=OrderProduct.objects.get(user=user,id=product_id)

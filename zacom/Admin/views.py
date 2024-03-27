@@ -59,7 +59,7 @@ def adminhome(request):
     print(orders,'ffff')
     count = orders.__len__()
     revenue = OrderProduct.objects.filter(order_status='Delivered').aggregate(total_revenue=Sum('grand_totol'))['total_revenue'] or 0
-
+    brand= Brand.objects.all()
     chart_month = []
     new_users = []
     orders_count= []
@@ -115,7 +115,7 @@ def adminhome(request):
     products_count = Product.objects.all().__len__
     categories_count = Category.objects.all().__len__
     payment_statuses = Payment.payment_status
-    context={'revenue':revenue, 'count':count, 'orders':all_orders,'date':date,'order_filter':order_filter, 'users':Account.objects.all(), 'month' : chart_month, 'new_users':new_users, 'orders_count':orders_count,'payment_statuses':payment_statuses, 'sorted_product_attributes':product_variant_counts, 'monthly_earning':monthly_earning, 'products_count':products_count, 'categories_count':categories_count}
+    context={'revenue':revenue, 'count':count, 'orders':all_orders,'date':date,'order_filter':order_filter, 'users':Account.objects.all(), 'month' : chart_month, 'new_users':new_users, 'orders_count':orders_count,'payment_statuses':payment_statuses, 'sorted_product_attributes':product_variant_counts, 'monthly_earning':monthly_earning, 'products_count':products_count, 'categories_count':categories_count , 'brand':brand}
     
     return render(request,"admin_templates/admin-home.html",context)
 
@@ -455,7 +455,7 @@ def orderlist(request):
 
 @never_cache 
 def orderdetail(request,order_id):
-    
+    print(1)
     order = Order.objects.get(id=order_id)
     
     order_products = OrderProduct.objects.filter(order=order)
@@ -470,8 +470,7 @@ def orderdetail(request,order_id):
     grand_total=0
 
     for i in order_products:
-        if i.order_status not in ('Cancelled Admin', 'Cancelled User','Returned'):        
-            grand_total += i.grand_totol
+        grand_total == i.grand_totol
         user=i.user
         address=i.order.shipping_address
     cleaned_string = address.replace('[', '').replace(']', '')
@@ -567,10 +566,7 @@ def update_orderitem_status(request):
                     wallet.save()
                     WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
 
-                order_instance.additional_discount=0
-                order_instance.grand_total =Total
-                order_instance.order_total=Total
-                order_instance.save()
+             
        
             order.order_status = new_status
             order.save()
@@ -629,11 +625,6 @@ def update_orderitem_status_admin(request):
 
                     print('5')
 
-                order_instance.additional_discount=0
-                order_instance.grand_total =Total
-                order_instance.order_total=Total
-                order_instance.save()
-        
                 
                
             print('++++++++++++++')
@@ -673,6 +664,31 @@ def order_return_approve(request,return_id):
     order = OrderProduct.objects.get(id=product_id)
     order.order_status = 'Returned'
     order.save()
+
+    order_instance=Order.objects.get(id=order.order.id)
+
+    payment_order=order.order.payment
+    method1=payment_order.payment_method
+    method=str(method1)
+
+    discount = order_instance.additional_discount
+    total = order_instance.grand_total
+    order_total = order_instance.order_total
+    Total= order_total + discount
+    Total-= order.grand_totol
+    walletamount = order.grand_totol-discount
+
+
+    user_instance = Account.objects.get(id=order.user.id)
+    wallet, created = Wallet.objects.get_or_create(user=user_instance)
+
+    if method != 'CASH ON DELIVERY':
+        wallet.balance += walletamount
+        wallet.save()
+        WalletTransaction.objects.create(wallet=wallet, amount=walletamount, transaction_type='CREDIT',transaction_detail='Refund')
+
+
+
 
     product=order.product_id
     product_instance=Product_Variant.objects.get(id=product)
