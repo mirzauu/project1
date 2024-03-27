@@ -31,13 +31,13 @@
                     <a class="nav-link rounded-5" href="{% url 'order' %}">Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active rounded-5" href="{% url 'wallet' %}">Wallet</a>
+                    <a class="nav-link  rounded-5" href="{% url 'wallet' %}">Wallet</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link rounded-5" href="{% url 'coupon-detail' %}">Coupon</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-5" href="{% url 'referral-detail' %}">Referral</a>
+                    <a class="nav-link active rounded-5" href="{% url 'referral-detail' %}">Referral</a>
                 </li>
             </div>
         </div>
@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-lg-8 col-md-7">
                             <div class="table_page table-responsive">
-                                <div class="container d-flex justify-content-between align-items-center" style="border: 2px solid #b6a8a8; border-radius: 10px; padding: 10px; height: 100px; background-color: #f9f9f9; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                <div class=" d-flex justify-content-between align-items-center" style="border: 2px solid #b6a8a8; border-radius: 10px; padding: 10px; height: 100px; background-color: #f9f9f9; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                                     <div class="d-flex align-items-center gap-4">
                                         <p style="font-size: 16px; color: #333; margin: 0;">Invited:</p>
                                         <p style="font-size: 20px; font-weight: bold; color: #666; margin: 0;">{{ referral.count }}</p>

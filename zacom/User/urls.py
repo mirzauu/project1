@@ -53,6 +53,7 @@ urlpatterns = [
     path('wishlist/',cartview.wishlist,name='wishlist'),
     path('wishlist/add/<int:product_id>/',cartview.wishlist_add,name='wishlist-add'),
     path('wishlist/delete/<int:product_id>/',cartview.wishlist_remove,name='wishlist-delete'),
+    path('wishlist/cartadd/<int:product_id>/',cartview.wishlist_cart_add,name='wishlist_cart_add'),
 
 # order
     path('order-address/',orderview.Address.as_view(),name='order-address'),

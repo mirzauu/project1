@@ -479,3 +479,51 @@ def wishlist_remove(request, product_id):
         pass
         
     return redirect('wishlist')
+
+@login_required(login_url='login')
+def wishlist_cart_add(request, product_id):
+    current_user = request.user
+    product = Product_Variant.objects.get(id=product_id)    #get the product
+    
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request)) # to get the cartid present in the session
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(
+            cart_id=_cart_id(request)
+        )
+    cart.save()
+ 
+    try:
+        cart_item = CartItem.objects.get(product=product,user=current_user)
+        print('1stttttttttttttttttttttt')
+        maxstock=cart_item.quantity + 1
+        if maxstock <= product.stock:
+            cart_item.quantity += 1
+            cart_item.save()
+            messages.error(request, 'Added to cart')
+        else:
+            messages.error(request, 'Stock limit exceed')
+
+
+    except CartItem.DoesNotExist:
+        print('12stttttttttttttttttttttt')
+        if 1 <= product.stock:
+            cart_item = CartItem.objects.create(
+                product=product,
+                user=current_user,
+                cart=cart,
+                quantity = 1,
+            )
+            cart_item.save()
+            messages.error(request, 'Added to cart')
+        else:
+            messages.error(request, 'Stock limit exceed')
+    try:
+     
+        wishlist_instance= Wishlist.objects.get(user=current_user)
+        wishlist_instance.product.remove(product)
+        
+
+    except Wishlist.DoesNotExist:
+        pass        
+    return redirect('wishlist')        

@@ -326,12 +326,12 @@ input.qtyminus { width:15px; height:15px;}
                 console.log(razorpayKeyId);
                 console.log(paymentAmount);
                 console.log(paymentOrderId);
-                var callbackURL = `http://127.0.0.1:8000/paymenthander/`;
+                var callbackURL = `https://mirsa.online/paymenthander/`;
                 var options = {
                     
                     "key": "rzp_test_vAeyohaspEahRA", // Enter the Key ID generated from the Dashboard
                     "amount": paymentAmount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                    "name": "ASHION",
+                    "name": "Pixeldot",
                     "description": "Test Transaction",
                     "image": "https://example.com/your_logo",
                     "order_id": paymentOrderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1

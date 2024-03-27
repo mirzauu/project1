@@ -54,6 +54,7 @@
                                     <td class="cart__price">${{i.sale_price}}</td>
                                     
                                     <td class="cart__total"  id="subtotal-{{ i.id }}">{{i.sub_total}}</td>
+                                    <td class="cart__close"><a href="{% url 'wishlist_cart_add' product_id=i.id %}"><span class="fa-solid fa-cart-plus"></span></a></td>
                                     <td class="cart__close"><a href="{% url 'wishlist-delete' product_id=i.id %}"><span class="icon_close"></span></a></td>
                                 </tr>       
                                 {% endfor %}
@@ -289,6 +290,7 @@ updateOrderSummary();
     }
 
 </script> -->
+
 
 <style>
     /* Style for the quantity input container */
