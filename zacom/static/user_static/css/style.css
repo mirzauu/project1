@@ -3277,6 +3277,7 @@ ol {
 	.offcanvas-menu-wrapper.active {
 		opacity: 1;
 		left: 0;
+		z-index: 1000;
 	}
 	.offcanvas__close {
 		position: absolute;
@@ -3445,6 +3446,7 @@ ol {
 	.offcanvas-menu-wrapper.active {
 		opacity: 1;
 		left: 0;
+		z-index: 1000;
 	}
 	.offcanvas__close {
 		position: absolute;
